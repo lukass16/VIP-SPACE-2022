@@ -5,12 +5,15 @@
 #include <heltec.h>
 #include <WiFi.h>
 
-//!failsafe
+//some links used
 //https://github.com/m1k0s/ESP32-HelloWorld3D/blob/master/include/display.h
 //https://randomnerdtutorials.com/esp32-web-server-arduino-ide/
 
+//define oled object
 U8X8_SSD1306_128X64_NONAME_SW_I2C oled(15, 4, 16);
 
+
+//definitions for LoRa
 #define SS 18
 #define RST 14
 #define DI0 26
@@ -19,8 +22,8 @@ int syncWord = 0xF3;
 byte _localAddress = 0xFF; // address of this device
 byte _destination = 0xFF;  // destination to send to
 
-//!wifi
 
+//*definitions for wifi
 const char *ssid = "Tele2-8c311";
 const char *password = "8g6ihj47rb2";
 
@@ -36,8 +39,9 @@ unsigned long currentTime = millis();
 unsigned long previousTime = 0;
 // Define timeout time in milliseconds (example: 2000ms = 2s)
 const long timeoutTime = 2000;
-//!
+//*wifi end
 
+//lora message function (this can be read by the current LoPy implementation)
 void sendMessage(String outgoing, int lora_message_id)
 {
 	LoRa.beginPacket();			   // start packet
@@ -52,20 +56,20 @@ void sendMessage(String outgoing, int lora_message_id)
 void setup()
 {
 	Serial.begin(115200);
+	Serial.println("Heltec test");
+
+	//oled setup
 	oled.begin();
 	oled.setFont(u8x8_font_chroma48medium8_r);
-	Serial.println("LoRa Receiver");
 	oled.drawString(1, 3, "Shalom");
 
 	//Lora
 	SPI.begin(5, 19, 27, 18);
 	LoRa.setPins(SS, RST, DI0);
-
 	if (!LoRa.begin(433E6))
 	{
 		Serial.println("Starting LoRa failed!");
-		while (1)
-			;
+		while (1);
 	}
 
 	//setting paramaters
@@ -77,7 +81,7 @@ void setup()
 
 	Serial.println("Lora initialized!");
 
-	//!wifi
+	//*wifi setup
 	// Connect to Wi-Fi network with SSID and password
 	Serial.print("Connecting to ");
 	Serial.println(ssid);
@@ -93,16 +97,17 @@ void setup()
 	Serial.println("IP address: ");
 	Serial.println(WiFi.localIP());
 	server.begin();
-	//!
+	//*wifi end
 }
 
 void loop()
 {
+	//uncomment to send messages
 	//sendMessage("Lora message", 0);
 	//delay(1000);
 	//Serial.println("Sent");
 
-	//!wifi
+	//*wifi functionality - paste ip adress into browser to see webpage
 	WiFiClient client = server.available(); // Listen for incoming clients
 
 	if (client)
@@ -144,7 +149,7 @@ void loop()
 						client.println(".button2 {background-color: #555555;}</style></head>");
 
 						// Web Page Heading
-						client.println("<body><h1>Kukaracha</h1>");
+						client.println("<body><h1>Chau Monika</h1>");
 						client.println("</body></html>");
 						client.println();
 						// Break out of the while loop
@@ -168,5 +173,5 @@ void loop()
 		Serial.println("Client disconnected.");
 		Serial.println("");
 	}
-//!
+	//*wifi end
 }
