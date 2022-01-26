@@ -19,6 +19,7 @@
 * */
 
 #define LoRa_frequency      433E6
+#define GPS_BAND_RATE      9600
 
 
 #define UNUSE_PIN                   (0)
@@ -165,3 +166,9 @@
 #else
 //#error "Please select the version you purchased in utilities.h"
 #endif
+
+void initBoard()
+{
+    Serial.println("initBoard");
+    Serial1.begin(GPS_BAND_RATE, SERIAL_8N1, GPS_RX_PIN, GPS_TX_PIN);
+}
