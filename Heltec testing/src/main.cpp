@@ -73,7 +73,7 @@ void setup()
 	}
 
 	//setting paramaters
-	LoRa.setSyncWord(0xF3);
+	LoRa.setSyncWord(0xF3); 
 	LoRa.setTxPower(14);
 	LoRa.setSpreadingFactor(10);
 	LoRa.setCodingRate4(6);
