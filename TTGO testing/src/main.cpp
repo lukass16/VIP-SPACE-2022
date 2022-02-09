@@ -3,6 +3,7 @@
 #include <SPI.h>
 #include "utilities.h"
 #include <TinyGPS++.h>
+#include "barometer_wrapper.h"
 
 //https://github.com/Xinyuan-LilyGO/LilyGo-LoRa-Series/blob/master/examples/ArduinoLoRa/LoRaSender/LoRaSender.ino
 
@@ -31,7 +32,10 @@ void setup()
 	Serial.println("TTGO test");
 
 	initBoard();
+	Wire.begin(I2C_SDA, I2C_SCL);
 	delay(1500);
+
+	barometer::setup();
 
 	SPI.begin(RADIO_SCLK_PIN, RADIO_MISO_PIN, RADIO_MOSI_PIN);
 	LoRa.setPins(RADIO_CS_PIN, RADIO_RST_PIN, RADIO_DI0_PIN);
@@ -66,6 +70,9 @@ void loop()
 		while (true)
 			;
 	}
+
+	//*barometer
+	barometer::readSensor();
 
 	//*LORA
 	//sendMessage("Hello", 0);
