@@ -73,7 +73,7 @@ void setup()
 	}
 
 	//setting paramaters
-	LoRa.setSyncWord(0xF3);
+	LoRa.setSyncWord(0xF3); 
 	LoRa.setTxPower(14);
 	LoRa.setSpreadingFactor(10);
 	LoRa.setCodingRate4(6);
@@ -149,7 +149,7 @@ void loop()
 						client.println(".button2 {background-color: #555555;}</style></head>");
 
 						// Web Page Heading
-						client.println("<body><h1>Chau Monika</h1>");
+						client.println("<body><h1>Chau, Lukass :)</h1>");
 						client.println("</body></html>");
 						client.println();
 						// Break out of the while loop
