@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <SimpleKalmanFilter.h>
+#include <Kalman.h>
 
 void setup() {
   Serial.begin(115200);
