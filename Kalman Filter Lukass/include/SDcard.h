@@ -22,10 +22,7 @@ namespace SDcard
         {
             Serial.println("SD Card Mount Failed");
         }
-        else
-            Serial.println("SD connected");
-
-        myFile = SD.open("/altitude.txt"); // Re-open the file for reading:
+        else Serial.println("SD connected");
     }
 
     String readline()
@@ -49,6 +46,11 @@ namespace SDcard
             String err = "ERROR: File not open";
             return err;
         }
+    }
+
+    void openFile()
+    {
+        myFile = SD.open("/altitude.txt"); // Re-open the file for reading:
     }
 
     void closeFile()
