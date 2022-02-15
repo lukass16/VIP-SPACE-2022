@@ -10,6 +10,7 @@
 #define SD_cs 25
 
 File myFile;
+File stateFile;
 
 namespace SDcard
 {
@@ -56,6 +57,16 @@ namespace SDcard
     void closeFile()
     {
         myFile.close(); // close the file:
+    }
+
+    void saveStateToFile(float p, float v, float a)
+    {
+        stateFile = SD.open("/filtered.txt", FILE_APPEND); // Re-open the file for reading:
+        char buffer[40] = "";
+        String state = String(p, 2) + "," + String(v, 2) + "," + String(a, 2);
+        state.toCharArray(buffer, 40);
+        stateFile.println(buffer);
+        stateFile.close(); // close the file:
     }
 
 }

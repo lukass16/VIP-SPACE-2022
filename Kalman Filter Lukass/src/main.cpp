@@ -20,6 +20,11 @@ void nextMeasurement()
 	Serial.println("P_baro: " + String(p_baro) + " T_sensor: " + String(t_sensor, 5));
 }
 
+void saveState()
+{
+	SDcard::saveStateToFile(kalman::getKalmanPosition(), kalman::getKalmanVelocity(), kalman::getKalmanAcceleration());
+}
+
 void setup()
 {
 	Serial.begin(115200);
@@ -42,9 +47,11 @@ void loop()
 
 	kalman::updateBaro(p_baro); // this doesn't necessarily have to be done right before prediction (extrapolation) but can be just done every time a new reading is available
 
-	kalman::printKalmanState();
-	kalman::printPostionUncertainty();
+	//kalman::printKalmanState();
+	//kalman::printPostionUncertainty();
+	saveState();
 
+	//TODO - fix large error at start
 	if(t_prev_sensor == t_sensor)
 	{
 		SDcard::closeFile();

@@ -8,9 +8,9 @@ using namespace BLA;
 
 namespace kalman {
 
-    BLA::Matrix<3, 3> Q = {0.01, 0, 0, //*Process Noise Uncertainty - how confident are you that the process is correct i.e. that the estimation model is valid
-                           0, 0.01, 0,
-                           0, 0, 0.01};
+    BLA::Matrix<3, 3> Q = {0.001, 0, 0, //*Process Noise Uncertainty - how confident are you that the process is correct i.e. that the estimation model is valid
+                           0, 0.001, 0,
+                           0, 0, 0.001};
 
     BLA::Matrix<1, 1> R_Baro = {0.0327}; //*Measurement Uncertainty - Variance in sensor measurement
 
