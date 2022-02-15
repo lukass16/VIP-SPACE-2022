@@ -1,48 +1,36 @@
 #include "Kalman.h"
 
+//https://www.youtube.com/watch?v=G2Ohf9GpHf4
+//https://www.kalmanfilter.net/multiSummary.html
+
 using namespace BLA;
 
-BLA::Matrix<4, 4> Q = {1, 0,0,0,
-                        0, 1,0,0,
-                        0, 0,1,0,
-                        0, 0,0,1,
-                          };
+BLA::Matrix<3, 3> Q = {0.01, 0, 0, //*Process Noise Uncertainty - how confident are you that the process is correct i.e. that the estimation model is valid
+                       0, 0.01, 0,
+                       0, 0, 0.01};
 
-BLA::Matrix<1, 1> R_Baro = {10};
+BLA::Matrix<1, 1> R_Baro = {0.0327}; //*Measurement Uncertainty - Variance in sensor measurement 
 
-BLA::Matrix<1, 1> R_GPS = {100};
-
-BLA::Matrix<4, 1> X = {
-    5,
-    0,
-    -9.81,
-    0
+BLA::Matrix<3, 1> X = {
+    0, //p
+    0, //v
+    0  //a
 };
 
-BLA::Matrix<4, 4> P = {10, 0,0,0,
-                       0, 1,0,0,
-                       0, 0,1,0,
-                       0, 0,0,100};
+BLA::Matrix<3, 3> P = {1, 0, 0, //*Estimate Uncertainty
+                       0, 1, 0,
+                       0, 0, 1};
 
-BLA::Matrix<4, 4> I = {1, 0,0,0,
-                       0, 1,0,0,
-                       0, 0,1,0,
-                       0, 0,0,1};
+BLA::Matrix<3, 3> I = {1, 0, 0,
+                       0, 1, 0,
+                       0, 0, 1};
 
-BLA::Matrix<1, 4> H_Baro = {1, 0, 0, 1};
-BLA::Matrix<1, 4> H_GPS = {1, 0, 0, 0};
+BLA::Matrix<1, 3> H_Baro = {1, 0, 0}; //*Observation Matrix - matches feature space of state vector to measurement (z = Hx)
 
-BLA::Matrix<4, 4> F;
+BLA::Matrix<3, 3> F;
 
 BLA::Matrix<1, 1> Z_Baro;
-BLA::Matrix<4, 1> K_Baro;
-
-BLA::Matrix<1, 1> Z_GPS;
-BLA::Matrix<4, 1> K_GPS;
-
-
-BLA::Matrix<2, 1> B;
-BLA::Matrix<1, 1> U;
+BLA::Matrix<3, 1> K_Baro; //*Kalman Gain
 
 //defining inverse function
 
@@ -59,7 +47,7 @@ float delT = 0.0f;
 
 bool isFirstStep = true;
 
-void predict(float accel)
+void predict()
 {
   	currentTime = micros();
   	delT = (currentTime - prevTime) / 1000000.0f;
@@ -68,43 +56,28 @@ void predict(float accel)
 
   	if (!isFirstStep)
   	{
-    	F = {
-        	1, delT,-(delT*delT)/2.0, 0,
-        	0, 1, -delT, 0,
-        	0, 0, 1, 0,
-        	0, 0, 0, 1};
+		//*State Transition Matrix
+    	F = {							
+        	1, delT, (delT*delT)/2.0,
+        	0, 1, delT,
+        	0, 0, 1};
 
-    	B = {delT * delT / 2.0, 
-        	delT,
-        	0,
-        	0};
-    
-    	U = {accel};
-
-    	X = F * X + B * U;
-    	P = F * P * ~F + Q;
+		//*State Extrapolation Equation
+    	X = F * X;
+    	P = F * P * ~F + Q; //*to be more accurate the Q matrix would be scaled with delT 
   	}
   	isFirstStep = false;
 }
 
 void updateBaro(float altitude)
 {
+	predict();
   	Z_Baro = {altitude};
-  	K_Baro = P * ~H_Baro * Inverse(H_Baro * P * ~H_Baro + R_Baro);
+  	K_Baro = P * ~H_Baro * Inverse(H_Baro * P * ~H_Baro + R_Baro); //*Compute the Kalman Gain
 
-  	X = X + K_Baro * (Z_Baro - H_Baro * X);
-  	P = (I - K_Baro * H_Baro) * P * (~(I - K_Baro * H_Baro)) + K_Baro * R_Baro * ~K_Baro;
+  	X = X + K_Baro * (Z_Baro - H_Baro * X); //*Update estimate with measurement
+  	P = (I - K_Baro * H_Baro) * P * (~(I - K_Baro * H_Baro)) + K_Baro * R_Baro * ~K_Baro; //*Update the estimate uncertainty
 }
-
-void updateGPS(float gpsAltitude)
-{
-  	Z_GPS = {gpsAltitude};
-  	K_GPS = P * ~H_GPS * Inverse(H_GPS * P * ~H_GPS + R_GPS);
-
-  	X = X + K_GPS * (Z_GPS - H_GPS * X);
-  	P = (I - K_GPS * H_GPS) * P * (~(I - K_GPS * H_GPS)) + K_GPS * R_GPS * ~K_GPS;
-}
-
 
 float getKalmanPosition() {
   	return X(0,0);
@@ -114,14 +87,10 @@ float getKalmanVelocity() {
   	return X(1,0);
 }
 
-
-float getKalmanGravity() {
+float getKalmanAcceleration() {
   	return X(2,0);
 }
 
-float getKalmanBias() {
-  	return X(3,0);
-}
 
 
 
