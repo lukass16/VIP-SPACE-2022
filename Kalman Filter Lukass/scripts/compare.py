@@ -16,17 +16,37 @@ import csv
 #    Reading the .txt, putting it in a pandas dataframe
 #----------------------------------------------------------------------------
 
-fdata = pd.read_csv("filtered.TXT", sep = ',')
-data = pd.read_csv("altitudeEx.TXT", sep = ',')
+#
+
+fin = open("mon.txt", 'r')
+fout = open("moncrop2.txt", 'w')
+
+for i,line in enumerate(fin.readlines()):
+    if i % 20 == 0:
+        fout.write(line)
+
+fdata = pd.read_csv("moncrop2.TXT", sep = ';')
+# Extracting the time and altitude parameters by their indexes
+p = fdata["P"].to_list()
+t = fdata["T"].to_list()
+
+
+df = pd.DataFrame(data=[p,t])
+
+df.to_csv("data.csv")
+
+
 
 # Extracting the time and altitude parameters by their indexes
 p = fdata["P"].to_list()
-v = fdata["V"].to_list()
-a = fdata["A"].to_list()
+t = fdata["T"].to_list()
 
-p_data = data["P"].to_list()
-t = data["T"].to_list()
+#plt.plot(t, p)
 
+#Finding the length of the lists
+print("There are "+str(len(p))+" data points of positon")
+print("There are "+str(len(t))+" data points of time")
+'''
 #Finding the length of the lists
 print("There are "+str(len(p))+" data points of positon")
 print("There are "+str(len(t))+" data points of time")
@@ -35,9 +55,11 @@ print("There are "+str(len(t))+" data points of time")
 plt.figure(1)
 
 plt.plot(t, p, color="r", label = "Filtered Altitude [m]")
-plt.plot(t, p_data, color="b", label = "Raw Altitude [m]")
+#plt.plot(t, p_data, color="b", label = "Raw Altitude [m]")
 plt.legend()
 plt.show()
+'''
+
 '''
 #----------------------------------------------------------------------------
 #    Cropping the data by index
