@@ -16,18 +16,28 @@ import csv
 #    Reading the .txt, putting it in a pandas dataframe
 #----------------------------------------------------------------------------
 
-data = pd.read_csv("filtered.TXT",sep = ',')
+fdata = pd.read_csv("filtered.TXT", sep = ',')
+data = pd.read_csv("altitudeEx.TXT", sep = ',')
 
 # Extracting the time and altitude parameters by their indexes
-p = data["P"].to_list()
-v = data["V"].to_list()
-a = data["A"].to_list()
+p = fdata["P"].to_list()
+v = fdata["V"].to_list()
+a = fdata["A"].to_list()
+
+p_data = data["P"].to_list()
+t = data["T"].to_list()
 
 #Finding the length of the lists
 print("There are "+str(len(p))+" data points of positon")
+print("There are "+str(len(t))+" data points of time")
 
-plt.plot(p)
 
+plt.figure(1)
+
+plt.plot(t, p, color="r", label = "Filtered Altitude [m]")
+plt.plot(t, p_data, color="b", label = "Raw Altitude [m]")
+plt.legend()
+plt.show()
 '''
 #----------------------------------------------------------------------------
 #    Cropping the data by index

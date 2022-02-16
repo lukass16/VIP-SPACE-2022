@@ -30,13 +30,15 @@ void setup()
 	Serial.begin(115200);
 	Serial.println("Kalman Filter tests");
 	SDcard::setup();
-	SDcard::setStateFile("filtered5.txt");
-
+	
 	SDcard::openFile();
+	SDcard::openStateFile();
 	nextMeasurement();
+	
 
 	//kalman::predict();
 	//SDcard::closeFile();
+	//SDcard::setStateFile("/filtered9.txt");
 }
 
 void loop()
@@ -56,6 +58,7 @@ void loop()
 	if(t_prev_sensor == t_sensor)
 	{
 		SDcard::closeFile();
+		SDcard::closeStateFile();
 		while(1);
 	}
 }
