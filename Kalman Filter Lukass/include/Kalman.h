@@ -49,12 +49,21 @@ namespace kalman {
 
     bool isFirstStep = true;
 
+    //*TESTING
+    void setDelT(float t_change)
+    {
+        delT = t_change;
+    }
+
     void predict()
     {
+        //*Replaced by setDelT()
+        /*
         currentTime = micros();
         delT = (currentTime - prevTime) / 1000000.0f;
         //data.loopTime = delT;
         prevTime = currentTime;
+        */
 
         if (!isFirstStep)
         {

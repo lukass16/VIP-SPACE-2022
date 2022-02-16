@@ -11,6 +11,7 @@
 
 File myFile;
 File stateFile;
+String stateFileName = "/filtered.txt";
 
 namespace SDcard
 {
@@ -59,9 +60,16 @@ namespace SDcard
         myFile.close(); // close the file:
     }
 
+    void setStateFile(String filename)
+    {
+        stateFileName = "/" + filename;
+        stateFile = SD.open(stateFileName, FILE_WRITE); // Open the file, rewrites a file with the same name
+        stateFile.close();
+    }
+
     void saveStateToFile(float p, float v, float a)
     {
-        stateFile = SD.open("/filtered.txt", FILE_APPEND); // Re-open the file for reading:
+        stateFile = SD.open(stateFileName, FILE_APPEND); // Re-open the file for reading:
         char buffer[40] = "";
         String state = String(p, 2) + "," + String(v, 2) + "," + String(a, 2);
         state.toCharArray(buffer, 40);
