@@ -11,7 +11,7 @@
 
 File myFile;
 File stateFile;
-String stateFileName = "/filtered2.txt";
+String stateFileName = "/filteredScaleQ3.txt";
 bool firstWriteStateFile = 1;
 
 namespace SDcard
@@ -53,7 +53,7 @@ namespace SDcard
 
     void openFile()
     {
-        myFile = SD.open("/altitude.txt"); // Re-open the file for reading:
+        myFile = SD.open("/altitude3.txt"); // Re-open the file for reading:
     }
 
     void closeFile()
@@ -69,6 +69,11 @@ namespace SDcard
     void closeStateFile()
     {
         stateFile.close();
+    }
+
+    int fileAvailable()
+    {
+        return myFile.available();
     }
 
     void saveStateToFile(float p, float v, float a)

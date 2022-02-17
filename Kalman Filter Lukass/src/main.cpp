@@ -55,7 +55,7 @@ void loop()
 	saveState();
 
 	//TODO - fix large error at start
-	if(t_prev_sensor == t_sensor)
+	if(!SDcard::fileAvailable())
 	{
 		SDcard::closeFile();
 		SDcard::closeStateFile();

@@ -16,57 +16,36 @@ import csv
 #    Reading the .txt, putting it in a pandas dataframe
 #----------------------------------------------------------------------------
 
-#
+data = pd.read_csv("altitude3.TXT",sep = ',')
 
-fdata = pd.read_csv("altitudeEx3.TXT", sep = ',')
+p = data["P"].to_list()
+t = data["T"].to_list()
+
+plt.plot(t,p)
+
+print("There are "+str(len(p))+" data points of positon")
+
+
+start_index = 1000
+end_index = 5600
+crop_p = p[start_index:end_index]
+crop_t = t[start_index:end_index]
+
+plt.figure(2)
+plt.plot(crop_t,crop_p)
+#plt.title("Cropped")
+
+'''
 # Extracting the time and altitude parameters by their indexes
-p_data = fdata["P"].to_list()
-t = fdata["T"].to_list()
-
-data = pd.read_csv("filteredScaleQ3.TXT", sep = ',')
 p = data["P"].to_list()
 v = data["V"].to_list()
 a = data["A"].to_list()
 
-print("There are "+str(len(p))+" data points of positon")
-print("There are "+str(len(t))+" data points of time")
-
-
-plt.figure(1)
-
-plt.plot(t, p_data, color="b", label = "Raw Altitude [m]")
-plt.plot(t, p, color="r", label = "Filtered Altitude [m]")
-plt.legend()
-plt.show()
-
-plt.figure(2)
-plt.plot(t, v, color="c", label = "Kalman velocity [m/s]")
-plt.legend()
-plt.show()
-
-plt.figure(3)
-plt.plot(t, a, color="m", label = "Kalman acceleration [m/s^2]")
-plt.legend()
-plt.show()
-#plt.plot(t, p)
-
 #Finding the length of the lists
 print("There are "+str(len(p))+" data points of positon")
-print("There are "+str(len(t))+" data points of time")
+
+plt.plot(p)
 '''
-#Finding the length of the lists
-print("There are "+str(len(p))+" data points of positon")
-print("There are "+str(len(t))+" data points of time")
-
-
-plt.figure(1)
-
-plt.plot(t, p, color="r", label = "Filtered Altitude [m]")
-#plt.plot(t, p_data, color="b", label = "Raw Altitude [m]")
-plt.legend()
-plt.show()
-'''
-
 '''
 #----------------------------------------------------------------------------
 #    Cropping the data by index
