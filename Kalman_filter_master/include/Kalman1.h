@@ -1,3 +1,4 @@
+#pragma once
 //source: https://www.youtube.com/watch?v=ruB917YmtgE 
 double KALMAN(double U);
 double KALMAN(double U){

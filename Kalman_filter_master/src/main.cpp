@@ -3,34 +3,54 @@
 #include <heltec.h>
 #include <SPIFFS.h>
 #include <SD.h>
-#include <SD_code.h>
-//http://blog.tkjelectronics.dk/2012/09/a-practical-approach-to-kalman-filter-and-how-to-implement-it/
-//Slikts nosakums, bet šis ir HELTEC
-//iedvesma:	default esp32 SD sample code no libary ESP-FTP-Server-Lib
-//			https://github.com/LilyGO/TTGO-T-Beam/issues/9
+#include <SDcard.h>
 
-//thread par LoRa un SD konfliktu: https://stackoverflow.com/questions/57454066/how-to-use-2-spi-devices-lora-and-sd-card-on-esp32
+double p_baro = 0;
+float t_sensor = 0, t_prev_sensor = 0;
+char buffer[40] = "";
+
+void deserializeData(char buffer[])
+{
+	sscanf(buffer, "%lf,%f", &p_baro, &t_sensor);
+}
+void nextMeasurement()
+{
+	t_prev_sensor = t_sensor; //current timestep becomes last timestep
+	String line = SDcard::readline();
+	line.toCharArray(buffer, 40);
+	deserializeData(buffer);
+	Serial.println("P_baro: " + String(p_baro) + " T_sensor: " + String(t_sensor, 5));
+}
+
+void saveState(double baro)
+{
+	SDcard::saveStateToFile(baro);
+}
 
 File readFile, writeFile;
 
-
 void setup()
 {
-  Serial.begin(115200);
+	Serial.begin(115200);
 	Serial.println("Heltec test");
-	initializeSD();
+	SDcard::setup();
 
+	SDcard::openFile();
+	SDcard::openStateFile();
+	nextMeasurement();
+}
 
-  readFile = SD.open("/raw.txt"); // Re-open the file for reading:
-  writeFile = SD.open("/result.txt", FILE_WRITE); //šis for some reason iztīra failu pirms rakstīšanas, idk jāpadomā, TTGO gan vnk raksta klāt
+void loop()
+{
+	nextMeasurement();
+	
+	//*Kalman stuff
+	saveState(KALMAN(p_baro));
 
-  DoData(writeFile, readFile);
-  
-  readFile.close(); // close the file:
-  writeFile.close(); 
-   
-
- }
-
-void loop(){
+	if(!SDcard::fileAvailable())
+	{
+		SDcard::closeFile();
+		SDcard::closeStateFile();
+		while(1);
+	}
 }
