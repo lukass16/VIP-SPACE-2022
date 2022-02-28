@@ -16,7 +16,7 @@ import csv
 #    Reading the .txt, putting it in a pandas dataframe
 #----------------------------------------------------------------------------
 
-data = pd.read_csv("filtered.TXT",sep = ',')
+data = pd.read_csv("filtered2.TXT",sep = ',')
 
 # Extracting the time and altitude parameters by their indexes
 p = data["P"].to_list()
@@ -26,7 +26,8 @@ a = data["A"].to_list()
 #Finding the length of the lists
 print("There are "+str(len(p))+" data points of positon")
 
-plt.plot(a)
+plt.plot(p)
+
 
 '''
 #----------------------------------------------------------------------------

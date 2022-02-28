@@ -30,19 +30,22 @@ void setup()
 	Serial.begin(115200);
 	Serial.println("Kalman Filter tests");
 	SDcard::setup();
-
+	
 	SDcard::openFile();
+	SDcard::openStateFile();
 	nextMeasurement();
+	
 
-	kalman::predict();
-
+	//kalman::predict();
 	//SDcard::closeFile();
+	//SDcard::setStateFile("/filtered9.txt");
 }
 
 void loop()
 {
 	nextMeasurement();
-	delay((t_sensor - t_prev_sensor)*1000); //in ms
+	//delay((t_sensor - t_prev_sensor)*1000); //in ms //*Instead replaced by setDelT() to account for the discrepencies in time due to calculations
+	kalman::setDelT(t_sensor - t_prev_sensor); //*Provide the predict() function with the appropriate change in time
 	kalman::predict();
 
 	kalman::updateBaro(p_baro); // this doesn't necessarily have to be done right before prediction (extrapolation) but can be just done every time a new reading is available
@@ -52,9 +55,10 @@ void loop()
 	saveState();
 
 	//TODO - fix large error at start
-	if(t_prev_sensor == t_sensor)
+	if(!SDcard::fileAvailable())
 	{
 		SDcard::closeFile();
+		SDcard::closeStateFile();
 		while(1);
 	}
 }

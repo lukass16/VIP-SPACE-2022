@@ -11,6 +11,8 @@
 
 File myFile;
 File stateFile;
+String stateFileName = "/filteredScaleQ3.txt";
+bool firstWriteStateFile = 1;
 
 namespace SDcard
 {
@@ -51,7 +53,7 @@ namespace SDcard
 
     void openFile()
     {
-        myFile = SD.open("/altitude.txt"); // Re-open the file for reading:
+        myFile = SD.open("/altitude3.txt"); // Re-open the file for reading:
     }
 
     void closeFile()
@@ -59,14 +61,29 @@ namespace SDcard
         myFile.close(); // close the file:
     }
 
+    void openStateFile()
+    {
+        stateFile = SD.open(stateFileName, FILE_WRITE); // Re-open the file for reading:
+    }
+
+    void closeStateFile()
+    {
+        stateFile.close();
+    }
+
+    int fileAvailable()
+    {
+        return myFile.available();
+    }
+
     void saveStateToFile(float p, float v, float a)
     {
-        stateFile = SD.open("/filtered.txt", FILE_APPEND); // Re-open the file for reading:
+        //stateFile = SD.open(stateFileName, FILE_APPEND); // Re-open the file for reading:
         char buffer[40] = "";
         String state = String(p, 2) + "," + String(v, 2) + "," + String(a, 2);
         state.toCharArray(buffer, 40);
         stateFile.println(buffer);
-        stateFile.close(); // close the file:
+        //stateFile.close(); // close the file:
     }
 
 }

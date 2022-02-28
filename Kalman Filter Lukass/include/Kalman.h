@@ -12,6 +12,10 @@ namespace kalman {
                            0, 0.001, 0,
                            0, 0, 0.001};
 
+    BLA::Matrix<3, 3> T = {0.01, 0, 0, //*Time scaling matrix
+                           0, 0.01, 0,
+                           0, 0, 0.01};
+
     BLA::Matrix<1, 1> R_Baro = {0.0327}; //*Measurement Uncertainty - Variance in sensor measurement
 
     BLA::Matrix<3, 1> X = {
@@ -20,9 +24,9 @@ namespace kalman {
         0  //a
     };
 
-    BLA::Matrix<3, 3> P = {1, 0, 0, //*Estimate Uncertainty
-                           0, 1, 0,
-                           0, 0, 1};
+    BLA::Matrix<3, 3> P = {0.5, 0, 0, //*Estimate Uncertainty
+                           0, 0.5, 0,
+                           0, 0, 0.5};
 
     BLA::Matrix<3, 3> I = {1, 0, 0,
                            0, 1, 0,
@@ -49,12 +53,21 @@ namespace kalman {
 
     bool isFirstStep = true;
 
+    //*TESTING
+    void setDelT(float t_change)
+    {
+        delT = t_change;
+    }
+
     void predict()
     {
+        //*Replaced by setDelT()
+        /*
         currentTime = micros();
         delT = (currentTime - prevTime) / 1000000.0f;
         //data.loopTime = delT;
         prevTime = currentTime;
+        */
 
         if (!isFirstStep)
         {
@@ -64,9 +77,12 @@ namespace kalman {
                 0, 1, delT,
                 0, 0, 1};
 
+            //*Update scaling matrix - matrix consists of delT and scales Q according to delT
+            T.Fill(delT);
+
             //*State Extrapolation Equation
             X = F * X;
-            P = F * P * ~F + Q; //*to be more accurate the Q matrix would be scaled with delT
+            P = F * P * ~F + T * Q; //*to be more accurate the Q matrix would be scaled with delT
         }
         isFirstStep = false;
     }
