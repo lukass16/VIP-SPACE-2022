@@ -18,15 +18,15 @@ import csv
 
 #
 
-fdata = pd.read_csv("altitudeEx2.TXT", sep = ',')
+fdata = pd.read_csv("altitudeEx.TXT", sep = ',')
 # Extracting the time and altitude parameters by their indexes
 p_data = fdata["P"].to_list()
 t = fdata["T"].to_list()
 
-data = pd.read_csv("mfilteredScaleQ2.TXT", sep = ',')
+data = pd.read_csv("filtered.TXT", sep = ',')
 p = data["P"].to_list()
-#v = data["V"].to_list()
-#a = data["A"].to_list()
+v = data["V"].to_list()
+a = data["A"].to_list()
 
 print("There are "+str(len(p))+" data points of positon")
 print("There are "+str(len(t))+" data points of time")
@@ -34,28 +34,29 @@ print("There are "+str(len(t))+" data points of time")
 
 plt.figure(figsize=(8,6))
 
-plt.plot(t, p_data, color="b", label = "Raw Altitude [m]", linewidth=0.1)
-plt.plot(t, p, color="r", label = "Filtered Altitude [m]", linewidth=0.1)
+plt.plot(t, p_data, color="b", label = "Raw Altitude [m]")
+plt.plot(t, p, color="r", label = "Filtered Altitude [m]")
 plt.legend()
 #plt.show()
-plt.savefig("mfitlered2.png", dpi=1000)
+plt.savefig("pos2.png", dpi=1000)
 
-'''
-plt.figure(2)
+plt.figure(figsize=(8,6))
 plt.plot(t, v, color="c", label = "Kalman velocity [m/s]")
 plt.legend()
-plt.show()
+#plt.show()
+plt.savefig("vel2.png", dpi=1000)
 
-plt.figure(3)
+plt.figure(figsize=(8,6))
 plt.plot(t, a, color="m", label = "Kalman acceleration [m/s^2]")
 plt.legend()
-plt.show()
+#plt.show()
+plt.savefig("acc2.png", dpi=1000)
 #plt.plot(t, p)
 
 #Finding the length of the lists
 print("There are "+str(len(p))+" data points of positon")
 print("There are "+str(len(t))+" data points of time")
-'''
+
 '''
 #Finding the length of the lists
 print("There are "+str(len(p))+" data points of positon")
