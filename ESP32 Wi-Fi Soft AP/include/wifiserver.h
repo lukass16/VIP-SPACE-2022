@@ -16,6 +16,9 @@ WiFiServer server(80);
 String header;
 String body;
 
+//*testing
+int data = 0;
+
 namespace wifiserver
 {
     void setup()
@@ -35,9 +38,14 @@ namespace wifiserver
 
     String getBody()
     {
-        body = "<br><h1>" + String(0) + "</h1>";
+        body = "<br><h1>" + String(data) + "</h1>";
         return body;
     }
+
+	void setData()
+	{
+		data+=1;
+	}
 
     void handleClient()
     {

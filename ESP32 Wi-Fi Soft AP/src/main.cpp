@@ -11,4 +11,6 @@ void setup()
 void loop()
 {
 	wifiserver::handleClient();
+	wifiserver::setData();
+	delay(100);
 }
