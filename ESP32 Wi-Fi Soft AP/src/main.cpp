@@ -1,9 +1,16 @@
 #include <Arduino.h>
 #include <WiFi.h>
 
+//https://randomnerdtutorials.com/esp32-access-point-ap-web-server/
+//https://en.wikipedia.org/wiki/SoftAP
+
 // Replace with your network credentials
 const char *ssid = "ESP32-Access-Point";
 const char *password = "VIP-2022";
+
+//* For testing
+int id = 0;
+String idline = "";
 
 // Set web server port number to 80
 WiFiServer server(80);
@@ -31,12 +38,15 @@ void setup()
 
 void loop()
 {
+
+	id++;
 	WiFiClient client = server.available(); // Listen for incoming clients
 
 	if (client)
 	{								   // If a new client connects,
-		Serial.println("New Client."); // print a message out in the serial port
+		Serial.println("\nNew Client."); // print a message out in the serial port
 		String currentLine = "";	   // make a String to hold incoming data from the client
+		
 		while (client.connected())     // loop while the client's connected
 		{
 			if (client.available())	   // if there's bytes to read from the client,
@@ -69,6 +79,8 @@ void loop()
 
 						//* Web Page Body
 						client.println("<body><h1>ESP32 Web Server</h1>");  // Web Page Heading
+						idline = "<br><h1>" + String(id) + "</h1>";
+						client.println(idline);
 						client.println("</body></html>");
 
 						// The HTTP response ends with another blank line
@@ -86,7 +98,10 @@ void loop()
 					currentLine += c; // add it to the end of the currentLine
 				}
 			}
+			//Serial.println(".");
+			//delay(10);
 		}
+		Serial.println("\nExit loop");
 		// Clear the header variable
 		header = "";
 		// Close the connection
