@@ -10,6 +10,7 @@ class DescentState : public State {
             Serial.println("DESCENT STATE");
 
             Serial.println("END");
+            while(1);
         }
 
         void HandleNextPhase() override

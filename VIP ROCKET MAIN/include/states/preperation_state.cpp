@@ -15,6 +15,8 @@ class PreperationState: public State {
             Serial.println("PREP STATE");
             oled::setup();
 
+            comms::setup(433E6);
+
             delay(2000);
 
             this->_context->RequestNextPhase();

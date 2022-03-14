@@ -10,6 +10,8 @@ class DrogueState: public State {
         void start () override {
             Serial.println("DROGUE STATE");
 
+            while(1);
+
             delay(2000);
 
             this->_context->RequestNextPhase();
