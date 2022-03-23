@@ -22,13 +22,13 @@ void initializeSD (){
 
 }
 
-void readSD(Files read){
+void readSD(SD_File read){
     if (read) while (read.available()) Serial.write(read.read());
     read.close();
 }     
 
 
-void DoData(Files write, Files read){
+void DoData(SD_File write, SD_File read){
   String line = "";
   
   if (read){

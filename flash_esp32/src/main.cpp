@@ -22,7 +22,7 @@ void setup(){
     deleteFile(LITTLEFS, "/test.txt");
 
     File writeFlash = LITTLEFS.open("/test.txt", FILE_APPEND); //prieksh flash
-    Files writeSD = SD.open("test.txt", FILE_WRITES); //prieksh SD
+    SD_File writeSD = SD.open("test.txt", FILE_WRITES); //prieksh SD
 
     uint32_t start = millis();
     for(int i=0; i<10; i++){
@@ -37,7 +37,7 @@ void setup(){
     Serial.println("Flash contents: ");
     readFlash(LITTLEFS, "/test.txt");
     Serial.println("SD contents: ");
-    Files readFile = SD.open("test.txt");
+    SD_File readFile = SD.open("test.txt");
     readSD(readFile);
     
 
