@@ -1,16 +1,17 @@
 #pragma once
 
 #include <heltec.h>
-#include <mySD.h>
+#include <SPIFFS.h>
+#include <SD.h>
 
 #define _miso 4
 #define _mosi 13
 #define _sclk 14
 #define SD_cs 25
 
-Files myFile;
-Files stateFile;
-const char* stateFileName = "/filteredScaleQ3.txt";
+File myFile;
+File stateFile;
+String stateFileName = "/filteredScaleQ3.txt";
 bool firstWriteStateFile = 1;
 
 namespace SDcard
@@ -18,14 +19,14 @@ namespace SDcard
 
     void setup()
     {
-        pinMode(SD_cs, OUTPUT); //SS
-
-        if (SD.begin(SD_cs, _mosi, _miso, _sclk)) {
-            Serial.println("SD card initialized OK...");}
-        else{
-            Serial.println("SD card initialization FAILED...");}
-
-}
+        SPIFFS.begin(true);
+        SPI.begin(_sclk, _miso, _mosi, SD_cs);
+        if (!SD.begin(SD_cs))
+        {
+            Serial.println("SD Card Mount Failed");
+        }
+        else Serial.println("SD connected");
+    }
 
     String readline()
     {
@@ -62,7 +63,7 @@ namespace SDcard
 
     void openStateFile()
     {
-        stateFile = SD.open(stateFileName, FILE_WRITES); // Re-open the file for reading:
+        stateFile = SD.open(stateFileName, FILE_WRITE); // Re-open the file for reading:
     }
 
     void closeStateFile()

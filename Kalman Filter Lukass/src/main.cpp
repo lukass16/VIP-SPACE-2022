@@ -1,7 +1,6 @@
 #include <Arduino.h>
 #include <Kalman.h>
 #include <SDcard.h>
-#include <Wire.h>
 
 float p_baro = 0;
 float t_sensor = 0, t_prev_sensor = 0;
