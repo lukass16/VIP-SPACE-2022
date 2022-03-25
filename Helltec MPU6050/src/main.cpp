@@ -13,6 +13,6 @@ void setup(void)
 
 void loop()
 {
-	accelerometer::printAll();
+	accelerometer::readPrintAll();
 	delay(300);
 }

@@ -6,10 +6,11 @@
 Adafruit_MPU6050 mpu;
 sensors_event_t a, g, temp;
 
-//todo: add personal variables like acc_x etc. and make getData function
 
 namespace accelerometer
 {
+    float acc_x, acc_y, acc_z, gyr_x, gyr_y, gyr_z, tmp;
+
     void setup()
     {
         if (!mpu.begin(0x68))
@@ -28,7 +29,25 @@ namespace accelerometer
         mpu.setFilterBandwidth(MPU6050_BAND_21_HZ);
     }
 
-    void printAll()
+    void readSensor()
+    {
+        mpu.getEvent(&a, &g, &temp);
+
+        //set acceleration values
+        acc_x = a.acceleration.x;
+        acc_y = a.acceleration.y;
+        acc_z = a.acceleration.z;
+
+        //set gyroscope values
+        gyr_x = g.gyro.x;
+        gyr_y = g.gyro.y;
+        gyr_z = g.gyro.z;
+
+        //set temperature value
+        tmp = temp.temperature;
+    }
+
+    void readPrintAll()
     {
         mpu.getEvent(&a, &g, &temp);
 
