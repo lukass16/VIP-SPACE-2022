@@ -5,15 +5,14 @@
 #include <heltec.h>
 #include <WiFi.h>
 
-//some links used
-//https://github.com/m1k0s/ESP32-HelloWorld3D/blob/master/include/display.h
-//https://randomnerdtutorials.com/esp32-web-server-arduino-ide/
+// some links used
+// https://github.com/m1k0s/ESP32-HelloWorld3D/blob/master/include/display.h
+// https://randomnerdtutorials.com/esp32-web-server-arduino-ide/
 
-//define oled object
+// define oled object
 U8X8_SSD1306_128X64_NONAME_SW_I2C oled(15, 4, 16);
 
-
-//definitions for LoRa
+// definitions for LoRa
 #define SS 18
 #define RST 14
 #define DI0 26
@@ -21,7 +20,6 @@ U8X8_SSD1306_128X64_NONAME_SW_I2C oled(15, 4, 16);
 int syncWord = 0xF3;
 byte _localAddress = 0xFF; // address of this device
 byte _destination = 0xFF;  // destination to send to
-
 
 //*definitions for wifi
 const char *ssid = "Tele2-8c311";
@@ -41,7 +39,43 @@ unsigned long previousTime = 0;
 const long timeoutTime = 2000;
 //*wifi end
 
-//lora message function (this can be read by the current LoPy implementation)
+String readMessage()
+{
+	int packetSize = LoRa.parsePacket();
+	String message = "";
+	if (packetSize)
+	{
+		/*
+		// read packet header bytes:
+		int recipient = LoRa.read();	   // recipient address
+		byte sender = LoRa.read();		   // sender address
+		byte incomingMsgId = LoRa.read();  // 
+		incoming msg ID
+		byte incomingLength = LoRa.read(); // incoming msg length
+
+		if (recipient != _localAddress && recipient != 0xBB)
+		{
+			Serial.println("This message is not for me, recipient: " + String(recipient));
+			return "NULL";
+		}
+		*/
+		while (LoRa.available())
+		{
+			byte b = LoRa.read();
+			Serial.print(b);
+			//message += (char)LoRa.read();
+		}
+		Serial.print("Message: " + message);
+	}
+	else
+	{
+		return "NULL";
+	}
+	Serial.println(" RSSI: " + String(LoRa.packetRssi()));
+	return message;
+}
+
+// lora message function (this can be read by the current LoPy implementation)
 void sendMessage(String outgoing, int lora_message_id)
 {
 	LoRa.beginPacket();			   // start packet
@@ -58,29 +92,30 @@ void setup()
 	Serial.begin(115200);
 	Serial.println("Heltec test");
 
-	//oled setup
+	// oled setup
 	oled.begin();
 	oled.setFont(u8x8_font_chroma48medium8_r);
 	oled.drawString(1, 3, "Shalom");
 
-	//Lora
+	// Lora
 	SPI.begin(5, 19, 27, 18);
 	LoRa.setPins(SS, RST, DI0);
 	if (!LoRa.begin(433E6))
 	{
 		Serial.println("Starting LoRa failed!");
-		while (1);
+		while (1)
+			;
 	}
 
-	//setting paramaters
-	LoRa.setSyncWord(0xF3); 
+	// setting paramaters
+	LoRa.setSyncWord(0xF3);
 	LoRa.setTxPower(14);
 	LoRa.setSpreadingFactor(10);
 	LoRa.setCodingRate4(6);
 	LoRa.setSignalBandwidth(62.5E3);
 
 	Serial.println("Lora initialized!");
-
+	/*
 	//*wifi setup
 	// Connect to Wi-Fi network with SSID and password
 	Serial.print("Connecting to ");
@@ -98,14 +133,17 @@ void setup()
 	Serial.println(WiFi.localIP());
 	server.begin();
 	//*wifi end
+	*/
 }
 
 void loop()
 {
-	//uncomment to send messages
-	//sendMessage("Lora message", 0);
-	//delay(1000);
-	//Serial.println("Sent");
+	readMessage();
+	/*
+	// uncomment to send messages
+	// sendMessage("Lora message", 0);
+	// delay(1000);
+	// Serial.println("Sent");
 
 	//*wifi functionality - paste ip adress into browser to see webpage
 	WiFiClient client = server.available(); // Listen for incoming clients
@@ -173,5 +211,6 @@ void loop()
 		Serial.println("Client disconnected.");
 		Serial.println("");
 	}
+	*/
 	//*wifi end
 }
