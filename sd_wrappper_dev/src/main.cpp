@@ -24,7 +24,7 @@ void setup()
 		Serial.println("SD card initialization FAILED...");
 	}
 
-	myFile = SD.open("/test.txt", 'w');
+	myFile = SD.open("/test3.txt", F_CREAT);
 	myFile.println("testing 1, 2, 3.");
 	myFile.println("testing 4, 5, 6.");
 
@@ -32,13 +32,15 @@ void setup()
 
 	//Reading
 
-	myFile = SD.open("/test.txt", 'r');
+	myFile = SD.open("/test3.txt");
 
+	String text;
 	while (myFile.available())
 	{
-		Serial.print(myFile.read());
-		delay(100);
+		char c = myFile.read();
+		text += (char)c;
 	}
+	Serial.println(text);
 
 	myFile.close();
 
@@ -46,7 +48,7 @@ void setup()
 
 	//test readline
 
-	myFile = SD.open("/test.txt", 'r');
+	myFile = SD.open("/test3.txt");
 
 	String line = "";
 	if (myFile.available())
