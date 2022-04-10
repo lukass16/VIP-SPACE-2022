@@ -2,9 +2,10 @@
 #include <SPI.h>
 #include <mySD.h>
 
-#define SDMISO 4
+//!Don't change without adding comment or notifying
+#define SDMISO 12 
 #define SDMOSI 13
-#define SDSCLK 14
+#define SDSCLK 2
 #define SDCS 25
 
 SD_File myFile;
@@ -13,8 +14,9 @@ void setup()
 {
 	Serial.begin(115200);
 	Serial.print("Starting SD test");
-	//setup
-	pinMode(SDCS, OUTPUT); //SS
+
+	//*Setup
+	pinMode(SDCS, OUTPUT); // SS
 	if (SD.begin(SDCS, SDMOSI, SDMISO, SDSCLK))
 	{
 		Serial.println("SD card initialized.");
@@ -24,16 +26,34 @@ void setup()
 		Serial.println("SD card initialization FAILED...");
 	}
 
-	myFile = SD.open("/test3.txt", F_CREAT);
+	myFile = SD.open("test3.txt", F_WRITE); //*only one file can be open at a time
+
+	if (myFile)
+	{
+		Serial.println("File opened.");
+	}
+
 	myFile.println("testing 1, 2, 3.");
 	myFile.println("testing 4, 5, 6.");
 
 	myFile.close();
 
-	//Reading
+	//*Reading
+	myFile = SD.open("test3.txt");
 
-	myFile = SD.open("/test3.txt");
+	if (myFile)
+	{
+		Serial.println("File opened for reading.");
 
+		while (myFile.available())
+		{
+			Serial.write(myFile.read());
+		}
+	}
+	// close the file:
+	myFile.close();
+
+	/*
 	String text;
 	while (myFile.available())
 	{
@@ -46,7 +66,7 @@ void setup()
 
 	Serial.println("END");
 
-	//test readline
+	// test readline
 
 	myFile = SD.open("/test3.txt");
 
@@ -69,6 +89,7 @@ void setup()
 		String err = "ERROR: File not open";
 		Serial.println(err);
 	}
+	*/
 }
 
 void loop() {}
