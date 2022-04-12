@@ -4,8 +4,8 @@
 #include "sensor_data.h"
 #include "EEPROM.h"
 
-#define RXPIN 17  //(important to remember about crossover connection)
-#define TXPIN 3 // 
+#define RXPIN 16  //(important to remember about crossover connection)
+#define TXPIN 17 // 
 
 namespace gps
 {
@@ -18,7 +18,8 @@ namespace gps
 
     void setup(uint gpsRate = 9600)
     {
-        gpsSerial.begin(gpsRate, ssc, RXPIN, TXPIN);
+        //gpsSerial.begin(gpsRate, ssc, RXPIN, TXPIN);
+        Serial2.begin(gpsRate); //hardware serial 2 (RX-16, TX-17)
         Serial.println("Init GPS: " + String(gpsRate));
     }
 
@@ -26,9 +27,9 @@ namespace gps
     {
         hasData = false;
 
-        while (gpsSerial.available())
+        while (Serial2.available())
         {
-            gps.encode(gpsSerial.read());
+            gps.encode(Serial2.read());
             hasData = true;
         }
 
