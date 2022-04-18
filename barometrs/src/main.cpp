@@ -11,15 +11,6 @@
 //define oled object
 U8X8_SSD1306_128X64_NONAME_SW_I2C oled(15, 4, 16);
 
-// Current time
-unsigned long currentTime = millis();
-// Previous time
-unsigned long previousTime = 0;
-// Define timeout time in milliseconds (example: 2000ms = 2s)
-const long timeoutTime = 2000;
-//*wifi end
-
-
 void setup()
 {
 	Serial.begin(115200);
@@ -36,5 +27,5 @@ void setup()
 
 void loop()
 {
-	barometer::readSensor();
+	barometer::printSensorValues();
 }
