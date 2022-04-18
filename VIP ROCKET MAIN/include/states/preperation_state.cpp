@@ -9,6 +9,7 @@
 #include "buzzer.h"
 #include "gps_wrapper.h"
 #include "barometer_wrapper.h"
+#include "imu_wrapper.h"
 #include "EEPROM.h"
 
 class PreperationState : public State
@@ -33,6 +34,7 @@ public:
         Wire.begin(21, 22); // initialize correct i2c lines
         gps::setup();
         barometer::setup();
+        imu::setup();
 
         comms::setup(433E6);
 
@@ -61,6 +63,11 @@ public:
             //*barometer
             sens_data::BarometerData bd = barometer::getBarometerState(); //reads and retrieves values from wrapper to be put in data object
             s_data.setBarometerData(bd);
+
+            //*imu
+            imu::readSensor();
+            sens_data::IMUData md = imu::getIMUState();
+            s_data.setIMUData(md);
 
             delay(1000);
         }

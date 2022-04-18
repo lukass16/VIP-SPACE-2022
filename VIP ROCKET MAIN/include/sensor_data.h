@@ -22,6 +22,7 @@ struct GpsData
 
 struct IMUData 
 {
+    //todo make these variables more verbose and self-explanatory
     float x = 0;
     float y = 0;
     float z = 0;
