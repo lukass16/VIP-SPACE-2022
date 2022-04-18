@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Arduino.h"
-#define RESONATING_FREQ 3400
+#define RESONATING_FREQ 2500
 
 namespace buzzer
 {

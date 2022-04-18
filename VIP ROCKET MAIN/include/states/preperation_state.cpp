@@ -6,6 +6,8 @@
 #include "oled_wrapper.h"
 #include "communication.h"
 #include "wifiserver_wrapper.h"
+#include "buzzer.h"
+#include "gps_wrapper.h"
 #include "EEPROM.h"
 
 class PreperationState: public State {
@@ -16,12 +18,22 @@ class PreperationState: public State {
         void start () override {
             
             Serial.println("PREP STATE");
-            oled::setup();
+
+            //*Buzzer test/signal start
+            buzzer::setup();
+            buzzer::signalStart();
+            delay(500);
+            buzzer::buzzEnd();
+            
+            //oled::setup(); //*possibly conflicting with GPS
+
+            //*Sensor setups
+            gps::setup();
 
             comms::setup(433E6);
-            wifiserver::setup();
-
-            while(true) //*testing wifi in prep loop 
+  
+            /*  wifiserver::setup(); //*testing wifi in prep loop 
+            while(true) 
             {
                 it++;
                 sens_data::MagenetometerData md;
@@ -30,9 +42,20 @@ class PreperationState: public State {
                 wifiserver::setData(); //making the wifi server retrieve/update the data
                 wifiserver::handleClient();
                 delay(100);
-            }
+            }*/
 
             delay(2000);
+
+            //*Sensor reading test loop
+            while(true)
+            {
+                //*gps
+                gps::readGps(); //reads in values from gps
+                sens_data::GpsData gd = gps::getGpsState(); //retrieve values from wrapper to be put in data object
+                s_data.setGpsData(gd);
+
+                delay(1000);
+            }
 
             this->_context->RequestNextPhase();
             this->_context->Start();
