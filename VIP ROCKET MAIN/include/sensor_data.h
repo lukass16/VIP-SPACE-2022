@@ -20,7 +20,7 @@ struct GpsData
     int sats = 0;
 };
 
-struct MagenetometerData 
+struct IMUData 
 {
     float x = 0;
     float y = 0;
@@ -52,7 +52,7 @@ class SensorData
     private:
         ROCKET_STATE current_rocket_state;
         GpsData gpsData;
-        MagenetometerData magnetometerData;
+        IMUData imuData;
         BarometerData barometerData;
         BatteryData batteryData;
         Mtx mtx;
@@ -64,17 +64,17 @@ class SensorData
             mtx.setup();
         };
 
-        MagenetometerData getMagnetometerData()
+        IMUData getIMUData()
         { 
             mtx.lock();
-            MagenetometerData md = magnetometerData;
+            IMUData md = imuData;
             mtx.unlock();
             return md;
         }
-        void setMagnetometerData(MagenetometerData md)
+        void setIMUData(IMUData md)
         {
             mtx.lock();
-            magnetometerData = md;
+            imuData = md;
             mtx.unlock();
         }
 

@@ -44,7 +44,7 @@ namespace wifiserver
 
 	void setData()
 	{
-        sens_data::MagenetometerData mag = s_data.getMagnetometerData(); //*testing
+        sens_data::IMUData mag = s_data.getIMUData(); //*testing
 		data = mag.x;
 	}
 

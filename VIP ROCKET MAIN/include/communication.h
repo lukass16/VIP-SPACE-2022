@@ -41,7 +41,7 @@ namespace comms
         char outgoing[80];
         static int counter = 0;
         sens_data::GpsData gps = s_data.getGpsData();
-        sens_data::MagenetometerData mag = s_data.getMagnetometerData();
+        sens_data::IMUData mag = s_data.getIMUData();
         sens_data::BarometerData bar = s_data.getBarometerData();
         sens_data::BatteryData bat = s_data.getBatteryData();
         sprintf(outgoing, "%7.4f,%7.4f,%5.0f,%2d,%5.2f,%5.2f,%5.2f,%3.1f,%6.1f,%3.0f,%1d,%4d", gps.lat, gps.lng, gps.alt, gps.sats, mag.x, mag.y, mag.z, bar.temperature, bar.altitude, bar.vert_velocity, bat.bs, counter);
