@@ -1,6 +1,8 @@
 #include <SPIFFS.h>
 #include <mySD.h>
 
+//https://github.com/nhatuan84/esp32-micro-sdcard
+
 #define SDMISO 4
 #define SDMOSI 13
 #define SDSCLK 14
