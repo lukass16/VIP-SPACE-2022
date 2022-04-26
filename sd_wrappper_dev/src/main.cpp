@@ -2,10 +2,16 @@
 #include <SPI.h>
 #include <mySD.h>
 
-#define SDMISO 4
-#define SDMOSI 13
-#define SDSCLK 14
-#define SDCS 25
+
+#define _miso 4
+#define _mosi 13
+#define _sclk 14
+#define SD_cs 25
+
+#define SDMISO 4 //was 12
+#define SDMOSI 13 //!the same
+#define SDSCLK 14 //was 2
+#define SDCS 25 //!the same
 
 SD_File myFile;
 
