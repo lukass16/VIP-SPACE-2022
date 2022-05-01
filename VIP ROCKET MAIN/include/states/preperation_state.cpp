@@ -6,6 +6,7 @@
 #include "oled_wrapper.h"
 #include "communication.h"
 #include "wifiserver_wrapper.h"
+#include "flash.h"
 #include "buzzer.h"
 #include "gps_wrapper.h"
 #include "barometer_wrapper.h"
@@ -30,6 +31,9 @@ public:
 
         // oled::setup(); //*possibly conflicting with GPS
 
+        //*flash setup
+        flash::setup();
+
         //*Sensor setups
         Wire.begin(21, 22); // initialize correct i2c lines
         gps::setup();
@@ -53,7 +57,7 @@ public:
         delay(2000);
 
         //*Sensor reading test loop
-        while (true)
+        while (false) //!change for flash testing
         {
             //*gps
             gps::readGps();                             // reads in values from gps
