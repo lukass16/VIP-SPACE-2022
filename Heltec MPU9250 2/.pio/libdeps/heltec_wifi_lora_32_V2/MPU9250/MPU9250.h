@@ -145,6 +145,7 @@ public:
                 if (b_verbose)
                     Serial.println("Could not connect to AK8963");
                 has_connected = true; //!changed
+                Serial.println("Forced connection to MPU9250");
                 return true; //!changed
             }
         } else {
