@@ -9,15 +9,29 @@ void setup()
 	Serial.println("Testing alternate library with MPU9250.");
 	Wire.begin(21, 22);
 	delay(2000);
-	mpu.setup(0x69);
+	mpu.setup(0x68);
+
+	//*test calibration
+	mpu.calibrateAccelGyro();
 }
 
 void loop()
 {
-	if (mpu.update()) {
-        Serial.print(mpu.getYaw()); Serial.print(", ");
-        Serial.print(mpu.getPitch()); Serial.print(", ");
-        Serial.println(mpu.getRoll());
-    }
+	if (mpu.update())
+	{
+		//*Get readings from accelerometer + gyro
+		Serial.print(mpu.getAccX());
+		Serial.print(", ");
+		Serial.print(mpu.getAccY());
+		Serial.print(", ");
+		Serial.print(mpu.getAccZ());
+
+		Serial.print("\t");
+		Serial.print(mpu.getGyroX());
+		Serial.print(", ");
+		Serial.print(mpu.getGyroY());
+		Serial.print(", ");
+		Serial.println(mpu.getGyroZ());
+	}
 	delay(1000);
 }
