@@ -95,7 +95,8 @@ void setup()
 	// oled setup
 	oled.begin();
 	oled.setFont(u8x8_font_chroma48medium8_r);
-	oled.drawString(1, 3, "Shalom");
+	oled.drawString(1, 3, "VIP Rocket");
+	oled.drawString(4, 4, "tests");
 
 	// Lora
 	SPI.begin(5, 19, 27, 18);
