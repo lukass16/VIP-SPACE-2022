@@ -9,7 +9,7 @@
 #include "flash.h"
 #include "buzzer.h"
 #include "gps_wrapper.h"
-#include "barometer_wrapper_bmp280.h"
+#include "barometer_wrapper_MS5607.h"
 #include "imu_wrapper_MPU9250.h"
 #include "EEPROM.h"
 
@@ -57,7 +57,7 @@ public:
         delay(2000);
 
         //*Sensor reading test loop
-        while (true) //!change for flash testing
+        while (false) //!change for flash testing
         {
             //*gps
             gps::readGps();                             // reads in values from gps
@@ -65,6 +65,7 @@ public:
             s_data.setGpsData(gd);
 
             //*barometer
+            barometer::readSensor();
             sens_data::BarometerData bd = barometer::getBarometerState(); //reads and retrieves values from wrapper to be put in data object
             s_data.setBarometerData(bd);
 
