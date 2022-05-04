@@ -6,8 +6,8 @@
 #include "flash.h"
 #include "buzzer.h"
 #include "gps_wrapper.h"
-#include "barometer_wrapper.h"
-#include "imu_wrapper.h"
+#include "barometer_wrapper_bmp280.h"
+#include "imu_wrapper_MPU9250.h"
 
 class DrogueState : public State
 {
