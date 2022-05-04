@@ -3,10 +3,16 @@
 #include <MS5x.h>
 
 MS5x barometer(&Wire);
+double seaLevelPressure = 0;
+unsigned long start_t = 0;
 
 void setup()
 {
 	Serial.begin(115200);
+
+	//*Testing the elapsed time while the barometer gets good readings
+	start_t = millis();
+
 	while (barometer.connect() > 0)
 	{ // barometer.connect starts wire and attempts to connect to sensor
 		Serial.println(F("Error connecting..."));
@@ -14,6 +20,9 @@ void setup()
 	}
 	Serial.println(F("Connected to Sensor"));
 	delay(5);
+
+	
+	
 }
 
 void loop()
@@ -21,14 +30,8 @@ void loop()
 
 	double pressure = 0;
 	double temperature = 0;
-	/*
-	In order to not have any delays used in code, checkUpdates cycles through sensor read process
-	Step 1: Ask for raw temperature calculation to be performed
-	Step 2: Once enough time has passed for calculation ask sensor to send results
-	Step 3: Ask for raw pressure calculation to be performed
-	Step 4: Once enough time has passed for calculation ask sensor to send results
-	At this point conversion preocess is complete and no new sensor readings will be performed until Readout function is called.
-	*/
+	double altitude = 0;
+
 	barometer.checkUpdates();
 
 	/*
@@ -38,14 +41,27 @@ void loop()
 
 	Alternatively, prior to reading temperature and pressure data, check isReady().
 	*/
+
+
 	if (barometer.isReady())
 	{
-		temperature = barometer.GetTemp(); // Returns temperature in C
-		pressure = barometer.GetPres();	   // Returns pressure in Pascals
+		// Calculate predicted seaLevel pressure based off a known altitude in meters
+		if (seaLevelPressure == 0)
+		{
+			seaLevelPressure = barometer.getSeaLevel(10.5); //this functions also as the sea level setter for altitude calculations
+			Serial.println("Sea level pressure set as: " + String(seaLevelPressure));
+			Serial.println("Time ellapsed while barometer ready: " + String(millis()-start_t,5)); //*the delay is about 44 ms which is quite okay - the largest contribution is between setup and checkUpdates(), which is most likely the time needed for the barometer to get accurate readings
+		}
+
+		temperature = barometer.GetTemp();	// Returns temperature in C
+		pressure = barometer.GetPres();		// Returns pressure in Pascals
+		altitude = barometer.getAltitude(); // Returns altitude in m - //*optionally temperature corrected
 		Serial.print(F("The Temperature is: "));
 		Serial.println(temperature);
 		Serial.print(F("The Pressure is: "));
 		Serial.println(pressure);
+		Serial.print(F("The Altitude is: "));
+		Serial.println(altitude);
 	}
 	delay(1000);
 }
