@@ -150,14 +150,14 @@ namespace flash
         auto bat2 = (uint8_t *)(&batData.bat2); //3.2
 
         //Mag
-        auto x = (uint8_t *)(&imuData.x); //4.1
-        auto y = (uint8_t *)(&imuData.y); //4.2
-        auto z = (uint8_t *)(&imuData.z); //4.3
+        auto mag_x = (uint8_t *)(&imuData.mag_x); //4.1
+        auto mag_y = (uint8_t *)(&imuData.mag_y); //4.2
+        auto mag_z = (uint8_t *)(&imuData.mag_z); //4.3
         auto acc_x = (uint8_t *)(&imuData.acc_x); //4.4
         auto acc_y = (uint8_t *)(&imuData.acc_y); //4.5
         auto acc_z = (uint8_t *)(&imuData.acc_z); //4.6
 
-        auto const buf_size = sizeof(time) + sizeof(lat) + sizeof(lng) + sizeof(alt) + sizeof(sats) + sizeof(pressure) + sizeof(altitude) + sizeof(vert_velocity) + sizeof(temperature) + sizeof(bat1) + sizeof(bat2) + sizeof(x) + sizeof(y) + sizeof(z) + sizeof(acc_x) + sizeof(acc_y) + sizeof(acc_z);
+        auto const buf_size = sizeof(time) + sizeof(lat) + sizeof(lng) + sizeof(alt) + sizeof(sats) + sizeof(pressure) + sizeof(altitude) + sizeof(vert_velocity) + sizeof(temperature) + sizeof(bat1) + sizeof(bat2) + sizeof(mag_x) + sizeof(mag_y) + sizeof(mag_z) + sizeof(acc_x) + sizeof(acc_y) + sizeof(acc_z);
         Buffer<buf_size> buffer;
 
         buffer.push(time);
@@ -175,9 +175,9 @@ namespace flash
         buffer.push(bat1);
         buffer.push(bat2);
         
-        buffer.push(x);
-        buffer.push(y);
-        buffer.push(z);
+        buffer.push(mag_x);
+        buffer.push(mag_y);
+        buffer.push(mag_z);
         buffer.push(acc_x);
         buffer.push(acc_y);
         buffer.push(acc_z);
@@ -255,17 +255,17 @@ namespace flash
             Serial.println("bat2: " + String(bat2, 10));
             
             //Mag
-            float x = 0;
-            stream.getValue<float>(&x);
-            Serial.println("magx: " + String(x, 10));
+            float mag_x = 0;
+            stream.getValue<float>(&mag_x);
+            Serial.println("magx: " + String(mag_x, 10));
 
-            float y = 0;
-            stream.getValue<float>(&y);
-            Serial.println("magy: " + String(y, 10));
+            float mag_y = 0;
+            stream.getValue<float>(&mag_y);
+            Serial.println("magy: " + String(mag_y, 10));
 
-            float z = 0;
-            stream.getValue<float>(&z);
-            Serial.println("magz: " + String(z, 10));
+            float mag_z = 0;
+            stream.getValue<float>(&mag_z);
+            Serial.println("magz: " + String(mag_z, 10));
 
             float acc_x = 0;
             stream.getValue<float>(&acc_x);
@@ -346,17 +346,17 @@ namespace flash
             Serial.print(String(bat2, 4) + ",");
             
             //Mag
-            float x = 0;
-            stream.getValue<float>(&x);
-            Serial.print(String(x, 4) + ",");
+            float mag_x = 0;
+            stream.getValue<float>(&mag_x);
+            Serial.print(String(mag_x, 4) + ",");
 
-            float y = 0;
-            stream.getValue<float>(&y);
-            Serial.print(String(y, 4) + ",");
+            float mag_y = 0;
+            stream.getValue<float>(&mag_y);
+            Serial.print(String(mag_y, 4) + ",");
 
-            float z = 0;
-            stream.getValue<float>(&z);
-            Serial.print(String(z, 4) + ",");
+            float mag_z = 0;
+            stream.getValue<float>(&mag_z);
+            Serial.print(String(mag_z, 4) + ",");
 
             float acc_x = 0;
             stream.getValue<float>(&acc_x);

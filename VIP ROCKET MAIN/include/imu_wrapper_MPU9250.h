@@ -58,12 +58,18 @@ namespace imu
     sens_data::IMUData getIMUState()
     {
         sens_data::IMUData md;
-        md.x = 42.0; //*has no magnetometer readings
-        md.y = 42.0;
-        md.z = 42.0;
         md.acc_x = acc_x;
         md.acc_y = acc_y;
         md.acc_z = acc_z;
+
+        md.gyr_x = gyr_x;
+        md.gyr_y = gyr_y;
+        md.gyr_z = gyr_z;
+
+        md.mag_x = 42.0; //*has no magnetometer readings
+        md.mag_y = 42.0;
+        md.mag_z = 42.0;
+        
         return md;
     }
 

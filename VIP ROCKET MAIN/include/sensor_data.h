@@ -22,14 +22,18 @@ struct GpsData
 
 struct IMUData 
 {
-    //todo make these variables more verbose and self-explanatory
-    float x = 0;
-    float y = 0;
-    float z = 0;
     // Acceleration
     float acc_x = 0;
     float acc_y = 0;
     float acc_z = 0;
+    // Rotation
+    float gyr_x = 0;
+    float gyr_y = 0;
+    float gyr_z = 0;
+    // Magnetic field
+    float mag_x = 0;
+    float mag_y = 0;
+    float mag_z = 0;
 };
 
 struct BarometerData 

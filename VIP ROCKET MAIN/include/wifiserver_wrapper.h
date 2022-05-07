@@ -45,7 +45,7 @@ namespace wifiserver
 	void setData()
 	{
         sens_data::IMUData mag = s_data.getIMUData(); //*testing
-		data = mag.x;
+		data = mag.acc_x;
 	}
 
     void handleClient()
