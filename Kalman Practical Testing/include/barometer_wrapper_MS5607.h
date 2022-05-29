@@ -65,15 +65,32 @@ namespace barometer
     {
         return 42.0;
     }
-/*
-    sens_data::BarometerData getBarometerState() //*outputs sensor readings from wrapper to be used in the data object
+
+    double getSensorVariance()
     {
-        sens_data::BarometerData bd;
-        bd.temperature = temp;
-        bd.pressure = pres;
-        bd.altitude = alt;
-        bd.vert_velocity = getVertVelocity();
-        return bd;
+        int it_count = 500;
+        double avg = 0, sumsq = 0;
+        double Z[it_count];
+
+        // get measurement uncertainty (R)
+        for (int i = 0; i < it_count; i++) // get readings and average
+        {
+            barometer::readSensor();
+            Z[i] = barometer::alt;
+            avg += barometer::alt;
+            delay(50);
+        }
+
+        avg = avg / it_count;
+
+        // calculate variance
+        for (int i = 0; i < it_count; i++)
+        {
+            sumsq += (Z[i] - avg) * (Z[i] - avg);
+        }
+
+        Serial.println("Variance: " + String(sumsq / (it_count - 1), 7));
+        return sumsq / (it_count - 1);
     }
-*/
+
 }
