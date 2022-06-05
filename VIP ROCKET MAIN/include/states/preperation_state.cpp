@@ -12,6 +12,7 @@
 #include "barometer_wrapper_MS5607.h"
 #include "imu_wrapper_MPU9250.h"
 #include "eeprom_wrapper.h"
+#include "SD_card.h"
 
 class PreperationState : public State
 {
@@ -29,13 +30,15 @@ public:
         delay(500);
         buzzer::buzzEnd();
 
-        // oled::setup(); //*possibly conflicting with GPS
-
         //*EEPROM setup
         eeprom::setup();
-        
+
         //*flash setup
         flash::setup();
+
+        //*SD card setup
+        SDcard::setup(); 
+        SD_File fileSD = SDcard::openFile();
 
         //*Sensor setups
         Wire.begin(21, 22); // initialize correct i2c lines
@@ -60,8 +63,9 @@ public:
 
         delay(2000);
 
-        //*Sensor reading test loop
-        while (false) //!change for flash testing
+        //*Sensor reading test loop + SD_Card read, write test loop
+        int loops = 0;
+        while (loops<50) //!change for flash testing
         {
             //*gps
             gps::readGps();                             // reads in values from gps
@@ -78,9 +82,19 @@ public:
             sens_data::IMUData md = imu::getIMUState();
             s_data.setIMUData(md);
 
-            delay(1000);
+            //*battery
+            sens_data::BatteryData btd;
+
+            //*testing SD card
+            SDcard::writeData(fileSD, gd, md, bd, btd);
+
+            delay(100);
+            loops++;
         }
 
+        //*close files
+        SDcard::closeFile(fileSD);
+        
         this->_context->RequestNextPhase();
         this->_context->Start();
     }
