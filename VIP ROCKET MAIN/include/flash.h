@@ -3,7 +3,7 @@
 #include "FS.h"
 #include <LITTLEFS.h>
 #include "sensor_data.h"
-#include "EEPROM.h"
+#include "eeprom_wrapper.h"
 
 #define FORMAT_LITTLEFS_IF_FAILED true
 
@@ -377,21 +377,17 @@ namespace flash
 
     void lock()
     {
-        Serial.println("Flash locked");
-        EEPROM.writeFloat(40, 5); //5 chosen as arbitrary value in case this address is used for more fucntionality (file names)
-        EEPROM.commit();
+        eeprom::lockFlash();
     }
 
     void unlock()
     {
-        Serial.println("Flash unlocked");
-        EEPROM.writeFloat(40, 0);
-        EEPROM.commit();
+        eeprom::unlockFlash();
     }
 
     bool locked()
     {
-        if (EEPROM.readFloat(40) == 5)
+        if (eeprom::lockedFlash())
         {
             Serial.println("Cannot delete flash - locked");
             return 1;
