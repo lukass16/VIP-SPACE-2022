@@ -2,11 +2,14 @@
 #include "barometer_wrapper_MS5607.h"
 #include "Kalman.h"
 #include "kalman_flash.h"
+#include "SD_card.h"
 
 unsigned long timer = millis(); // keeps track of delT and time
 unsigned long t_init = millis(); // saves inital time
 
 File file;
+SD_File fileSD;
+char sdfilename[50] = "kalman10.txt";
 
 void setup()
 {
@@ -15,10 +18,15 @@ void setup()
 
 	barometer::setup();
 	flash::setup();
+	SDCard::setup();
 
+	//open flash file
 	if(!flash::locked()) flash::deleteFile("/kalman.txt");
-
 	file = flash::openFile();
+
+	//open SD file
+	fileSD = SD.open(sdfilename, FILE_WRITES);
+	fileSD.println("Time [s],Baro_P [m],Kalman_P [m],Kalman_V [m/s],Kalman_A [m/s^2],Kalman_Gain_P,Kalman_Uncertainty_P"); //print labels to file
 
 	kalman::predict(); // make first prediction
 	timer = millis();
@@ -41,10 +49,20 @@ void loop()
 	//saving data to flash
 	flash::writeKalmanState(file, barometer::alt, kalman::getKalmanPosition(), kalman::getKalmanVelocity(), kalman::getKalmanAcceleration(), kalman::getPositionKalmanGain(), kalman::getPositionUncertainty());
 
+	//saving data to SD
+	fileSD.println(String(millis()-t_init) + "," + String(barometer::alt, 2) + "," + String(kalman::getKalmanPosition(), 2) + "," + String(kalman::getKalmanVelocity(), 2) + "," + String(kalman::getKalmanAcceleration(), 2) + "," + String(kalman::getPositionKalmanGain(), 5) + "," + String(kalman::getPositionUncertainty(), 5) );
+
 	if(millis() - t_init > 10000)
 	{
+		//flash close and read
 		flash::closeFile(file);
 		flash::readKalmanFlash("/kalman.txt");
+
+		//SD close and read
+		fileSD.close();
+		fileSD = SD.open(sdfilename); //open file for reading
+		SDCard::readSD(fileSD);
+		
 		delay(1000000);
 	}
 	delay(50);

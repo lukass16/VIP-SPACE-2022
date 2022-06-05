@@ -23,15 +23,15 @@ namespace kalman {
     float delT = 0.0f;
     bool isFirstStep = true;
 
-    BLA::Matrix<3, 3> Q = {10000, 0, 0, //*Process Noise Uncertainty - how confident are you that the process is correct i.e. that the estimation model is valid
-                           0, 10000, 0,
-                           0, 0, 10000000};
+    BLA::Matrix<3, 3> Q = {100000, 0, 0, //*Process Noise Uncertainty - how confident are you that the process is correct i.e. that the estimation model is valid
+                           0, 100000, 0,
+                           0, 0, 100000000000};
 
     BLA::Matrix<3, 3> T = {0.01, 0, 0, //*Time scaling matrix
                            0, 0.01, 0,
                            0, 0, 0.01};
 
-    BLA::Matrix<1, 1> R_Baro = {0.0282}; //*Measurement Uncertainty - Variance in sensor measurement
+    BLA::Matrix<1, 1> R_Baro = {0.0082}; //*Measurement Uncertainty - Variance in sensor measurement - measured to be 0.0282
 
     BLA::Matrix<3, 1> X = {
         0, //p
@@ -78,7 +78,7 @@ namespace kalman {
                 0, 0, 1};
 
             //*Update scaling matrix - matrix consists of delT and scales Q according to delT
-            T.Fill(delT);
+            T.Fill(delT*100);
 
             //*State Extrapolation Equation
             X = F * X;
