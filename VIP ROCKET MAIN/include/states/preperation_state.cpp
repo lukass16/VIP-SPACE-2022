@@ -11,7 +11,7 @@
 #include "gps_wrapper.h"
 #include "barometer_wrapper_MS5607.h"
 #include "imu_wrapper_MPU9250.h"
-#include "EEPROM.h"
+#include "eeprom_wrapper.h"
 
 class PreperationState : public State
 {
@@ -31,6 +31,9 @@ public:
 
         // oled::setup(); //*possibly conflicting with GPS
 
+        //*EEPROM setup
+        eeprom::setup();
+        
         //*flash setup
         flash::setup();
 
@@ -42,7 +45,8 @@ public:
 
         comms::setup(433E6);
 
-        /*  wifiserver::setup(); //*testing wifi in prep loop
+        //*testing wifi in prep loop
+        /*  wifiserver::setup(); 
         while(true)
         {
             it++;
