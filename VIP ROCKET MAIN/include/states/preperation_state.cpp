@@ -95,9 +95,6 @@ public:
 
         //*close files
         SDcard::closeFile(fileSD);
-
-        //!Stop for kalman testing
-        while(true);
         
         this->_context->RequestNextPhase();
         this->_context->Start();
