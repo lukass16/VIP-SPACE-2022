@@ -76,6 +76,7 @@ public:
             barometer::readSensor();
             sens_data::BarometerData bd = barometer::getBarometerState(); //reads and retrieves values from wrapper to be put in data object
             s_data.setBarometerData(bd);
+            barometer::printInfoFiltered(); //*Testing Kalman
 
             //*imu
             imu::readSensor();
@@ -88,12 +89,15 @@ public:
             //*testing SD card
             SDcard::writeData(fileSD, gd, md, bd, btd);
 
-            delay(100);
+            delay(50);
             loops++;
         }
 
         //*close files
         SDcard::closeFile(fileSD);
+
+        //!Stop for kalman testing
+        while(true);
         
         this->_context->RequestNextPhase();
         this->_context->Start();
