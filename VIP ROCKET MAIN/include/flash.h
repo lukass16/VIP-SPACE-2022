@@ -74,7 +74,7 @@ namespace flash
             //LITTLEFS.format(); //comment this out - only for first time with testing flash
             return;
         }
-        Serial.println("SPIFFS-like write file to new path and delete it w/folders");
+        Serial.println("Flash setup");
     }
 
     void deleteFile(const char *path)

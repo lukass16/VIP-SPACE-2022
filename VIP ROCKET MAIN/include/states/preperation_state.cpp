@@ -14,6 +14,9 @@
 #include "eeprom_wrapper.h"
 #include "SD_card.h"
 
+//*Temporary variables
+bool clearEEPROM = false;
+
 class PreperationState : public State
 {
 public:
@@ -48,24 +51,22 @@ public:
 
         comms::setup(433E6);
 
-        //*testing wifi in prep loop
-        /*  wifiserver::setup(); 
-        while(true)
+        //check if need to clear EEPROM
+        if(clearEEPROM) //TODO add dedicated clear function which clears all appropriate EEPROM addresses
         {
-            it++;
-            sens_data::MagenetometerData md;
-            md.x = it;
-            s_data.setMagnetometerData(md); //setting data in sensor data object
-            wifiserver::setData(); //making the wifi server retrieve/update the data
-            wifiserver::handleClient();
-            delay(100);
-        }*/
+            eeprom::unlockFlash(); //only utility currently for EEPROM
+        }
 
-        delay(2000);
+        //if flash not locked - delete file
+        if(!eeprom::lockedFlash())
+        {
+            flash::deleteFile("/test.txt"); //*deleting file so as to reset it
+        }
 
-        //*Sensor reading test loop + SD_Card read, write test loop
+        //TODO add EEPROM state transfer mechanism
+
         int loops = 0;
-        while (loops<100) //!change for flash testing
+        while (loops<100) //!TODO change with while(!arming::armed) - add arming functionality
         {
             //*gps
             gps::readGps();                             // reads in values from gps
@@ -76,7 +77,6 @@ public:
             barometer::readSensor();
             sens_data::BarometerData bd = barometer::getBarometerState(); //reads and retrieves values from wrapper to be put in data object
             s_data.setBarometerData(bd);
-            barometer::printInfoFilteredPosition(); //*Testing Kalman
 
             //*imu
             imu::readSensor();
@@ -86,18 +86,16 @@ public:
             //*battery
             sens_data::BatteryData btd;
 
-            //*testing SD card
+            //writing to SD card
             SDcard::writeData(fileSD, gd, md, bd, btd);
 
             delay(50);
             loops++;
+            Serial.println(loops);
         }
 
-        //*close files
+        //*close SD file
         SDcard::closeFile(fileSD);
-
-        //!Stop for kalman testing
-        while(true);
         
         this->_context->RequestNextPhase();
         this->_context->Start();

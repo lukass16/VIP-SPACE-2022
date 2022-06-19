@@ -1,3 +1,4 @@
+#pragma once
 #include <SPIFFS.h>
 #include <mySD.h>
 #include "sensor_data.h"

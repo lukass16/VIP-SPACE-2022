@@ -4,6 +4,7 @@
 #include "core/core.cpp"
 #include "main_state.cpp"
 #include "flash.h"
+#include "SD_card.h"
 #include "buzzer.h"
 #include "gps_wrapper.h"
 #include "barometer_wrapper_MS5607.h"
@@ -16,10 +17,8 @@ public:
     {
         Serial.println("DROGUE STATE");
 
-        //*Flash testing
-        Serial.println("Testing flash");
-        flash::deleteFile("/test.txt"); //*deleting file so as to reset it every test
-        File file = flash::openFile();  // opening file for writing during flight
+        File file = flash::openFile();  // opening flash file for writing during flight
+        SD_File fileSD = SDcard::openFile();
 
         //*variables for writing to flash (Note: in the preparation state these are repeatedly constructed every loop - should evaluate whether defining them once would not be a better solution)
         sens_data::GpsData gd;
@@ -46,16 +45,14 @@ public:
 
             //*placeholder for battery data
 
-            delay(100);
+            delay(50);
         }
 
         flash::closeFile(file);
         Serial.println("Finished writing to flash");
 
         flash::readFlashVerbose("/test.txt"); // opening and reading file
-        while (1);
-
-        delay(2000);
+        while (1); //*End of testing
 
         this->_context->RequestNextPhase();
         this->_context->Start();

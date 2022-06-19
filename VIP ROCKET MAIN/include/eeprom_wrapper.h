@@ -36,7 +36,12 @@ namespace eeprom
 
     bool lockedFlash()
     {
-        return EEPROM.readFloat(40) == 5;
+        bool locked = false;
+        if(EEPROM.readFloat(40) == 5)
+        {
+            locked = true;
+        }
+        return locked;
     }
 
 };
