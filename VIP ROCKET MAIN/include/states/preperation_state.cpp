@@ -76,7 +76,7 @@ public:
             barometer::readSensor();
             sens_data::BarometerData bd = barometer::getBarometerState(); //reads and retrieves values from wrapper to be put in data object
             s_data.setBarometerData(bd);
-            barometer::printInfoFiltered(); //*Testing Kalman
+            barometer::printInfoFilteredPosition(); //*Testing Kalman
 
             //*imu
             imu::readSensor();

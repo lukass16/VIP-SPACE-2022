@@ -62,7 +62,7 @@ namespace SDcard
         //Bar
         float pressure = barData.pressure; //2.1
         float altitude = barData.altitude; //2.2
-        float vert_velocity = barData.vert_velocity; //2.3
+        float vert_velocity = barData.f_velocity; //2.3
         float temperature = barData.temperature; //2.4
        
         //Bat

@@ -142,7 +142,7 @@ namespace flash
         //Bar
         auto pressure = (uint8_t *)(&barData.pressure); //2.1
         auto altitude = (uint8_t *)(&barData.altitude); //2.2
-        auto vert_velocity = (uint8_t *)(&barData.vert_velocity); //2.3
+        auto f_velocity = (uint8_t *)(&barData.f_velocity); //2.3
         auto temperature = (uint8_t *)(&barData.temperature); //2.4
        
         //Bat
@@ -157,7 +157,7 @@ namespace flash
         auto acc_y = (uint8_t *)(&imuData.acc_y); //4.5
         auto acc_z = (uint8_t *)(&imuData.acc_z); //4.6
 
-        auto const buf_size = sizeof(time) + sizeof(lat) + sizeof(lng) + sizeof(alt) + sizeof(sats) + sizeof(pressure) + sizeof(altitude) + sizeof(vert_velocity) + sizeof(temperature) + sizeof(bat1) + sizeof(bat2) + sizeof(mag_x) + sizeof(mag_y) + sizeof(mag_z) + sizeof(acc_x) + sizeof(acc_y) + sizeof(acc_z);
+        auto const buf_size = sizeof(time) + sizeof(lat) + sizeof(lng) + sizeof(alt) + sizeof(sats) + sizeof(pressure) + sizeof(altitude) + sizeof(f_velocity) + sizeof(temperature) + sizeof(bat1) + sizeof(bat2) + sizeof(mag_x) + sizeof(mag_y) + sizeof(mag_z) + sizeof(acc_x) + sizeof(acc_y) + sizeof(acc_z);
         Buffer<buf_size> buffer;
 
         buffer.push(time);
@@ -169,7 +169,7 @@ namespace flash
 
         buffer.push(pressure);
         buffer.push(altitude);
-        buffer.push(vert_velocity);
+        buffer.push(f_velocity);
         buffer.push(temperature);
         
         buffer.push(bat1);
@@ -237,9 +237,9 @@ namespace flash
             stream.getValue<float>(&altitude);
             Serial.println("altitude: " + String(altitude, 10));
 
-            float vert_velocity = 0;
-            stream.getValue<float>(&vert_velocity);
-            Serial.println("vert_velocity: " + String(vert_velocity, 10));
+            float f_velocity = 0;
+            stream.getValue<float>(&f_velocity);
+            Serial.println("vert_velocity: " + String(f_velocity, 10));
 
             float temperature = 0;
             stream.getValue<float>(&temperature);

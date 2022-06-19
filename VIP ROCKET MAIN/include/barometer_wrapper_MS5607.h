@@ -93,7 +93,7 @@ namespace barometer
         Serial.println(alt);
     }
 
-    void printInfoFiltered()
+    void printInfoFilteredPosition()
     {
         kalman::printFullInfoPosition(alt);
     }
@@ -109,7 +109,9 @@ namespace barometer
         bd.temperature = temp;
         bd.pressure = pres;
         bd.altitude = alt;
-        bd.vert_velocity = getVertVelocity();
+        bd.f_altitude = f_alt;
+        bd.f_velocity = f_vel;
+        bd.f_acceleration = f_acc;
         return bd;
     }
 }
