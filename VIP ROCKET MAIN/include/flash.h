@@ -141,7 +141,7 @@ namespace flash
 
         //Bar
         auto pressure = (uint8_t *)(&barData.pressure); //2.1
-        auto altitude = (uint8_t *)(&barData.altitude); //2.2
+        auto f_altitude = (uint8_t *)(&barData.f_altitude); //2.2
         auto f_velocity = (uint8_t *)(&barData.f_velocity); //2.3
         auto temperature = (uint8_t *)(&barData.temperature); //2.4
        
@@ -157,7 +157,7 @@ namespace flash
         auto acc_y = (uint8_t *)(&imuData.acc_y); //4.5
         auto acc_z = (uint8_t *)(&imuData.acc_z); //4.6
 
-        auto const buf_size = sizeof(time) + sizeof(lat) + sizeof(lng) + sizeof(alt) + sizeof(sats) + sizeof(pressure) + sizeof(altitude) + sizeof(f_velocity) + sizeof(temperature) + sizeof(bat1) + sizeof(bat2) + sizeof(mag_x) + sizeof(mag_y) + sizeof(mag_z) + sizeof(acc_x) + sizeof(acc_y) + sizeof(acc_z);
+        auto const buf_size = sizeof(time) + sizeof(lat) + sizeof(lng) + sizeof(alt) + sizeof(sats) + sizeof(pressure) + sizeof(f_altitude) + sizeof(f_velocity) + sizeof(temperature) + sizeof(bat1) + sizeof(bat2) + sizeof(mag_x) + sizeof(mag_y) + sizeof(mag_z) + sizeof(acc_x) + sizeof(acc_y) + sizeof(acc_z);
         Buffer<buf_size> buffer;
 
         buffer.push(time);
@@ -168,7 +168,7 @@ namespace flash
         buffer.push(sats);
 
         buffer.push(pressure);
-        buffer.push(altitude);
+        buffer.push(f_altitude);
         buffer.push(f_velocity);
         buffer.push(temperature);
         
@@ -233,9 +233,9 @@ namespace flash
             stream.getValue<float>(&pressure);
             Serial.println("pressure: " + String(pressure, 10));
 
-            float altitude = 0;
-            stream.getValue<float>(&altitude);
-            Serial.println("altitude: " + String(altitude, 10));
+            float f_altitude = 0;
+            stream.getValue<float>(&f_altitude);
+            Serial.println("altitude: " + String(f_altitude, 10));
 
             float f_velocity = 0;
             stream.getValue<float>(&f_velocity);
@@ -324,13 +324,13 @@ namespace flash
             stream.getValue<float>(&pressure);
             Serial.print(String(pressure, 4) + ",");
 
-            float altitude = 0;
-            stream.getValue<float>(&altitude);
-            Serial.print(String(altitude, 4) + ",");
+            float f_altitude = 0;
+            stream.getValue<float>(&f_altitude);
+            Serial.print(String(f_altitude, 4) + ",");
 
-            float vert_velocity = 0;
-            stream.getValue<float>(&vert_velocity);
-            Serial.print(String(vert_velocity, 4) + ",");
+            float f_velocity = 0;
+            stream.getValue<float>(&f_velocity);
+            Serial.print(String(f_velocity, 4) + ",");
 
             float temperature = 0;
             stream.getValue<float>(&temperature);
