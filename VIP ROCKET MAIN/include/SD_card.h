@@ -61,9 +61,11 @@ namespace SDcard
 
         //Bar
         float pressure = barData.pressure; //2.1
-        float f_altitude = barData.f_altitude; //2.2
-        float vert_velocity = barData.f_velocity; //2.3
-        float temperature = barData.temperature; //2.4
+		float altitude = barData.altitude; //2.2
+        float f_altitude = barData.f_altitude; //2.3
+        float f_velocity = barData.f_velocity; //2.4
+		float f_acceleration = barData.f_acceleration; //2.5
+        float temperature = barData.temperature; //2.6
        
         //Bat
         float bat1 = batData.bat1; //3.1
@@ -77,7 +79,7 @@ namespace SDcard
         float acc_y = imuData.acc_y; //4.5
         float acc_z = imuData.acc_z; //4.6
 
-		fileSD.println(String(time, 2)+","+String(lat, 4)+","+String(lng, 4)+","+String(alt, 2)+","+String(sats)+","+String(pressure, 2)+","+String(f_altitude, 2)+","+String(vert_velocity, 2)+","+String(temperature, 1)+","+String(bat1, 2)+","+String(bat2, 2)+","+String(mag_x, 2)+","+String(mag_y, 2)+","+String(mag_z, 2)+","+String(acc_x, 2)+","+String(acc_y, 2)+","+String(acc_z, 2));
+		fileSD.println(String(time, 2)+","+String(lat, 4)+","+String(lng, 4)+","+String(alt, 2)+","+String(sats)+","+String(pressure, 2)+","+String(altitude, 2)+","+String(f_altitude, 2)+","+String(f_velocity, 2)+","+String(f_acceleration, 2)+","+String(temperature, 1)+","+String(bat1, 2)+","+String(bat2, 2)+","+String(mag_x, 2)+","+String(mag_y, 2)+","+String(mag_z, 2)+","+String(acc_x, 2)+","+String(acc_y, 2)+","+String(acc_z, 2));
 		return 1;
     }
 

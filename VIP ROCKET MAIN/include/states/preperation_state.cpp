@@ -65,7 +65,7 @@ public:
 
         //*Sensor reading test loop + SD_Card read, write test loop
         int loops = 0;
-        while (loops<50) //!change for flash testing
+        while (loops<100) //!change for flash testing
         {
             //*gps
             gps::readGps();                             // reads in values from gps
@@ -95,6 +95,9 @@ public:
 
         //*close files
         SDcard::closeFile(fileSD);
+
+        //!Stop for kalman testing
+        while(true);
         
         this->_context->RequestNextPhase();
         this->_context->Start();
