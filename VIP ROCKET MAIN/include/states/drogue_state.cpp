@@ -48,21 +48,22 @@ public:
 
             //*placeholder for battery data
 
+            //writing to flash
             flash::writeData(file, gd, md, bd, btd);
-            delay(100);
+            //writing to SD card
+            SDcard::writeData(fileSD, gd, md, bd, btd);
+            delay(50);
         }
-/*
-        while (flash::writeData(file, gd, md, bd, btd) <= 100) //*while a 100 writes have not been made
-        {
-        }
-*/
+
         // TODO add apogee detect
 
+        //close flash file
         flash::closeFile(file);
-        Serial.println("Finished writing to flash");
 
-        flash::readFlashVerbose("/test.txt"); // opening and reading file
-        while (1); //*End of testing
+        //close SD file
+        SDcard::closeFile(fileSD);
+
+        //flash::readFlashVerbose("/test.txt"); // opening and reading file
 
         this->_context->RequestNextPhase();
         this->_context->Start();

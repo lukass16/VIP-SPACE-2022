@@ -13,6 +13,10 @@ class MainState : public State {
             Serial.println("MAIN STATE");
 
             delay(1000);
+            while(true)
+            {
+                delay(1000);
+            }
            
             this->_context->RequestNextPhase();
             this->_context->Start();

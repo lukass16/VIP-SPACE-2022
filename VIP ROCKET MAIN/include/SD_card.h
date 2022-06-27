@@ -34,7 +34,7 @@ namespace SDcard
 
 	SD_File openFile() //returnds file handle
 	{
-		SD_File fileSD = SD.open("data0.txt", FILE_WRITES);
+		SD_File fileSD = SD.open("data1.txt", FILE_WRITES);
 		return fileSD;
 	}
 
