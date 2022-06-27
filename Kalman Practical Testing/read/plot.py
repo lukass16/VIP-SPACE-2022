@@ -41,7 +41,7 @@ plt.figure(figsize=(8,6))
 plt.plot(t, bp, color="b", label = "Raw Altitude [m]")
 plt.plot(t, p, color="r", label = "Filtered Altitude [m]")
 plt.legend()
-plt.show()
+#plt.show()
 plt.savefig("pos{}.png".format(ID), dpi=1000)
 
 plt.figure(figsize=(8,6))
@@ -68,3 +68,12 @@ plt.legend()
 #plt.show()
 plt.savefig("uncert{}.png".format(ID), dpi=1000)
 
+
+'''Additional mixed plots'''
+plt.figure(figsize=(8,6))
+plt.plot(t, p, color="r", label = "Filtered Altitude [m]")
+plt.plot(t, bp, color="b", label = "Raw Altitude [m]")
+plt.plot(t, v, color="c", label = "Kalman velocity [m/s]")
+plt.legend()
+#plt.show()
+plt.savefig("pos&vel{}.png".format(ID), dpi=1000)
