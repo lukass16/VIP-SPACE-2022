@@ -41,7 +41,9 @@ struct BarometerData
     float temperature = 0;
     float pressure = 0;
     float altitude = 0;
-    float vert_velocity = 0;
+    float f_altitude = 0;
+    float f_velocity = 0; //vertical velocity
+    float f_acceleration = 0; //vertical acceleration
 };
 
 struct BatteryData

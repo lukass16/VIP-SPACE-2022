@@ -7,9 +7,9 @@
 
 //thread par LoRa un SD konfliktu: https://stackoverflow.com/questions/57454066/how-to-use-2-spi-devices-lora-and-sd-card-on-esp32
 
-#define _miso 4
-#define _mosi 13 
-#define _sclk 14
+#define _miso 13
+#define _mosi 12
+#define _sclk 2
 #define SD_cs 25
 
 void initializeSD (){

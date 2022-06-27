@@ -1,7 +1,6 @@
 #pragma once
 #include <TinyGPS++.h>
 #include "sensor_data.h"
-#include "EEPROM.h"
 
 #define RXPIN 16  //(important to remember about crossover connection)
 #define TXPIN 17 // 

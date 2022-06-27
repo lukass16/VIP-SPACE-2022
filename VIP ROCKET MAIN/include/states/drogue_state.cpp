@@ -4,6 +4,7 @@
 #include "core/core.cpp"
 #include "main_state.cpp"
 #include "flash.h"
+#include "SD_card.h"
 #include "buzzer.h"
 #include "gps_wrapper.h"
 #include "barometer_wrapper_MS5607.h"
@@ -16,18 +17,19 @@ public:
     {
         Serial.println("DROGUE STATE");
 
-        //*Flash testing
-        Serial.println("Testing flash");
-        flash::deleteFile("/test.txt"); //*deleting file so as to reset it every test
-        File file = flash::openFile();  // opening file for writing during flight
+        File file = flash::openFile();       // opening flash file for writing during flight
+        SD_File fileSD = SDcard::openFile(); // opening SD file for writing during drogue state
+        SDcard::markDrogue(fileSD);
 
-        //*variables for writing to flash (Note: in the preparation state these are repeatedly constructed every loop - should evaluate whether defining them once would not be a better solution)
+        // variables for writing to flash
         sens_data::GpsData gd;
         sens_data::BarometerData bd;
         sens_data::IMUData md;
         sens_data::BatteryData btd;
 
-        while (flash::writeData(file, gd, md, bd, btd) <= 100) //*while a 100 writes have not been made
+        // TODO add launch detect
+        // Detect launch using IMU acceleration *a* for *n* times
+        while (!imu::launchDetected())
         {
             //*gps
             gps::readGps();          // reads in values from gps
@@ -41,21 +43,28 @@ public:
 
             //*imu
             imu::readSensor();
+            imu::printAll();
             md = imu::getIMUState();
             s_data.setIMUData(md);
 
             //*placeholder for battery data
 
-            delay(100);
+            //writing to flash
+            flash::writeData(file, gd, md, bd, btd);
+            //writing to SD card
+            SDcard::writeData(fileSD, gd, md, bd, btd);
+            delay(50);
         }
 
+        // TODO add apogee detect
+
+        //close flash file
         flash::closeFile(file);
-        Serial.println("Finished writing to flash");
 
-        flash::readFlashVerbose("/test.txt"); // opening and reading file
-        while (1);
+        //close SD file
+        SDcard::closeFile(fileSD);
 
-        delay(2000);
+        //flash::readFlashVerbose("/test.txt"); // opening and reading file
 
         this->_context->RequestNextPhase();
         this->_context->Start();

@@ -11,12 +11,15 @@
 #include "gps_wrapper.h"
 #include "barometer_wrapper_MS5607.h"
 #include "imu_wrapper_MPU9250.h"
-#include "EEPROM.h"
+#include "eeprom_wrapper.h"
+#include "SD_card.h"
+
+//*Temporary variables
+bool clearEEPROM = false;
 
 class PreperationState : public State
 {
 public:
-    float it = 0;
 
     void start() override
     {
@@ -29,10 +32,16 @@ public:
         delay(500);
         buzzer::buzzEnd();
 
-        // oled::setup(); //*possibly conflicting with GPS
+        //*EEPROM setup
+        eeprom::setup();
 
         //*flash setup
         flash::setup();
+
+        //*SD card setup
+        SDcard::setup(); 
+        SD_File fileSD = SDcard::openFile();
+        SDcard::markPreparation(fileSD);
 
         //*Sensor setups
         Wire.begin(21, 22); // initialize correct i2c lines
@@ -42,22 +51,22 @@ public:
 
         comms::setup(433E6);
 
-        /*  wifiserver::setup(); //*testing wifi in prep loop
-        while(true)
+        //*check if need to clear EEPROM
+        if(clearEEPROM) //TODO add dedicated clear function which clears all appropriate EEPROM addresses
         {
-            it++;
-            sens_data::MagenetometerData md;
-            md.x = it;
-            s_data.setMagnetometerData(md); //setting data in sensor data object
-            wifiserver::setData(); //making the wifi server retrieve/update the data
-            wifiserver::handleClient();
-            delay(100);
-        }*/
+            eeprom::unlockFlash(); //only utility currently for EEPROM
+        }
 
-        delay(2000);
+        //*if flash not locked - delete file
+        if(!eeprom::lockedFlash())
+        {
+            flash::deleteFile("/test.txt"); //*deleting file so as to reset it
+        }
 
-        //*Sensor reading test loop
-        while (false) //!change for flash testing
+        //TODO add EEPROM state transfer mechanism
+
+        int loops = 0;
+        while (loops<10) //!TODO change with while(!arming::armed) - add arming functionality
         {
             //*gps
             gps::readGps();                             // reads in values from gps
@@ -74,9 +83,20 @@ public:
             sens_data::IMUData md = imu::getIMUState();
             s_data.setIMUData(md);
 
-            delay(1000);
+            //*battery
+            sens_data::BatteryData btd;
+
+            //writing to SD card
+            SDcard::writeData(fileSD, gd, md, bd, btd);
+
+            delay(50);
+            loops++;
+            Serial.println(loops);
         }
 
+        //*close SD file
+        SDcard::closeFile(fileSD);
+        
         this->_context->RequestNextPhase();
         this->_context->Start();
     }

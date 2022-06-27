@@ -3,7 +3,7 @@
 #include "FS.h"
 #include <LITTLEFS.h>
 #include "sensor_data.h"
-#include "EEPROM.h"
+#include "eeprom_wrapper.h"
 
 #define FORMAT_LITTLEFS_IF_FAILED true
 
@@ -74,7 +74,7 @@ namespace flash
             //LITTLEFS.format(); //comment this out - only for first time with testing flash
             return;
         }
-        Serial.println("SPIFFS-like write file to new path and delete it w/folders");
+        Serial.println("Flash setup");
     }
 
     void deleteFile(const char *path)
@@ -142,8 +142,10 @@ namespace flash
         //Bar
         auto pressure = (uint8_t *)(&barData.pressure); //2.1
         auto altitude = (uint8_t *)(&barData.altitude); //2.2
-        auto vert_velocity = (uint8_t *)(&barData.vert_velocity); //2.3
-        auto temperature = (uint8_t *)(&barData.temperature); //2.4
+        auto f_altitude = (uint8_t *)(&barData.f_altitude); //2.4
+        auto f_velocity = (uint8_t *)(&barData.f_velocity); //2.5
+        auto f_acceleration = (uint8_t *)(&barData.f_acceleration); //2.6
+        auto temperature = (uint8_t *)(&barData.temperature); //2.7
        
         //Bat
         auto bat1 = (uint8_t *)(&batData.bat1); //3.1
@@ -157,7 +159,7 @@ namespace flash
         auto acc_y = (uint8_t *)(&imuData.acc_y); //4.5
         auto acc_z = (uint8_t *)(&imuData.acc_z); //4.6
 
-        auto const buf_size = sizeof(time) + sizeof(lat) + sizeof(lng) + sizeof(alt) + sizeof(sats) + sizeof(pressure) + sizeof(altitude) + sizeof(vert_velocity) + sizeof(temperature) + sizeof(bat1) + sizeof(bat2) + sizeof(mag_x) + sizeof(mag_y) + sizeof(mag_z) + sizeof(acc_x) + sizeof(acc_y) + sizeof(acc_z);
+        auto const buf_size = sizeof(time) + sizeof(lat) + sizeof(lng) + sizeof(alt) + sizeof(sats) + sizeof(pressure) + sizeof(altitude) + sizeof(f_altitude) + sizeof(f_velocity) + sizeof(f_acceleration) + sizeof(temperature) + sizeof(bat1) + sizeof(bat2) + sizeof(mag_x) + sizeof(mag_y) + sizeof(mag_z) + sizeof(acc_x) + sizeof(acc_y) + sizeof(acc_z);
         Buffer<buf_size> buffer;
 
         buffer.push(time);
@@ -169,7 +171,9 @@ namespace flash
 
         buffer.push(pressure);
         buffer.push(altitude);
-        buffer.push(vert_velocity);
+        buffer.push(f_altitude);
+        buffer.push(f_velocity);
+        buffer.push(f_acceleration);
         buffer.push(temperature);
         
         buffer.push(bat1);
@@ -198,7 +202,7 @@ namespace flash
     {
         File file = LITTLEFS.open(path);
         //This is the size of reading
-        auto const buf_size = sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float);   
+        auto const buf_size = sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float);   
         while (file.available())
         {
 
@@ -237,9 +241,17 @@ namespace flash
             stream.getValue<float>(&altitude);
             Serial.println("altitude: " + String(altitude, 10));
 
-            float vert_velocity = 0;
-            stream.getValue<float>(&vert_velocity);
-            Serial.println("vert_velocity: " + String(vert_velocity, 10));
+            float f_altitude = 0;
+            stream.getValue<float>(&f_altitude);
+            Serial.println("f_altitude: " + String(f_altitude, 10));
+
+            float f_velocity = 0;
+            stream.getValue<float>(&f_velocity);
+            Serial.println("f_velocity: " + String(f_velocity, 10));
+
+            float f_acceleration = 0;
+            stream.getValue<float>(&f_acceleration);
+            Serial.println("f_acceleration: " + String(f_acceleration, 10));
 
             float temperature = 0;
             stream.getValue<float>(&temperature);
@@ -328,9 +340,17 @@ namespace flash
             stream.getValue<float>(&altitude);
             Serial.print(String(altitude, 4) + ",");
 
-            float vert_velocity = 0;
-            stream.getValue<float>(&vert_velocity);
-            Serial.print(String(vert_velocity, 4) + ",");
+            float f_altitude = 0;
+            stream.getValue<float>(&f_altitude);
+            Serial.print(String(f_altitude, 4) + ",");
+
+            float f_velocity = 0;
+            stream.getValue<float>(&f_velocity);
+            Serial.print(String(f_velocity, 4) + ",");
+
+            float f_acceleration = 0;
+            stream.getValue<float>(&f_acceleration);
+            Serial.print(String(f_acceleration, 4) + ",");
 
             float temperature = 0;
             stream.getValue<float>(&temperature);
@@ -377,21 +397,17 @@ namespace flash
 
     void lock()
     {
-        Serial.println("Flash locked");
-        EEPROM.writeFloat(40, 5); //5 chosen as arbitrary value in case this address is used for more fucntionality (file names)
-        EEPROM.commit();
+        eeprom::lockFlash();
     }
 
     void unlock()
     {
-        Serial.println("Flash unlocked");
-        EEPROM.writeFloat(40, 0);
-        EEPROM.commit();
+        eeprom::unlockFlash();
     }
 
     bool locked()
     {
-        if (EEPROM.readFloat(40) == 5)
+        if (eeprom::lockedFlash())
         {
             Serial.println("Cannot delete flash - locked");
             return 1;

@@ -10,7 +10,7 @@ namespace imu
 
     void setup()
     {
-        mpu.setup(0x68); //! Note if the sensor can't connect check that the setup is forced in the MPU9250.h file
+        mpu.setup(0x69); //! Note if the sensor can't connect check that the setup is forced in the MPU9250.h file
     }
 
     void calibrateAccelAndGyro()
@@ -40,18 +40,52 @@ namespace imu
         if (mpu.update())
         {
             //*Get readings from accelerometer + gyro
-            Serial.print(mpu.getAccX());
+            Serial.print("Acc X: " + String(mpu.getAccX(), 2));
             Serial.print(", ");
-            Serial.print(mpu.getAccY());
+            Serial.print("Acc Y: " + String(mpu.getAccY(), 2));
             Serial.print(", ");
-            Serial.print(mpu.getAccZ());
+            Serial.print("Acc Z: " + String(mpu.getAccZ(), 2));
 
             Serial.print("\t");
-            Serial.print(mpu.getGyroX());
+            Serial.print("Gyro X: " + String(mpu.getGyroX(), 2));
             Serial.print(", ");
-            Serial.print(mpu.getGyroY());
+            Serial.print("Gyro Y: " + String(mpu.getGyroY(), 2));
             Serial.print(", ");
-            Serial.println(mpu.getGyroZ());
+            Serial.println("Gyro Z: " + String(mpu.getGyroZ(), 2));
+        }
+    }
+
+    void printAll()
+    {
+        Serial.print("Acc X: " + String(acc_x, 2));
+        Serial.print(", ");
+        Serial.print("Acc Y: " + String(acc_y, 2));
+        Serial.print(", ");
+        Serial.print("Acc Z: " + String(acc_z, 2));
+
+        Serial.print("\t");
+        Serial.print("Gyro X: " + String(gyr_x, 2));
+        Serial.print(", ");
+        Serial.print("Gyro Y: " + String(gyr_y, 2));
+        Serial.print(", ");
+        Serial.println("Gyro Z: " + String(gyr_z, 2));
+    }
+
+    bool launchDetected(float threshold = 1, int times = 10) //threshold - threshold acceleration to be detected (in g), times - times for the threshold to be detected
+    {
+        static int counter = 0;
+        if (acc_y > threshold)
+        {
+            counter++;
+        }
+        if (counter > times)
+        {
+            Serial.println("Launch detected!");
+            return true;
+        }
+        else
+        {
+            return false;
         }
     }
 
@@ -69,7 +103,7 @@ namespace imu
         md.mag_x = 42.0; //*has no magnetometer readings
         md.mag_y = 42.0;
         md.mag_z = 42.0;
-        
+
         return md;
     }
 
