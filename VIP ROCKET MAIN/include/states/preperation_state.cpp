@@ -41,6 +41,7 @@ public:
         //*SD card setup
         SDcard::setup(); 
         SD_File fileSD = SDcard::openFile();
+        SDcard::markPreparation(fileSD);
 
         //*Sensor setups
         Wire.begin(21, 22); // initialize correct i2c lines

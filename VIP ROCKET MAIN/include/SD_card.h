@@ -34,7 +34,7 @@ namespace SDcard
 
 	SD_File openFile() //returnds file handle
 	{
-		SD_File fileSD = SD.open("data1.txt", FILE_WRITES);
+		SD_File fileSD = SD.open("data2.txt", FILE_WRITES);
 		return fileSD;
 	}
 
@@ -88,6 +88,26 @@ namespace SDcard
 		fileSD.println(String(time, 2)+","+String(lat, 4)+","+String(lng, 4)+","+String(alt, 2)+","+String(sats)+","+String(pressure, 2)+","+String(altitude, 2)+","+String(f_altitude, 2)+","+String(f_velocity, 2)+","+String(f_acceleration, 2)+","+String(temperature, 1)+","+String(bat1, 2)+","+String(bat2, 2)+","+String(mag_x, 2)+","+String(mag_y, 2)+","+String(mag_z, 2)+","+String(acc_x, 2)+","+String(acc_y, 2)+","+String(acc_z, 2));
 		return 1;
     }
+
+	void markPreparation(SD_File fileSD)
+	{
+		fileSD.println("PREPARATION STATE");
+	}
+
+	void markDrogue(SD_File fileSD)
+	{
+		fileSD.println("DROGUE STATE");
+	}
+
+	void markMain(SD_File fileSD)
+	{
+		fileSD.println("MAIN STATE");
+	}
+
+	void markDescent(SD_File fileSD)
+	{
+		fileSD.println("DESCENT STATE");
+	}
 
 	void readFullSD(SD_File rfile)
 	{

@@ -19,6 +19,7 @@ public:
 
         File file = flash::openFile();       // opening flash file for writing during flight
         SD_File fileSD = SDcard::openFile(); // opening SD file for writing during drogue state
+        SDcard::markDrogue(fileSD);
 
         // variables for writing to flash
         sens_data::GpsData gd;
