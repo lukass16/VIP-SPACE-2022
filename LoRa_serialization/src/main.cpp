@@ -16,7 +16,7 @@
     float bat1 = 7.9, bat2 = 9.9;                                                       // Battery data simulator
     int sats = 10, bs = 1000;
 
-    // storage space for data
+    // storage space for dataā
     byte mydata[35]; // 35 = number of bytes to store
     // adding as an object ... lkm xD
     LoraEncoder encoder(mydata);
@@ -24,10 +24,11 @@
 void setup()
 {
     Serial.begin(115200);
-    lora::setup();
-    Serial.println("Lora initialized!");
+//....................................................LoRa..................................................
+   /* lora::setup();
+    Serial.println("Lora initialized!");*/
 
-//......................................Ja gribas sensorus atsevišķi ierakstīt buferē.......................
+//......................................Ja gribas sensorus atsevišķi ierakstīt buferē.......................!NOT ESSENTIAL
 //* vienīgais nav decoderis šiem encoders – bet varu uztaisīt
     //encoder.writeHumidity(100.11);
     // encoder.writeGPS(lat, lng, alt, sats);          // lat, lng = each 32 bits = 8 bytes
@@ -36,16 +37,16 @@ void setup()
     //                                                 //  8+2+1 -> 11 bytes total
     // encoder.writeMag(x, y, z, acc_x, acc_y, acc_z); // each 16 bits = 2 bytes -> 2*6 = 12 bytes total
 
-    //encoding data
+    //encoding data 
     encoder.writeMessage(x, y, z, acc_x, acc_y, acc_z,lat, lng, gps_alt, sats,temperature, pressure, bar_alt, vert_velocity, bat1, bat2);
-    //deencoding data
+    //decoding data
     encoder.decodeMessage(mydata); // writes decoded data on the serial monitor
 
 
 
-//........................................write out the contents of the buffer..........................
+//........................................write out the contents of the buffer..........................!NOT ESSENTIAL
 /*
-    for (int i = 0; i <= 35; i++)
+    for (int i = 0; i < 35; i++)
         { 
             Serial.println(mydata[i]);
         }   
@@ -57,7 +58,7 @@ void loop()
 {
     
 //....................................... write out the contents of the buffer to LoRa....................................
-    LoRa.beginPacket();
+   /* LoRa.beginPacket();
     for (int i = 0; i <= 23; i++)
     { 
         LoRa.write(mydata[i]);
@@ -67,5 +68,5 @@ void loop()
     Serial.print("Sending packet: ");
     Serial.println(1);
 
-    delay(5000);
+    delay(5000);*/
 }
