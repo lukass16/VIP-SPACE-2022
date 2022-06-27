@@ -17,16 +17,18 @@ public:
     {
         Serial.println("DROGUE STATE");
 
-        File file = flash::openFile();  // opening flash file for writing during flight
-        SD_File fileSD = SDcard::openFile();
+        File file = flash::openFile();       // opening flash file for writing during flight
+        SD_File fileSD = SDcard::openFile(); // opening SD file for writing during drogue state
 
-        //*variables for writing to flash (Note: in the preparation state these are repeatedly constructed every loop - should evaluate whether defining them once would not be a better solution)
+        // variables for writing to flash
         sens_data::GpsData gd;
         sens_data::BarometerData bd;
         sens_data::IMUData md;
         sens_data::BatteryData btd;
 
-        while (flash::writeData(file, gd, md, bd, btd) <= 100) //*while a 100 writes have not been made
+        // TODO add launch detect
+        // Detect launch using IMU acceleration *a* for *n* times
+        while (!imu::launchDetected())
         {
             //*gps
             gps::readGps();          // reads in values from gps
@@ -40,13 +42,21 @@ public:
 
             //*imu
             imu::readSensor();
+            imu::printAll();
             md = imu::getIMUState();
             s_data.setIMUData(md);
 
             //*placeholder for battery data
 
-            delay(50);
+            flash::writeData(file, gd, md, bd, btd);
+            delay(100);
         }
+/*
+        while (flash::writeData(file, gd, md, bd, btd) <= 100) //*while a 100 writes have not been made
+        {
+        }
+*/
+        // TODO add apogee detect
 
         flash::closeFile(file);
         Serial.println("Finished writing to flash");

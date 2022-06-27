@@ -43,7 +43,7 @@ namespace SDcard
 		fileSD.close();
 	}
 
-	int writeData(SD_File fileSD, sens_data::GpsData gpsData, sens_data::IMUData imuData, sens_data::BarometerData barData, sens_data::BatteryData batData)
+	int writeData(SD_File fileSD, sens_data::GpsData gpsData, sens_data::IMUData imuData, sens_data::BarometerData barData, sens_data::BatteryData batData, bool verbose = false)
     {
 		if(!fileSD) 
 		{
@@ -79,6 +79,11 @@ namespace SDcard
         float acc_x = imuData.acc_x; //4.4
         float acc_y = imuData.acc_y; //4.5
         float acc_z = imuData.acc_z; //4.6
+
+		if(verbose)
+		{
+			Serial.println(String(time, 2)+","+String(lat, 4)+","+String(lng, 4)+","+String(alt, 2)+","+String(sats)+","+String(pressure, 2)+","+String(altitude, 2)+","+String(f_altitude, 2)+","+String(f_velocity, 2)+","+String(f_acceleration, 2)+","+String(temperature, 1)+","+String(bat1, 2)+","+String(bat2, 2)+","+String(mag_x, 2)+","+String(mag_y, 2)+","+String(mag_z, 2)+","+String(acc_x, 2)+","+String(acc_y, 2)+","+String(acc_z, 2));
+		}
 
 		fileSD.println(String(time, 2)+","+String(lat, 4)+","+String(lng, 4)+","+String(alt, 2)+","+String(sats)+","+String(pressure, 2)+","+String(altitude, 2)+","+String(f_altitude, 2)+","+String(f_velocity, 2)+","+String(f_acceleration, 2)+","+String(temperature, 1)+","+String(bat1, 2)+","+String(bat2, 2)+","+String(mag_x, 2)+","+String(mag_y, 2)+","+String(mag_z, 2)+","+String(acc_x, 2)+","+String(acc_y, 2)+","+String(acc_z, 2));
 		return 1;

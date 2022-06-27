@@ -20,7 +20,6 @@ bool clearEEPROM = false;
 class PreperationState : public State
 {
 public:
-    float it = 0;
 
     void start() override
     {
@@ -51,13 +50,13 @@ public:
 
         comms::setup(433E6);
 
-        //check if need to clear EEPROM
+        //*check if need to clear EEPROM
         if(clearEEPROM) //TODO add dedicated clear function which clears all appropriate EEPROM addresses
         {
             eeprom::unlockFlash(); //only utility currently for EEPROM
         }
 
-        //if flash not locked - delete file
+        //*if flash not locked - delete file
         if(!eeprom::lockedFlash())
         {
             flash::deleteFile("/test.txt"); //*deleting file so as to reset it
@@ -66,7 +65,7 @@ public:
         //TODO add EEPROM state transfer mechanism
 
         int loops = 0;
-        while (loops<100) //!TODO change with while(!arming::armed) - add arming functionality
+        while (loops<10) //!TODO change with while(!arming::armed) - add arming functionality
         {
             //*gps
             gps::readGps();                             // reads in values from gps
