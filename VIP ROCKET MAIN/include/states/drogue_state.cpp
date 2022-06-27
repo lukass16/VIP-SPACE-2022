@@ -49,22 +49,47 @@ public:
 
             //*placeholder for battery data
 
-            //writing to flash
+            // writing to flash
             flash::writeData(file, gd, md, bd, btd);
-            //writing to SD card
+            // writing to SD card
             SDcard::writeData(fileSD, gd, md, bd, btd);
             delay(50);
         }
 
-        // TODO add apogee detect
+        while (!barometer::apogeeDetected()) //TODO add alternative timer apogee detection
+        {
+            //*gps
+            gps::readGps();          // reads in values from gps
+            gd = gps::getGpsState(); // retrieve values from wrapper to be put in data object
+            s_data.setGpsData(gd);
 
-        //close flash file
+            //*barometer
+            barometer::readSensor();
+            barometer::printState();
+            bd = barometer::getBarometerState(); // reads and retrieves values from wrapper to be put in data object
+            s_data.setBarometerData(bd);
+
+            //*imu
+            imu::readSensor();
+            md = imu::getIMUState();
+            s_data.setIMUData(md);
+
+            //*placeholder for battery data
+
+            // writing to flash
+            flash::writeData(file, gd, md, bd, btd);
+            // writing to SD card
+            SDcard::writeData(fileSD, gd, md, bd, btd);
+            delay(50);
+        }
+
+        // close flash file
         flash::closeFile(file);
 
-        //close SD file
+        // close SD file
         SDcard::closeFile(fileSD);
 
-        //flash::readFlashVerbose("/test.txt"); // opening and reading file
+        // flash::readFlashVerbose("/test.txt"); // opening and reading file
 
         this->_context->RequestNextPhase();
         this->_context->Start();

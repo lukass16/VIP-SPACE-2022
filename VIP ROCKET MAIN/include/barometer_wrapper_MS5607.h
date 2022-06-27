@@ -13,7 +13,7 @@ namespace barometer
     double alt = 0;
     double seaLevelPressure = 0;
 
-    //Kalman (filtered) readings
+    // Kalman (filtered) readings
     float f_alt = 0;
     float f_vel = 0;
     float f_acc = 0;
@@ -52,10 +52,9 @@ namespace barometer
             }
         }
 
-        //kalman setup
+        // kalman setup
         kalman::predict(); // make first prediction
-	    kalman_t = millis();
-
+        kalman_t = millis();
     }
 
     void readSensor(bool temperatureCorrected = false)
@@ -75,9 +74,9 @@ namespace barometer
         kalman_t = millis();
 
         kalman::predict();
-	    kalman::updateBaro(alt);
+        kalman::updateBaro(alt);
 
-        //set filtered readings
+        // set filtered readings
         f_alt = kalman::getKalmanPosition();
         f_vel = kalman::getKalmanVelocity();
         f_acc = kalman::getKalmanAcceleration();
@@ -98,9 +97,36 @@ namespace barometer
         kalman::printFullInfoPosition(alt);
     }
 
+    void printState()
+    {
+        kalman::printKalmanState();
+    }
+ 
     float getVertVelocity() // todo make this
     {
         return 42.0;
+    }
+
+    bool apogeeDetected(int times = 3, float minimum_height = 20.0) // times - times to detect the vertical speed being below zero, minimum_height - the minimum height at which apogee can be detected, otherwise apogee detection is prohibited
+    {
+        static int counter = 0;
+        if (f_vel < 0 && f_alt > minimum_height)
+        {
+            counter++;
+        }
+        else
+        {
+            counter = 0;
+        }
+        if (counter > times)
+        {
+            Serial.println("Apogee detected!");
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
     sens_data::BarometerData getBarometerState() //*outputs sensor readings from wrapper to be used in the data object
