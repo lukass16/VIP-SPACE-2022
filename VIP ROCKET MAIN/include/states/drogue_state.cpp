@@ -21,7 +21,7 @@ public:
         SD_File fileSD = SDcard::openFile(); // opening SD file for writing during drogue state
         SDcard::markDrogue(fileSD);
 
-        // variables for writing to flash
+        // variables for writing to memory
         sens_data::GpsData gd;
         sens_data::BarometerData bd;
         sens_data::IMUData md;
