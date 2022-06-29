@@ -54,10 +54,11 @@ public:
             delay(50);
         }
 
-        while(true)
-        {
-            delay(1000);
-        }
+        // close flash file
+        flash::closeFile(file);
+
+        // close SD file
+        SDcard::closeFile(fileSD);
 
         this->_context->RequestNextPhase();
         this->_context->Start();

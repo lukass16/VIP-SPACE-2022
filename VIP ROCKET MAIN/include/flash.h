@@ -8,6 +8,7 @@
 #define FORMAT_LITTLEFS_IF_FAILED true
 
 unsigned long flash_time = millis();
+unsigned long start_descent_time;
 
 //to simplify the usage of the Flash header declared a different function - deleteFile - this serves as it's basis
 void delete_File(fs::FS &fs, const char *path)
@@ -418,5 +419,23 @@ namespace flash
     void closeFile(File file)
     {
         file.close();
+    }
+
+    bool flashEnded(File file, int flash_duration = 30000)
+    {
+        static bool firstCall = true;
+        static bool ended = false;
+        if(firstCall)
+        {
+            start_descent_time = millis();
+            firstCall = false;
+        }
+        if(!ended && millis() - start_descent_time > flash_duration)
+        {
+            ended = true;
+            file.close();
+            Serial.println("Flash Writing Ended");
+        }
+        return ended;
     }
 }

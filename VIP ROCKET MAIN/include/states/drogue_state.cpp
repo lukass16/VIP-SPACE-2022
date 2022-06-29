@@ -27,7 +27,6 @@ public:
         sens_data::IMUData md;
         sens_data::BatteryData btd;
 
-        // TODO add launch detect
         // Detect launch using IMU acceleration *a* for *n* times
         while (!imu::launchDetected())
         {
