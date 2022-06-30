@@ -20,11 +20,15 @@ public:
         SD_File fileSD = SDcard::openFile(); // opening SD file for writing
         SDcard::markDescent(fileSD);
 
+        s_data.updateRocketState(); //update state that's written to LoRa messages
+
         // variables for writing to memory
         sens_data::GpsData gd;
         sens_data::BarometerData bd;
         sens_data::IMUData md;
         sens_data::BatteryData btd;
+
+        //TODO add periodic SD card closing and opening as this is an infinite loop and SD card doesn't save unless closed
 
         while(!flash::flashEnded(file))
         {
@@ -57,6 +61,14 @@ public:
             SDcard::writeData(fileSD, gd, md, bd, btd);
             delay(200);
         }
+
+
+        //*Testing
+        // close flash file
+        flash::closeFile(file);
+
+        // close SD file
+        SDcard::closeFile(fileSD);
 
         flash::readFlashVerbose("/test.txt");
 

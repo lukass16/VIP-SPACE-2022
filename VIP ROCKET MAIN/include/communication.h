@@ -44,7 +44,8 @@ namespace comms
         sens_data::IMUData imu = s_data.getIMUData();
         sens_data::BarometerData bar = s_data.getBarometerData();
         sens_data::BatteryData bat = s_data.getBatteryData();
-        sprintf(outgoing, "%7.4f,%7.4f,%5.0f,%2d,%5.2f,%5.2f,%5.2f,%3.1f,%6.1f,%3.0f,%1d,%4d", gps.lat, gps.lng, gps.alt, gps.sats, imu.acc_x, imu.acc_y, imu.acc_z, bar.temperature, bar.f_altitude, bar.f_velocity, bat.bs, counter); //*imu sends acceleration in place of magnetic field strength
+        int r_state = s_data.getRocketState();
+        sprintf(outgoing, "%7.4f,%7.4f,%5.0f,%2d,%5.2f,%5.2f,%5.2f,%3.1f,%6.1f,%3.0f,%1d,%1d,%4d", gps.lat, gps.lng, gps.alt, gps.sats, imu.acc_x, imu.acc_y, imu.acc_z, bar.temperature, bar.f_altitude, bar.f_velocity, bat.bs, r_state, counter); //*imu sends acceleration in place of magnetic field strength
         counter++;
         return outgoing;
     }

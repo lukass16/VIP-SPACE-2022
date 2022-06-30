@@ -21,6 +21,8 @@ public:
         SD_File fileSD = SDcard::openFile(); // opening SD file for writing during drogue state
         SDcard::markDrogue(fileSD);
 
+        s_data.updateRocketState(); //update state that's written to LoRa messages
+
         // variables for writing to memory
         sens_data::GpsData gd;
         sens_data::BarometerData bd;

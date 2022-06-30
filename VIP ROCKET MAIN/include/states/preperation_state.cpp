@@ -50,6 +50,7 @@ public:
         imu::setup();
 
         comms::setup(433E6);
+        s_data.updateRocketState(); //update state that's written to LoRa messages
 
         //*check if need to clear EEPROM
         if(clearEEPROM) //TODO add dedicated clear function which clears all appropriate EEPROM addresses

@@ -5,13 +5,6 @@
 
 namespace sens_data {
 
-enum ROCKET_STATE {
-    PREPERATION = 0, // Sensor checks 
-    MAIN = 1, //  is already flying
-    DROGUE = 2, // Parachute is realeased, rocket has reached apogee
-    DESCENT = 3 // Rocked is landing/has landed somewhere - need to find it 
-};
-
 struct GpsData 
 {
     double lat = 0;
@@ -57,7 +50,7 @@ struct BatteryData
 class SensorData
 {
     private:
-        ROCKET_STATE current_rocket_state;
+        int current_rocket_state = 0;
         GpsData gpsData;
         IMUData imuData;
         BarometerData barometerData;
@@ -70,6 +63,21 @@ class SensorData
         SensorData(){
             mtx.setup();
         };
+
+        void updateRocketState()
+        {
+            mtx.lock();
+            current_rocket_state++;
+            mtx.unlock();
+        }
+
+        int getRocketState()
+        {
+            mtx.lock();
+            int state = current_rocket_state;
+            mtx.unlock();
+            return state;
+        }
 
         IMUData getIMUData()
         { 
