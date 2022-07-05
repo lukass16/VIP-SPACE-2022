@@ -16,7 +16,7 @@ void LoraEncoder::_intToBytes(byte *buf, int32_t i, uint8_t byteSize) {
 
 int LoraEncoder::_BytesToNum(byte *buf, int32_t start, uint8_t size) {
     int num=0;
-     for(uint8_t x = start; x < start+size; x++) {
+    for(uint8_t x = start; x < start+size; x++) {
         num = num + (int) (buf[x] << (x-start)*8);
     }
     return num;
@@ -131,7 +131,7 @@ void LoraEncoder::decodeMessage(byte *buf){
     
 
 
-    Serial.printf("%.2f, %.2f,  %.2f,  %.2f,  %.2f,  %.2f, %.4f, %.4f, %.0f, %.0f, %.1f, %.0f, %.1f, %.2f, %.2f", x, y, z, acc_x, acc_y, acc_z, lat, lng, gps_alt, sats, temperature, pressure, vert_velocity, bat1, bat2);   
+    Serial.printf("\n%.2f, %.2f,  %.2f,  %.2f,  %.2f,  %.2f, %.4f, %.4f, %.0f, %.0f, %.1f, %.0f, %.1f, %.2f, %.2f", x, y, z, acc_x, acc_y, acc_z, lat, lng, gps_alt, sats, temperature, pressure, vert_velocity, bat1, bat2);   
     
 }
 void LoraEncoder::writeUint16(uint16_t i) {
