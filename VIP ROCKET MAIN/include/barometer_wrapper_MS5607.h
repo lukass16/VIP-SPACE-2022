@@ -63,7 +63,7 @@ namespace barometer
         if (MS5607.isReady())
         {
             temp = MS5607.GetTemp();                        // Returns temperature in C
-            pres = MS5607.GetPres();                        // Returns pressure in Pascals
+            pres = MS5607.GetPres();                        // Returns pressure in Pascals //*Note - saved and sent in hPa
             alt = MS5607.getAltitude(temperatureCorrected); // Returns altitude in m - //*optionally temperature corrected
         }
 
@@ -155,7 +155,7 @@ namespace barometer
     {
         sens_data::BarometerData bd;
         bd.temperature = temp;
-        bd.pressure = pres;
+        bd.pressure = pres / 100.0; //saving in hPa
         bd.altitude = alt;
         bd.f_altitude = f_alt;
         bd.f_velocity = f_vel;
