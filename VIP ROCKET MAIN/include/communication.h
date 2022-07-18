@@ -5,10 +5,10 @@
 #include "lora_wrapper.h"
 #include "thread_wrapper.h"
 
-using namespace std;
 
 namespace comms
 {
+
     String serializeData();
     void loop(void *args);
 
@@ -26,11 +26,13 @@ namespace comms
         while (true)
         {
             String serialized = comms::serializeData();
-            lora::sendMessage(serialized, s_data.lora_message_id);
+            lora::encodeMessage();
+            lora::sendEncodedMessage();
             Serial.print("Lora (msg id: ");
             Serial.print(s_data.lora_message_id);
             Serial.print(") sent: ");
             Serial.println(serialized);
+            lora::printBuffer();
             s_data.lora_message_id++;
             delay(400);
         }
