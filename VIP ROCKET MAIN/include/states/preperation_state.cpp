@@ -66,8 +66,9 @@ public:
 
         //TODO add EEPROM state transfer mechanism
 
-        int loops = 0;
-        while (loops<10) //!TODO change with while(!arming::armed) - add arming functionality
+        int loops = 0; 
+        //!TODO change with while(!arming::armed) - add arming functionality 
+        while (true) //!Serialization testing
         {
             //*gps
             gps::readGps();                             // reads in values from gps
@@ -91,8 +92,8 @@ public:
             SDcard::writeData(fileSD, gd, md, bd, btd);
 
             delay(50);
-            loops++;
-            Serial.println(loops);
+            //loops++;
+            //Serial.println(loops);
         }
 
         //*close SD file
