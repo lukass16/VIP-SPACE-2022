@@ -26,7 +26,7 @@ namespace lora
 
     LoraEncoder encoder(message);
 
-    sens_data::SensorData s_data; //data object
+    sens_data::SensorData s_data; // data object
 
     String outgoing; // outgoing message
 
@@ -134,20 +134,32 @@ namespace lora
     sens_data::SensorData readEncodedMessage()
     {
         int packetSize = LoRa.parsePacket();
+
         if (packetSize)
         {
-            Serial.println("1");
+            Serial.print("Received packet: " + String(packetSize) + " ");
+
+            // read packet header bytes:
+            int recipient = LoRa.read();       // recipient address
+            byte sender = LoRa.read();         // sender address
+            byte incomingMsgId = LoRa.read();  // incoming msg ID
+            byte incomingLength = LoRa.read(); // incoming msg length
+
             int i = 0;
+            if (recipient != _localAddress && recipient != 0xBB)
+            {
+                s_data.counter = -2;
+                Serial.println("This message is not for me, recipient: " + String(recipient));
+                return s_data;
+            }
             while (LoRa.available())
             {
                 byte read = LoRa.read();
                 message[i] = read;
-                //Serial.print(read);
+                // Serial.print(read);
                 i++;
             }
-            Serial.println("2");
-            s_data = encoder.decodeMessage(message); //also prints out decoded variables in a comma separated format
-            Serial.println("3");
+            s_data = encoder.decodeMessage(message); // also prints out decoded variables in a comma separated format
         }
         else
         {

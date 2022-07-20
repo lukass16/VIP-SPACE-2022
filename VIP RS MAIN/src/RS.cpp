@@ -29,7 +29,7 @@ int r_state = 0;
 // Packet stuff
 
 int counter = 0;
-int badPackets = 0;
+int lostPackets = 0;
 int corruptedPackets = 0;
 double successRate = 0;
 float receivedRSSI = 0;
@@ -53,7 +53,7 @@ int currentScreen = 1;
 int prevSats = -1;
 int pageCounter = 1;
 int prevDisplayedCounter = 0;
-int MathCounter = 0; // EXP
+int lastCounter = 0; // EXP
 bool ScreenSwitched = 0;
 
 // defining necessary functional variables
@@ -95,6 +95,25 @@ void printData()
 	Serial.printf("%7.4f,%7.4f,%5.0f,%2d,%4.2f,%4.2f,%4.2f,%5.0f,%6.1f,%6.1f,%3.0f,%2.1f,%1d,%4d\n", lat, lng, alt, sats, acc_x, acc_y, acc_z, pres, bar_alt, f_alt, f_vel, bat1, r_state, counter);
 }
 
+void calculatePacketInfo()
+{
+	// Ja divu secīgu pakešu atšķirība ir lielāka par viens, aprēķina izkritušo paketi
+	// Ja pienāk nulles pakete pēc tā, ka ir saņemta pakete lielāka par 0, tā tiek uztverta kā koruptēta
+	if (lastCounter != counter) // ja ir pienākusi jauna pakete
+	{
+		if (counter >= 1) // ja nav pienākusi pati pirmā
+		{
+			lostPackets += counter - lastCounter - 1;						 // aprēķinam cik izkrita paketes
+			successRate = 100 - (int)((float)lostPackets / counter * 100.0); // Percentage of good packets from total
+			lastCounter = counter;
+			Serial.println("Lost Packets: " + String(lostPackets) + " Success rate: " + String(successRate));
+		}
+		else if (counter == 0 && lastCounter >= 1)
+		{
+			corruptedPackets++;
+		}
+	}
+}
 
 void setup()
 {
@@ -119,25 +138,21 @@ void setup()
 	pinMode(RightSwitch, INPUT);
 }
 
-
 void loop()
 {
 	gps::readGps();
 
-	// LoRa parametri
-	receivedRSSI = lora::getPacketRssi();
-	receivedSNR = lora::getPacketSNR();
-
-	freqError = lora::freqError();
-
 	// Ziņu nolasīšana
 	s_data = lora::readEncodedMessage();
 
-	if(s_data.counter != -1) //ja tika saņemta ziņa
+	// LoRa parametri
+	receivedRSSI = lora::getPacketRssi();
+	receivedSNR = lora::getPacketSNR();
+	freqError = lora::freqError();
+
+	if (s_data.counter != -1) // ja tika saņemta ziņa
 	{
 		allotData(s_data);
-		// Saņemto datu izvade uz Serial
-		printData();
 	}
 
 	// RS GPS aprēķini un funkcijas
@@ -149,29 +164,8 @@ void loop()
 	sats = gps::getSatellites();
 	gpsValid = gps::gpsValid();
 
-
 	//* SLIKTO PAKEŠU APRĒĶINS
-	// Ja divu secīgu pakešu atšķirība ir lielāka par viens, aprēķina izkritušo paketi
-	// Ja pienāk nulles pakete pēc tā, ka ir saņemta pakete lielāka par 0, tā tiek uztverta kā koruptēta
-
-	if (MathCounter != counter)
-	{
-		if (counter >= 1)
-		{
-			badPackets = badPackets + (counter - (MathCounter + 1));
-			successRate = 100 - ((int)((double)badPackets / counter * 100));
-			MathCounter = counter;
-			Serial.print("New packet, badPackets = ");
-			Serial.print(badPackets);
-			Serial.print(" success ratio = ");
-			Serial.println(successRate);
-		}
-	}
-	if (counter == 0 && MathCounter >= 1 && startCorruption == 1)
-	{
-		corruptedPackets++;
-		startCorruption = 0;
-	}
+	calculatePacketInfo();
 
 	// Ja pg counter == 2 un ekrāns pārslēgts vai mainās distance vai pienāk jauna pakete, tad atsvaidzina
 	// Ja pg counter == 1 un ekrāns pārslēgts vai mainās satelītu skaits, tad atsvaidzina
@@ -217,7 +211,7 @@ void loop()
 	}
 	else if (pageCounter == 0 && (currentScreen != 0 || prevDisplayedCounter != counter))
 	{
-		lcd::LoRaSetup(MathCounter, badPackets, successRate, receivedRSSI, receivedSNR, corruptedPackets);
+		lcd::LoRaSetup(lastCounter, lostPackets, successRate, receivedRSSI, receivedSNR, corruptedPackets);
 		prevDisplayedCounter = counter;
 		currentScreen = 0;
 	}

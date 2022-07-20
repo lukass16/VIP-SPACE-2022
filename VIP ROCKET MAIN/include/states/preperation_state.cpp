@@ -46,7 +46,7 @@ public:
         //*Sensor setups
         Wire.begin(21, 22); // initialize correct i2c lines
         gps::setup();
-        barometer::setup();
+        //barometer::setup(); //!Commented out 
         imu::setup();
 
         comms::setup(433E6);
