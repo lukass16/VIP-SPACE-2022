@@ -31,6 +31,16 @@ namespace gps {
         }
     }
 
+    void disableSerial()
+    {
+        gpsSerial.enableRx(false);
+    }
+
+    void enableSerial()
+    {
+        gpsSerial.enableRx(true);
+    }
+
     double lastLatitude() {
         return gps.location.lat();  //TODO ar 6 skaitljiem?
     }
