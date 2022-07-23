@@ -26,16 +26,12 @@ namespace comms
         while (true)
         {
             String serialized = comms::serializeData();
-            Serial.println("Sent data: " + String(serialized));
-
-            //*option 1 - Not encoded
-            lora::sendMessage(serialized, 1);
-
-            //*option 2 - Encoded
-            // lora::encodeMessage();
-            // lora::sendEncodedMessage(1);
-
-            delay(1000); //Changed form 400
+            Serial.println("Serialized: " + String(serialized));
+            lora::encodeMessage();
+            // Serial.print("Decoded: ");
+            // lora::decodeMessage();
+            lora::sendEncodedMessage(1);
+            delay(3000); //Changed form 400
         }
     }
 
