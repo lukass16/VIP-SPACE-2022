@@ -31,7 +31,7 @@ void LoraEncoder::writeUnixtime(uint32_t unixtime) {
 
 
 void LoraEncoder::writeMessage(float mag_x, float mag_y, float mag_z, float macc_x, float macc_y, float macc_z, double glat, double glng, double gps_alt, int sats, float temperature, float pressure, float bar_alt, float vert_velocity, float bat1, float bat2) {
-    int16_t x = (int16_t)(mag_x*100);
+    int16_t x = mag_x*100;
     int16_t y = mag_y*100;
     int16_t z = mag_z*100;
     int16_t acc_x = macc_x*100;

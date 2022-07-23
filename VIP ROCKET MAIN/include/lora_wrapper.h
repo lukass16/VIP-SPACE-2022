@@ -6,7 +6,6 @@
 #include "sensor_data.h"
 // https://randomnerdtutorials.com/ttgo-lora32-sx1276-arduino-ide/
 // https://github.com/sandeepmistry/arduino-LoRa/blob/master/examples/LoRaDuplex/LoRaDuplex.ino
-// https://www.thethingsnetwork.org/docs/devices/bytes/
 
 // definitions for LoRa
 #define SS 18
@@ -21,18 +20,8 @@
 namespace lora
 {
 
-    String outgoing; // outgoing message
-
-    int syncWord = 0xF3;
-    byte _localAddress = 0xFF; // address of this device
-    byte _destination = 0xFF;  // destination to send to
-
-    boolean _canPrintHeaderMessage = false;
-
     //*ENCODING
     byte data[B_SIZE]; // main buffer that is linked with encoder
-    byte pseudodata[B_SIZE]; //!Testing
-
     LoraEncoder encoder(data);
 
     void encodeMessage()
@@ -55,35 +44,34 @@ namespace lora
         encoder.decodeMessage(data);
     }
 
-    void sendEncodedMessage(int lora_message_id)
+    void sendEncodedMessage()
     {
         LoRa.beginPacket();
-        LoRa.write(_destination);      // add destination address
-        LoRa.write(_localAddress);     // add sender address
-        LoRa.write(lora_message_id);   // add message ID
-        LoRa.write(B_SIZE);
-        LoRa.write(data, B_SIZE);
+        for (int i = 0; i < B_SIZE; i++)
+        {
+            LoRa.write(data[i]);
+        }
         LoRa.endPacket();
-        // Serial.println("Printing data:");
-        // for (int i = 0; i < B_SIZE; i++)
-        // {
-        //     Serial.print(String(i) + ": ");
-        //     Serial.println(data[i]);
-        // }
     }
 
     void printBuffer()
     {
-        Serial.println("Printing buffer:");
         for (int i = 0; i < B_SIZE; i++)
         {
-            Serial.print(String(i) + ": ");
-            Serial.println(data[i]);
+            Serial.print(data[i]);
         }
         Serial.println();
     }
 
     //*
+    
+    String outgoing; // outgoing message
+
+    int syncWord = 0xF3;
+    byte _localAddress = 0xFF; // address of this device
+    byte _destination = 0xFF;  // destination to send to
+
+    boolean _canPrintHeaderMessage = false;
 
     void sendMessage(String outgoing, int lora_message_id);
 

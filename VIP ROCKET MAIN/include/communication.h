@@ -26,17 +26,18 @@ namespace comms
         while (true)
         {
             String serialized = comms::serializeData();
-            Serial.println("Serialized: " + String(serialized));
             lora::encodeMessage();
-            // Serial.print("Encoded: ");
-            //lora::printBuffer();
+            lora::sendEncodedMessage();
+            // Serial.print("Lora (msg id: ");
+            // Serial.print(s_data.lora_message_id);
+            // Serial.print(") sent: ");
+            Serial.println("Serialized: " + serialized);
             Serial.print("Decoded: ");
             lora::decodeMessage();
-            // Serial.print("Sending: ");
-            lora::sendEncodedMessage(1);
-            
-            //s_data.lora_message_id++;
-            delay(1000); //!Changed form 400
+            Serial.print("Buffer: ");
+            lora::printBuffer();
+            s_data.lora_message_id++;
+            delay(400);
         }
     }
 
@@ -49,7 +50,7 @@ namespace comms
         sens_data::BarometerData bar = s_data.getBarometerData();
         sens_data::BatteryData bat = s_data.getBatteryData();
         int r_state = s_data.getRocketState();
-        sprintf(outgoing, "%7.4f,%7.4f,%5.0f,%2d,%4.2f,%4.2f,%4.2f,%5.0f,%6.1f,%6.1f,%4.0f,%2.1f,%1d,%4d", gps.lat, gps.lng, gps.alt, gps.sats, imu.acc_x, imu.acc_y, imu.acc_z, bar.pressure, bar.altitude, bar.f_altitude, bar.f_velocity, bat.bat1, r_state, counter); //*imu sends acceleration in place of magnetic field strength
+        sprintf(outgoing, "%7.4f,%7.4f,%5.0f,%2d,%4.2f,%4.2f,%4.2f,%5.0f,%6.1f,%6.1f,%3.0f,%2.1f,%1d,%4d", gps.lat, gps.lng, gps.alt, gps.sats, imu.acc_x, imu.acc_y, imu.acc_z, bar.pressure, bar.altitude, bar.f_altitude, bar.f_velocity, bat.bat1, r_state, counter); //*imu sends acceleration in place of magnetic field strength
         counter++;
         return outgoing;
     }
