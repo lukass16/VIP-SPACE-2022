@@ -131,23 +131,44 @@ namespace lora
         return message;
     }
 
-    sens_data::SensorData readEncodedMessage()
+    //*NEW
+    String readMessage()
     {
         int packetSize = LoRa.parsePacket();
         if (packetSize)
         {
-            Serial.println("1");
             int i = 0;
             while (LoRa.available())
             {
                 byte read = LoRa.read();
                 message[i] = read;
-                //Serial.print(read);
+                Serial.print(read);
                 i++;
             }
-            Serial.println("2");
-            s_data = encoder.decodeMessage(message); //also prints out decoded variables in a comma separated format
-            Serial.println("3");
+            //encoder.decodeMessage(message);
+        }
+        else
+        {
+            return "NULL";
+        }
+        Serial.println(" RSSI: " + String(LoRa.packetRssi()));
+        return "<3!!!!!!!!!!!!!!!!!!!!!!!!!!!!!Nomaini Šo, luni!";
+    }
+
+    sens_data::SensorData readEncodedMessage()
+    {
+        int packetSize = LoRa.parsePacket();
+        if (packetSize)
+        {
+            int i = 0;
+            while (LoRa.available())
+            {
+                byte read = LoRa.read();
+                message[i] = read;
+                Serial.print(read);
+                i++;
+            }
+            s_data = encoder.decodeMessage(message);
         }
         else
         {

@@ -39,15 +39,15 @@ void LoraEncoder::writeMessage(double blat, double blng, double balt, int bsats,
     int8_t sats = bsats;
 
     //IMU
-    int32_t acc_x = bacc_x*100;
-    int32_t acc_y = bacc_y*100;
-    int32_t acc_z = bacc_z*100;
+    int16_t acc_x = bacc_x*100;
+    int16_t acc_y = bacc_y*100;
+    int16_t acc_z = bacc_z*100;
     
     //Barometer
     int16_t pres = bpressure;
     int32_t altitude = baltitude*10;
     int32_t f_altitude = bf_altitude*10;
-    int32_t f_velocity = bf_velocity;
+    int16_t f_velocity = bf_velocity;
 
     //Battery
     int16_t bat1 = bbat1*10;
@@ -64,57 +64,78 @@ void LoraEncoder::writeMessage(double blat, double blng, double balt, int bsats,
     _intToBytes(_buffer + 10, sats, 1);
 
     //IMU data
-    _intToBytes(_buffer + 11, acc_x, 4);
-    _intToBytes(_buffer + 15, acc_y, 4);
-    _intToBytes(_buffer + 19, acc_z, 4);
+    _intToBytes(_buffer + 11, acc_x, 2);
+    _intToBytes(_buffer + 13, acc_y, 2);
+    _intToBytes(_buffer + 15, acc_z, 2);
     
     //Barometer data
-    _intToBytes(_buffer + 23, pres, 2);
-    _intToBytes(_buffer + 25, altitude, 4);
-    _intToBytes(_buffer + 29, f_altitude, 4);
-    _intToBytes(_buffer + 33, f_velocity, 4);
+    _intToBytes(_buffer + 17, pres, 2);
+    _intToBytes(_buffer + 19, altitude, 4);
+    _intToBytes(_buffer + 23, f_altitude, 4);
+    _intToBytes(_buffer + 27, f_velocity, 2);
   
     //Battery data
-    _intToBytes(_buffer + 37, bat1, 2);
+    _intToBytes(_buffer + 29, bat1, 2);
 
     //Other data
-    _intToBytes(_buffer + 39, r_state, 1);
-    _intToBytes(_buffer + 40, counter, 2);
+    _intToBytes(_buffer + 31, r_state, 1);
+    _intToBytes(_buffer + 32, counter, 2);
 
 }
 
-void LoraEncoder::decodeMessage(byte *buf)
-{
-    int32_t s = 0; //buffer counter
+void LoraEncoder::decodeMessage(byte *buf){
+    /*
+    int32_t s = 0;
+    float x, y, z, acc_x, acc_y, acc_z;
+    double lat, lng, gps_alt;
+    float temperature, pressure, bar_alt, vert_velocity;
+    float bat1, bat2;
+    float sats, bs;
+
+    //magnetoemeter data
+    x = _BytesToNum(buf, s, 2);
+    x= x/100;
+    y = _BytesToNum(buf, s + 2, 2);
+    y= y/100;
+    z = _BytesToNum(buf, s + 4, 2);
+    z= z/100;
+    acc_x = _BytesToNum(buf, s + 6, 2);
+    acc_x= acc_x/100;
+    acc_y = _BytesToNum(buf, s + 8, 2);
+    acc_y= acc_y/100;
+    acc_z = _BytesToNum(buf, s + 10, 2);
+    acc_z= acc_z/100;
+    s = s+12;
+
+    //GPS data
+    lat = _BytesToNum(buf, s, 4);
+    lat= lat/10000;
+    lng = _BytesToNum(buf, s + 4, 4);
+    lng = lng/ 10000;
+    gps_alt = _BytesToNum(buf, s + 8, 4);
+    sats = _BytesToNum(buf, s  +  12, 1);
+    s = s + 13;
+
+    //barometer data
+    temperature = _BytesToNum(buf, s, 2);
+    temperature= temperature/10;
+    pressure = _BytesToNum(buf, s + 2, 2);
+    bar_alt = _BytesToNum(buf, s + 4, 4);
+    vert_velocity = _BytesToNum(buf, s + 8, 2);
+    vert_velocity= vert_velocity/10;
+    s = s + 10;
+
+    //rest
+    bat1 = _BytesToNum(buf, s, 1);
+    bat1= bat1/10;
+    bat2 = _BytesToNum(buf, s + 1, 1);
+    bat2= bat2/10;
     
-    // GPS data
-    double lat = _BytesToNum(buf, s, 4) / 10000.0;
-    double lng = _BytesToNum(buf, s + 4, 4) / 10000.0;
-    double alt = _BytesToNum(buf, s + 8, 2);
-    int sats = _BytesToNum(buf, s + 10, 1);
 
-    // IMU data
-    float acc_x = _BytesToNum(buf, s + 11, 4) / 100.0;
-    float acc_y = _BytesToNum(buf, s + 15, 4) / 100.0;
-    float acc_z = _BytesToNum(buf, s + 19, 4) / 100.0;
 
-    // Barometer data
-    float pressure = _BytesToNum(buf, s + 23, 2);
-    float altitude = _BytesToNum(buf, s + 25, 4) / 10.0;
-    float f_altitude = _BytesToNum(buf, s + 29, 4) / 10.0;
-    float f_velocity = _BytesToNum(buf, s + 33, 4);
-
-    // Battery data
-    float bat1 = _BytesToNum(buf, s + 37, 2) / 10.0;
-
-    // Other data
-    int current_rocket_state = _BytesToNum(buf, s + 39, 1);
-    int counter = _BytesToNum(buf, s + 40, 2);
-
-    Serial.printf("%7.4f,%7.4f,%5.0f,%2d,%4.2f,%4.2f,%4.2f,%5.0f,%6.1f,%6.1f,%3.0f,%2.1f,%1d,%4d\n", lat, lng, alt, sats, acc_x, acc_y, acc_z, pressure, altitude, f_altitude, f_velocity, bat1, current_rocket_state, counter);
-
+    Serial.printf("\n%.2f, %.2f,  %.2f,  %.2f,  %.2f,  %.2f, %.4f, %.4f, %.0f, %.0f, %.1f, %.0f, %.1f, %.2f, %.2f", x, y, z, acc_x, acc_y, acc_z, lat, lng, gps_alt, sats, temperature, pressure, vert_velocity, bat1, bat2);   
+    */
 }
-
 void LoraEncoder::writeUint16(uint16_t i) {
     _intToBytes(_buffer, i, 2);
     _buffer += 2;
