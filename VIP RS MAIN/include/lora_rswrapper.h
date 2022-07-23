@@ -100,7 +100,7 @@ namespace lora
     }
 
     //*NEW
-    String readMessage()
+    String readMessageLegacy()
     {
         int packetSize = LoRa.parsePacket();
         String message = "";
@@ -121,7 +121,7 @@ namespace lora
             {
                 message += (char)LoRa.read();
             }
-            //Serial.print("Message Received: " + message);
+            Serial.print("Message: " + message);
         }
         else
         {

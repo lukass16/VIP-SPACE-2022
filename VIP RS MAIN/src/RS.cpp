@@ -9,10 +9,6 @@
 
 sens_data::SensorData s_data;
 
-// defining message string and deserialization buffer
-String message = "";
-char buffer[80] = "";
-
 // defining receivable sensor variables
 double lat = 0;
 double lng = 0;
@@ -39,6 +35,8 @@ double successRate = 0;
 float receivedRSSI = 0;
 float receivedSNR = 0;
 int receivedSize = 0;
+int mathCounter = 0;
+bool startCorruption = 0;
 long freqError = 0;
 
 // ScreenSwitching related variables
@@ -49,11 +47,6 @@ short RightState = 0;
 int prevLeftState = 0;
 int prevRightState = 0;
 bool buttonPressed = 0;
-
-//Flash writing logic
-bool holdBoth = 0;
-unsigned long start_hold = 0;
-unsigned long hold_time = 0;
 
 // Screen update logic
 int currentScreen = 1;
@@ -102,11 +95,6 @@ void printData()
 	Serial.printf("%7.4f,%7.4f,%5.0f,%2d,%4.2f,%4.2f,%4.2f,%5.0f,%6.1f,%6.1f,%3.0f,%2.1f,%1d,%4d\n", lat, lng, alt, sats, acc_x, acc_y, acc_z, pres, bar_alt, f_alt, f_vel, bat1, r_state, counter);
 }
 
-void deserializeData(char buffer[])
-{
-	sscanf(buffer, "%lf,%lf,%lf,%d,%f,%f,%f,%f,%f,%f,%f,%f,%d,%d", &lat, &lng, &alt, &sats, &acc_x, &acc_y, &acc_z, &pres, &bar_alt, &f_alt, &f_vel, &bat1, &r_state, &counter); // for deserialization double ahs to vbe specified as %lf
-}
-
 void calculatePacketInfo()
 {
 	// Ja divu secīgu pakešu atšķirība ir lielāka par viens, aprēķina izkritušo paketi
@@ -118,9 +106,9 @@ void calculatePacketInfo()
 			lostPackets += counter - lastCounter - 1;						 // aprēķinam cik izkrita paketes
 			successRate = 100 - (int)((float)lostPackets / counter * 100.0); // Percentage of good packets from total
 			lastCounter = counter;
-			//Serial.println("Lost Packets: " + String(lostPackets) + " Success rate: " + String(successRate));
+			Serial.println("Lost Packets: " + String(lostPackets) + " Success rate: " + String(successRate));
 		}
-		else if (counter == 0 && lastCounter >= 1) // ja rāda 0, bet nav pirmā
+		else if (counter == 0 && lastCounter >= 1)
 		{
 			corruptedPackets++;
 		}
@@ -155,23 +143,17 @@ void loop()
 	gps::readGps();
 
 	// Ziņu nolasīšana
-
-	//*option 1 - Not encoded
-	message = lora::readMessage();
-	message.toCharArray(buffer, 80);
-	deserializeData(buffer);
-
-	//*option 2 - Encoded
-	// s_data = lora::readEncodedMessage();
-	// if (s_data.counter != -1) // ja tika saņemta ziņa
-	// {
-	// 	allotData(s_data);
-	// }
+	s_data = lora::readEncodedMessage();
 
 	// LoRa parametri
 	receivedRSSI = lora::getPacketRssi();
 	receivedSNR = lora::getPacketSNR();
 	freqError = lora::freqError();
+
+	if (s_data.counter != -1) // ja tika saņemta ziņa
+	{
+		allotData(s_data);
+	}
 
 	// RS GPS aprēķini un funkcijas
 	if (lat != 0 && lng != 0)
@@ -182,65 +164,38 @@ void loop()
 	sats = gps::getSatellites();
 	gpsValid = gps::gpsValid();
 
-	//*Slikto pakešu aprēķins
+	//* SLIKTO PAKEŠU APRĒĶINS
 	calculatePacketInfo();
 
-	//*Slēdžu nolasīšana
+	// Ja pg counter == 2 un ekrāns pārslēgts vai mainās distance vai pienāk jauna pakete, tad atsvaidzina
+	// Ja pg counter == 1 un ekrāns pārslēgts vai mainās satelītu skaits, tad atsvaidzina
+	// Ja pg counter == 0 un ekrāns pārslēgts vai mainās pakešu skaits, tad atsvaidzina
+	// Slēdžu nolasīšana
 	LeftState = digitalRead(LeftSwitch);
 	RightState = digitalRead(RightSwitch);
 
-	//*Nosakām vai tiek turētas abas pogas kopā
-	if(LeftState == 0 && RightState == 0 && !holdBoth) //ja nospiestas kopā pirmo reizi
-	{
-		holdBoth = 1;
-		start_hold = millis(); //sākam timeri
-	}
-	else if(LeftState == 0 && RightState == 0 && holdBoth) //ja jau bija nospiestas abas un joprojām ir
-	{
-		hold_time = millis() - start_hold;
-	}
-	else if(holdBoth) //ja bija, bet vairs nav
-	{
-		holdBoth = 0;
-	}
-	else //ja vairs nav
-	{
-		hold_time = 0; //piezīme: neatstatam uzreiz, lai vienu reizi sanāktu pārbaudīt vai pārsniegts laiks un atlaists
-	}
-	Serial.println("Hold time: " + String(hold_time));
-	Serial.println("Left: " + String(LeftState));
-	Serial.println("Right: " + String(RightState));
-
-	//*Rīkojamies, ja pārsniegts intervāls cik turējām līdz atlaidām
-	if(hold_time > 10000 && !holdBoth) //ja turējām vairāk par 10 sekundēm un atlaidām
-	{
-		Serial.println("Turējām vairāk par 10!");
-	}
-	else if(hold_time > 3000 && !holdBoth) //ja turējām vairāk par 3 sekundēm un atlaidām
-	{
-		Serial.println("Turējām vairāk par 3!");
-	}
-
-	
-	//*Nosakām nospiestu pogu individuālo stāvokli
-	if (LeftState == 1 && prevLeftState == 0 && pageCounter <= 1) //ja konstatējam atlaisu kreiso un ja varam tad pabraucam pa kreisi
+	// BUTTON LOGIC
+	if (LeftState == 1 && prevLeftState == 0 && pageCounter <= 1)
 	{
 		pageCounter++;
+		prevLeftState = 1;
+		buttonPressed = 1;
 	}
-	prevLeftState = LeftState; //jaunais paliek par veco
 
-	if (RightState == 1 && prevRightState == 0 && pageCounter >= 1) //ja konstatējam atlaisu labo un ja varam tad pabraucam pa labi
+	if (RightState == 1 && prevRightState == 0 && pageCounter >= 1)
 	{
-		pageCounter--;
+		pageCounter = pageCounter - 1;
+		prevRightState = 1;
+		buttonPressed = 1;
 	}
-	prevRightState = RightState; //jaunais paliek par veco
 
+	buttonPressed = 0;
+	prevLeftState = digitalRead(LeftSwitch);
+	prevRightState = digitalRead(RightSwitch);
 
-	//*Pārbaudam vai vajag atjaunot ekrānu
-	// Ja pg counter == 2 un ekrāns pārslēgts vai mainās distance vai pienāk jauna pakete, tad atsvaidzina
 	if (pageCounter == 2 && (currentScreen != 2 || prevDisplayedCounter != counter || prevDistance != distance))
 	{
-		if (counter >= 1) //ja pakete nav koruptēta
+		if (counter >= 1)
 		{
 			lcd::writeAll(lat, lng, distance, course, bar_alt, f_vel, gpsValid, counter);
 			prevDisplayedCounter = counter;
@@ -248,21 +203,16 @@ void loop()
 			currentScreen = 2;
 		}
 	}
-
-	// Ja pg counter == 1 un ekrāns pārslēgts vai mainās satelītu skaits, tad atsvaidzina
 	else if (pageCounter == 1 && (currentScreen != 1 || prevSats != sats))
 	{
 		lcd::GPSSetup(sats);
 		prevSats = sats;
 		currentScreen = 1;
 	}
-
-	// Ja pg counter == 0 un ekrāns pārslēgts vai mainās pakešu skaits, tad atsvaidzina
 	else if (pageCounter == 0 && (currentScreen != 0 || prevDisplayedCounter != counter))
 	{
 		lcd::LoRaSetup(lastCounter, lostPackets, successRate, receivedRSSI, receivedSNR, corruptedPackets);
 		prevDisplayedCounter = counter;
 		currentScreen = 0;
 	}
-
 }
