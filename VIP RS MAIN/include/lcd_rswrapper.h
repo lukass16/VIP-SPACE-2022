@@ -103,7 +103,7 @@ namespace lcd {
     }
 
 //GPS Prep wrapperis
-    void RSinfo(int sats, bool canWriteToFlash)
+    void GPSSetup(int sats)
     {
         lcd.clear();
         if(sats <= 3)
@@ -114,15 +114,9 @@ namespace lcd {
             lcd.setCursor(0, 0);
             lcd.print("3D Lock Established");
         }
-        lcd.setCursor(0, 1);
+        lcd.setCursor(0,1);
         lcd.print("Sats visible: ");
         lcd.print(sats);
-        if(canWriteToFlash)
-        {
-            lcd.setCursor(19, 3);
-            lcd.print("W");
-        }
-
     }
     
     void LoRaSetup(int lastCounter, int lostPackets, double successRate, float receivedRSSI, float receivedSNR, int corruptedPackets)
