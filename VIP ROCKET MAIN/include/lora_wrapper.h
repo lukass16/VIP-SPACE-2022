@@ -1,9 +1,7 @@
 #pragma once
 #include <LoRa.h>
 #include <SPI.h>
-#include "LoraMessage.h"
-#include <LoraEncoder.h>
-#include "sensor_data.h"
+
 // https://randomnerdtutorials.com/ttgo-lora32-sx1276-arduino-ide/
 // https://github.com/sandeepmistry/arduino-LoRa/blob/master/examples/LoRaDuplex/LoRaDuplex.ino
 
@@ -15,51 +13,8 @@
 #define MISO 19
 #define MOSI 27
 
-#define B_SIZE 34
-
 namespace lora
 {
-
-    //*ENCODING
-    byte data[B_SIZE]; // main buffer that is linked with encoder
-    LoraEncoder encoder(data);
-
-    void encodeMessage()
-    {
-        // gather all data
-        static int counter = 0;
-        sens_data::GpsData gps = s_data.getGpsData();
-        sens_data::IMUData imu = s_data.getIMUData();
-        sens_data::BarometerData bar = s_data.getBarometerData();
-        sens_data::BatteryData bat = s_data.getBatteryData();
-        int r_state = s_data.getRocketState();
-        // encode
-        encoder.writeMessage(gps.lat, gps.lng, gps.alt, gps.sats, imu.acc_x, imu.acc_y, imu.acc_z, bar.pressure, bar.altitude, bar.f_altitude, bar.f_velocity, bat.bat1, r_state, counter);
-        
-        counter++;
-    }
-
-    void sendEncodedMessage()
-    {
-        LoRa.beginPacket();
-        for (int i = 0; i < B_SIZE; i++)
-        {
-            LoRa.write(data[i]);
-        }
-        LoRa.endPacket();
-    }
-
-    void printBuffer()
-    {
-        for (int i = 0; i < B_SIZE; i++)
-        {
-            Serial.print(data[i]);
-        }
-        Serial.println();
-    }
-
-    //*
-    
     String outgoing; // outgoing message
 
     int syncWord = 0xF3;
@@ -76,15 +31,14 @@ namespace lora
 
         // SPI LoRa pins
         SPI.begin(SCK, MISO, MOSI, SS);
-
+      
         // setup LoRa transceiver module
         LoRa.setPins(SS, RST, DI0);
 
         if (!LoRa.begin(frequency))
         {
             Serial.println("Starting LoRa failed!");
-            while (1)
-                ;
+            while (1);
         }
 
         // setting paramaters
