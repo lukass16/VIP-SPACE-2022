@@ -28,10 +28,15 @@ namespace comms
             String serialized = comms::serializeData();
             Serial.println("Serialized: " + String(serialized));
             lora::encodeMessage();
-            // Serial.print("Decoded: ");
-            // lora::decodeMessage();
+            // Serial.print("Encoded: ");
+            //lora::printBuffer();
+            Serial.print("Decoded: ");
+            lora::decodeMessage();
+            // Serial.print("Sending: ");
             lora::sendEncodedMessage(1);
-            delay(3000); //Changed form 400
+            
+            //s_data.lora_message_id++;
+            delay(1000); //!Changed form 400
         }
     }
 
