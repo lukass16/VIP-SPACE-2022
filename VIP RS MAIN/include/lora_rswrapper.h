@@ -121,7 +121,7 @@ namespace lora
             {
                 message += (char)LoRa.read();
             }
-            //Serial.print("Message Received: " + message);
+            Serial.print("Message Received: " + message);
         }
         else
         {

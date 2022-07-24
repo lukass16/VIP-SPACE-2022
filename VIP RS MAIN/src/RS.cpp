@@ -5,6 +5,7 @@
 #include <SPI.h>
 #include <lcd_rswrapper.h>
 #include <lora_rswrapper.h>
+#include "flash_rswrapper.h"
 #include "sensor_data.h"
 
 sens_data::SensorData s_data;
@@ -50,10 +51,14 @@ int prevLeftState = 0;
 int prevRightState = 0;
 bool buttonPressed = 0;
 
-//Flash writing logic
+// Flash writing logic
 bool holdBoth = 0;
-unsigned long start_hold = 0;
+unsigned long start_hold = millis();
 unsigned long hold_time = 0;
+bool canWriteToFlash = 0;
+bool prevCanWriteToFlash = 0;
+bool newPacket = 0;
+File file;
 
 // Screen update logic
 int currentScreen = 1;
@@ -107,7 +112,7 @@ void deserializeData(char buffer[])
 	sscanf(buffer, "%lf,%lf,%lf,%d,%f,%f,%f,%f,%f,%f,%f,%f,%d,%d", &lat, &lng, &alt, &sats, &acc_x, &acc_y, &acc_z, &pres, &bar_alt, &f_alt, &f_vel, &bat1, &r_state, &counter); // for deserialization double ahs to vbe specified as %lf
 }
 
-void calculatePacketInfo()
+bool calculatePacketInfo() // atgriež true, ja pienākusi jauna pakete, false, ja nē
 {
 	// Ja divu secīgu pakešu atšķirība ir lielāka par viens, aprēķina izkritušo paketi
 	// Ja pienāk nulles pakete pēc tā, ka ir saņemta pakete lielāka par 0, tā tiek uztverta kā koruptēta
@@ -118,13 +123,15 @@ void calculatePacketInfo()
 			lostPackets += counter - lastCounter - 1;						 // aprēķinam cik izkrita paketes
 			successRate = 100 - (int)((float)lostPackets / counter * 100.0); // Percentage of good packets from total
 			lastCounter = counter;
-			//Serial.println("Lost Packets: " + String(lostPackets) + " Success rate: " + String(successRate));
+			// Serial.println("Lost Packets: " + String(lostPackets) + " Success rate: " + String(successRate));
 		}
 		else if (counter == 0 && lastCounter >= 1) // ja rāda 0, bet nav pirmā
 		{
 			corruptedPackets++;
 		}
+		return true; //ir pienākusi jauna
 	}
+	return false; //nav pienākusi jauna
 }
 
 void setup()
@@ -145,6 +152,11 @@ void setup()
 	Serial.println("Setup LCD");
 	lcd::setup();
 
+	// Flash
+	gps::disableSerial();
+	flash::setup();
+	gps::enableSerial();
+
 	// Slēdži
 	pinMode(LeftSwitch, INPUT);
 	pinMode(RightSwitch, INPUT);
@@ -152,6 +164,7 @@ void setup()
 
 void loop()
 {
+	// lasām gps
 	gps::readGps();
 
 	// Ziņu nolasīšana
@@ -182,65 +195,93 @@ void loop()
 	sats = gps::getSatellites();
 	gpsValid = gps::gpsValid();
 
+	//
+
 	//*Slikto pakešu aprēķins
-	calculatePacketInfo();
+	newPacket = calculatePacketInfo(); //atgriež vai pienākusi jauna pakete, un aprēķina paketes kvalitātes info
+
+	if (newPacket) //ja pienākusi jauna - rakstam iekšā flash;
+	{
+		gps::disableSerial();
+		flash::writeData(file, canWriteToFlash, lat, lng, alt, sats, acc_x, acc_y, acc_z, pres, bar_alt, f_alt, f_vel, bat1, r_state, counter); //ja nav atļauts 
+		gps::enableSerial();
+	}
 
 	//*Slēdžu nolasīšana
 	LeftState = digitalRead(LeftSwitch);
 	RightState = digitalRead(RightSwitch);
 
 	//*Nosakām vai tiek turētas abas pogas kopā
-	if(LeftState == 0 && RightState == 0 && !holdBoth) //ja nospiestas kopā pirmo reizi
+	if (LeftState == 0 && RightState == 0 && !holdBoth) // ja nospiestas kopā pirmo reizi
 	{
 		holdBoth = 1;
-		start_hold = millis(); //sākam timeri
+		start_hold = millis(); // sākam timeri
 	}
-	else if(LeftState == 0 && RightState == 0 && holdBoth) //ja jau bija nospiestas abas un joprojām ir
+	else if (LeftState == 0 && RightState == 0 && holdBoth) // ja jau bija nospiestas abas un joprojām ir
 	{
 		hold_time = millis() - start_hold;
 	}
-	else if(holdBoth) //ja bija, bet vairs nav
+	else if (holdBoth) // ja bija, bet vairs nav
 	{
 		holdBoth = 0;
 	}
-	else //ja vairs nav
+	else // ja vairs nav
 	{
-		hold_time = 0; //piezīme: neatstatam uzreiz, lai vienu reizi sanāktu pārbaudīt vai pārsniegts laiks un atlaists
+		hold_time = 0; // piezīme: neatstatam uzreiz, lai vienu reizi sanāktu pārbaudīt vai pārsniegts laiks un atlaists
 	}
-	Serial.println("Hold time: " + String(hold_time));
-	Serial.println("Left: " + String(LeftState));
-	Serial.println("Right: " + String(RightState));
 
 	//*Rīkojamies, ja pārsniegts intervāls cik turējām līdz atlaidām
-	if(hold_time > 10000 && !holdBoth) //ja turējām vairāk par 10 sekundēm un atlaidām
+	if (hold_time > 15000 && !holdBoth) // ja turējām vairāk par 15 sekundēm un atlaidām
 	{
+		Serial.println("Turējām vairāk par 15!");
+		gps::disableSerial();
+		flash::deleteFile("/test.txt");
+		gps::enableSerial();
+	}
+	else if (hold_time > 10000 && !holdBoth) // ja turējām vairāk par 10 sekundēm un atlaidām
+	{
+		gps::disableSerial();
+		flash::readFlashVerbose("/test.txt");
+		gps::enableSerial();
 		Serial.println("Turējām vairāk par 10!");
 	}
-	else if(hold_time > 3000 && !holdBoth) //ja turējām vairāk par 3 sekundēm un atlaidām
+	else if (hold_time > 3000 && !holdBoth) // ja turējām vairāk par 3 sekundēm un atlaidām
 	{
 		Serial.println("Turējām vairāk par 3!");
+		if (!canWriteToFlash) // atveram flash
+		{
+			gps::disableSerial();
+			file = flash::openFile();
+			gps::enableSerial();
+			canWriteToFlash = 1;
+		}
+		else // ja atkārtoti - tad aizveram flash
+		{
+			gps::disableSerial();
+			flash::closeFile(file);
+			canWriteToFlash = 0;
+			gps::enableSerial();
+		}
 	}
 
-	
 	//*Nosakām nospiestu pogu individuālo stāvokli
-	if (LeftState == 1 && prevLeftState == 0 && pageCounter <= 1) //ja konstatējam atlaisu kreiso un ja varam tad pabraucam pa kreisi
+	if (LeftState == 1 && prevLeftState == 0 && pageCounter <= 1) // ja konstatējam atlaistu kreiso un ja varam tad pabraucam pa kreisi
 	{
 		pageCounter++;
 	}
-	prevLeftState = LeftState; //jaunais paliek par veco
+	prevLeftState = LeftState; // jaunais paliek par veco
 
-	if (RightState == 1 && prevRightState == 0 && pageCounter >= 1) //ja konstatējam atlaisu labo un ja varam tad pabraucam pa labi
+	if (RightState == 1 && prevRightState == 0 && pageCounter >= 1) // ja konstatējam atlaistu labo un ja varam tad pabraucam pa labi
 	{
 		pageCounter--;
 	}
-	prevRightState = RightState; //jaunais paliek par veco
-
+	prevRightState = RightState; // jaunais paliek par veco
 
 	//*Pārbaudam vai vajag atjaunot ekrānu
 	// Ja pg counter == 2 un ekrāns pārslēgts vai mainās distance vai pienāk jauna pakete, tad atsvaidzina
 	if (pageCounter == 2 && (currentScreen != 2 || prevDisplayedCounter != counter || prevDistance != distance))
 	{
-		if (counter >= 1) //ja pakete nav koruptēta
+		if (counter >= 1 || lastCounter == 0) // ja pakete nav koruptēta vai ja vēl nav neviena pakete pienākusi
 		{
 			lcd::writeAll(lat, lng, distance, course, bar_alt, f_vel, gpsValid, counter);
 			prevDisplayedCounter = counter;
@@ -250,10 +291,11 @@ void loop()
 	}
 
 	// Ja pg counter == 1 un ekrāns pārslēgts vai mainās satelītu skaits, tad atsvaidzina
-	else if (pageCounter == 1 && (currentScreen != 1 || prevSats != sats))
+	else if (pageCounter == 1 && (currentScreen != 1 || prevSats != sats || canWriteToFlash != prevCanWriteToFlash))
 	{
-		lcd::GPSSetup(sats);
+		lcd::RSinfo(sats, canWriteToFlash);
 		prevSats = sats;
+		prevCanWriteToFlash = canWriteToFlash;
 		currentScreen = 1;
 	}
 
@@ -264,5 +306,4 @@ void loop()
 		prevDisplayedCounter = counter;
 		currentScreen = 0;
 	}
-
 }
