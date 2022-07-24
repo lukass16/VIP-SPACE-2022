@@ -3,7 +3,7 @@
 #include "Arduino.h"
 #include "core/core.cpp"
 #include "flash.h"
-#include "SD_card.h"
+// #include "SD_card.h"
 #include "buzzer.h"
 #include "gps_wrapper.h"
 #include "barometer_wrapper_MS5607.h"
@@ -17,8 +17,8 @@ public:
         Serial.println("DESCENT STATE");
 
         File file = flash::openFile();       // opening flash file for writing during descent
-        SD_File fileSD = SDcard::openFile(); // opening SD file for writing
-        SDcard::markDescent(fileSD);
+        // SD_File fileSD = SDcard::openFile(); // opening SD file for writing
+        // SDcard::markDescent(fileSD);
 
         s_data.updateRocketState(); //update state that's written to LoRa messages
 
@@ -57,8 +57,8 @@ public:
                 flash::writeData(file, gd, md, bd, btd);
             }
             
-            // writing to SD card
-            SDcard::writeData(fileSD, gd, md, bd, btd);
+            // // writing to SD card
+            // SDcard::writeData(fileSD, gd, md, bd, btd);
             delay(200);
         }
 
@@ -67,8 +67,8 @@ public:
         // close flash file
         flash::closeFile(file);
 
-        // close SD file
-        SDcard::closeFile(fileSD);
+        // // close SD file
+        // SDcard::closeFile(fileSD);
 
         flash::readFlashVerbose("/test.txt");
 
