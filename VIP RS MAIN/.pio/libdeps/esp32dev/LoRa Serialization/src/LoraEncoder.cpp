@@ -88,35 +88,35 @@ void LoraEncoder::writeMessage(double blat, double blng, double balt, int bsats,
 
 sens_data::SensorData LoraEncoder::decodeMessage(byte *buf)
 {
-    int32_t s = 0; //buffer counter
+    int32_t s = 0; // buffer counter
 
-    sens_data::SensorData s_data; //data object
-    
+    sens_data::SensorData s_data; // data object
+
     // GPS data
-    s_data.gpsData.lat = _BytesToNum(buf, s, 4) / 10000;
-    s_data.gpsData.lng = _BytesToNum(buf, s + 4, 4) / 10000;
+    s_data.gpsData.lat = _BytesToNum(buf, s, 4) / 10000.0;
+    s_data.gpsData.lng = _BytesToNum(buf, s + 4, 4) / 10000.0;
     s_data.gpsData.alt = _BytesToNum(buf, s + 8, 2);
     s_data.gpsData.sats = _BytesToNum(buf, s + 10, 1);
 
     // IMU data
-    s_data.imuData.acc_x = _BytesToNum(buf, s + 11, 2) / 100;
-    s_data.imuData.acc_y = _BytesToNum(buf, s + 13, 2) / 100;
-    s_data.imuData.acc_z = _BytesToNum(buf, s + 15, 2) / 100;
+    s_data.imuData.acc_x = _BytesToNum(buf, s + 11, 4) / 100.0;
+    s_data.imuData.acc_y = _BytesToNum(buf, s + 15, 4) / 100.0;
+    s_data.imuData.acc_z = _BytesToNum(buf, s + 19, 4) / 100.0;
 
     // Barometer data
-    s_data.barometerData.pressure = _BytesToNum(buf, s + 17, 2);
-    s_data.barometerData.altitude = _BytesToNum(buf, s + 19, 4) / 10;
-    s_data.barometerData.f_altitude = _BytesToNum(buf, s + 23, 4) / 10;
-    s_data.barometerData.f_velocity = _BytesToNum(buf, s + 27, 2);
+    s_data.barometerData.pressure = _BytesToNum(buf, s + 23, 2);
+    s_data.barometerData.altitude = _BytesToNum(buf, s + 25, 4) / 10.0;
+    s_data.barometerData.f_altitude = _BytesToNum(buf, s + 29, 4) / 10.0;
+    s_data.barometerData.f_velocity = _BytesToNum(buf, s + 33, 4);
 
     // Battery data
-    s_data.batteryData.bat1 = _BytesToNum(buf, s + 29, 2) / 10;
+    s_data.batteryData.bat1 = _BytesToNum(buf, s + 37, 2) / 10.0;
 
     // Other data
-    s_data.current_rocket_state = _BytesToNum(buf, s + 31, 1);
-    s_data.counter = _BytesToNum(buf, s + 32, 2);
+    s_data.current_rocket_state = _BytesToNum(buf, s + 39, 1);
+    s_data.counter = _BytesToNum(buf, s + 40, 2);
 
-    //Serial.printf("%7.4f,%7.4f,%5.0f,%2d,%4.2f,%4.2f,%4.2f,%5.0f,%6.1f,%6.1f,%3.0f,%2.1f,%1d,%4d", s_data.gpsData.lat, s_data.gpsData.lng, s_data.gpsData.alt, s_data.gpsData.sats,  s_data.imuData.acc_x,  s_data.imuData.acc_y,  s_data.imuData.acc_z, s_data.barometerData.pressure, s_data.barometerData.altitude, s_data.barometerData.f_altitude, s_data.barometerData.f_velocity, s_data.batteryData.bat1, s_data.current_rocket_state, s_data.counter);
+    Serial.printf("%7.4f,%7.4f,%5.0f,%2d,%4.2f,%4.2f,%4.2f,%5.0f,%6.1f,%6.1f,%3.0f,%2.1f,%1d,%4d", s_data.gpsData.lat, s_data.gpsData.lng, s_data.gpsData.alt, s_data.gpsData.sats, s_data.imuData.acc_x, s_data.imuData.acc_y, s_data.imuData.acc_z, s_data.barometerData.pressure, s_data.barometerData.altitude, s_data.barometerData.f_altitude, s_data.barometerData.f_velocity, s_data.batteryData.bat1, s_data.current_rocket_state, s_data.counter);
 
     return s_data;
 }
