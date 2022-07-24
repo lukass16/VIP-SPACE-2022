@@ -31,8 +31,6 @@ namespace lora
 
     //*ENCODING
     byte data[B_SIZE]; // main buffer that is linked with encoder
-    byte pseudodata[B_SIZE]; //!Testing
-
     LoraEncoder encoder(data);
 
     void encodeMessage()
