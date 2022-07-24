@@ -17,7 +17,7 @@ namespace lora
 #define RST 14
 #define DIO0 26
 
-    // storage space for dataā
+    // storage space for data
     byte message[38]; // 35 = number of bytes to store
     // adding as an object ... lkm xD
     LoraEncoder encoder(message);
