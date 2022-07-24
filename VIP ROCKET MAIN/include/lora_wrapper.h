@@ -16,7 +16,7 @@
 #define MISO 19
 #define MOSI 27
 
-#define B_SIZE 50
+#define B_SIZE 42
 
 namespace lora
 {
