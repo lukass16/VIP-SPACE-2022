@@ -13,18 +13,15 @@ sens_data::SensorData s_data;
 double lat = 0;
 double lng = 0;
 double alt = 0;
-int sats_r = 0;
 
 float acc_x = 0;
 float acc_y = 0;
 float acc_z = 0;
 
-float temp = 0;
 float pres = 0;
 float bar_alt = 0;
 float f_alt = 0;
 float f_vel = 0;
-float vert_velocity = 0;
 float bat1;
 
 int r_state = 0;
@@ -93,9 +90,11 @@ void allotData(sens_data::SensorData s_data)
 	counter = s_data.counter;
 }
 
-// defining message string and deserialization buffer
-String message = "";
-char buffer[80] = "";
+void printData()
+{
+	Serial.printf("%7.4f,%7.4f,%5.0f,%2d,%4.2f,%4.2f,%4.2f,%5.0f,%6.1f,%6.1f,%3.0f,%2.1f,%1d,%4d\n", lat, lng, alt, sats, acc_x, acc_y, acc_z, pres, bar_alt, f_alt, f_vel, bat1, r_state, counter);
+}
+
 
 void setup()
 {
@@ -120,21 +119,26 @@ void setup()
 	pinMode(RightSwitch, INPUT);
 }
 
+
 void loop()
 {
-	// GPS nolasīšanas/barošanas funkcija
-
 	gps::readGps();
 
-	// RSSI update
+	// LoRa parametri
 	receivedRSSI = lora::getPacketRssi();
 	receivedSNR = lora::getPacketSNR();
 
 	freqError = lora::freqError();
 
-	// loop tiek lasits LoRa
+	// Ziņu nolasīšana
 	s_data = lora::readEncodedMessage();
-	allotData(s_data);
+
+	if(s_data.counter != -1) //ja tika saņemta ziņa
+	{
+		allotData(s_data);
+		// Saņemto datu izvade uz Serial
+		printData();
+	}
 
 	// RS GPS aprēķini un funkcijas
 	if (lat != 0 && lng != 0)
@@ -145,7 +149,8 @@ void loop()
 	sats = gps::getSatellites();
 	gpsValid = gps::gpsValid();
 
-	// SLIKTO PAKEŠU APRĒĶINS
+
+	//* SLIKTO PAKEŠU APRĒĶINS
 	// Ja divu secīgu pakešu atšķirība ir lielāka par viens, aprēķina izkritušo paketi
 	// Ja pienāk nulles pakete pēc tā, ka ir saņemta pakete lielāka par 0, tā tiek uztverta kā koruptēta
 
@@ -198,7 +203,7 @@ void loop()
 	{
 		if (counter >= 1)
 		{
-			lcd::writeAll(lat, lng, distance, course, bar_alt, vert_velocity, gpsValid, counter);
+			lcd::writeAll(lat, lng, distance, course, bar_alt, f_vel, gpsValid, counter);
 			prevDisplayedCounter = counter;
 			prevDistance = distance;
 			currentScreen = 2;
