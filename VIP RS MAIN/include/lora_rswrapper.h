@@ -31,7 +31,7 @@ namespace lora
     String outgoing; // outgoing message
 
     // defining received message buffer
-    char received[80];
+    char received[90];
 
     int syncWord = 0xF3;
 
@@ -106,6 +106,7 @@ namespace lora
         String message = "";
         if (packetSize)
         {
+            Serial.println("Received message: " + String(packetSize) + " ");
             // read packet header bytes:
             int recipient = LoRa.read();       // recipient address
             byte sender = LoRa.read();         // sender address
@@ -114,14 +115,14 @@ namespace lora
 
             if (recipient != _localAddress && recipient != 0xBB)
             {
-                Serial.println("This message is not for me, recipient: " + String(recipient));
+                Serial.print("This message is not for me, recipient: " + String(recipient) + " ");
                 return "NULL";
             }
             while (LoRa.available())
             {
                 message += (char)LoRa.read();
             }
-            Serial.print("Message Received: " + message);
+            Serial.print(message);
         }
         else
         {

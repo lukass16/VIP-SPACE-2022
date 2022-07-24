@@ -86,6 +86,8 @@ namespace lora {
         int packetSize = LoRa.parsePacket();
         String message = "";
         if(packetSize){
+            Serial.println("Received message: " + String(packetSize) + " ");
+
             // read packet header bytes:
             int recipient = LoRa.read();          // recipient address
             byte sender = LoRa.read();            // sender address
@@ -93,8 +95,8 @@ namespace lora {
             byte incomingLength = LoRa.read();    // incoming msg length
  
             if (recipient != _localAddress && recipient != 0xBB) {
-                Serial.println("This message is not for me, recipient: " + String(recipient));
-                return "NULL";                            
+                Serial.print("This message is not for me, recipient: " + String(recipient) + " ");
+                return "NULL";                             
             }   
             while(LoRa.available()){
                 message += (char)LoRa.read();
