@@ -50,7 +50,7 @@ struct BatteryData
 class SensorData
 {
     private:
-        int current_rocket_state = 0;
+        int current_rocket_state = 0;  //1 - PREPARATION, 2 - DROGUE, 3 - MAIN, 4 - DESCENT
         GpsData gpsData;
         IMUData imuData;
         BarometerData barometerData;

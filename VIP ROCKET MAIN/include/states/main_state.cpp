@@ -4,7 +4,6 @@
 #include "core/core.cpp"
 #include "descent_state.cpp"
 #include "flash.h"
-// #include "SD_card.h"
 #include "buzzer.h"
 #include "gps_wrapper.h"
 #include "barometer_wrapper_MS5607.h"
@@ -50,17 +49,12 @@ public:
             //*placeholder for battery data
 
             // writing to flash
-            flash::writeData(file, gd, md, bd, btd);
-            // // writing to SD card
-            // SDcard::writeData(fileSD, gd, md, bd, btd);
+            flash::writeData(file, gd, md, bd, btd, 3);
             delay(50);
         }
 
         // close flash file
         flash::closeFile(file);
-
-        // // close SD file
-        // SDcard::closeFile(fileSD);
 
         this->_context->RequestNextPhase();
         this->_context->Start();

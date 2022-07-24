@@ -4,7 +4,6 @@
 #include "core/core.cpp"
 #include "main_state.cpp"
 #include "flash.h"
-// #include "SD_card.h"
 #include "buzzer.h"
 #include "gps_wrapper.h"
 #include "barometer_wrapper_MS5607.h"
@@ -18,9 +17,6 @@ public:
         Serial.println("DROGUE STATE");
 
         File file = flash::openFile();       // opening flash file for writing during flight
-        // SD_File fileSD = SDcard::openFile(); // opening SD file for writing during drogue state
-        // SDcard::markDrogue(fileSD);
-
         s_data.updateRocketState(); //update state that's written to LoRa messages
 
         // variables for writing to memory
@@ -51,11 +47,14 @@ public:
             //*placeholder for battery data
 
             // writing to flash
-            flash::writeData(file, gd, md, bd, btd);
-            // // writing to SD card
-            // SDcard::writeData(fileSD, gd, md, bd, btd);
+            flash::writeData(file, gd, md, bd, btd, 2);
             delay(50);
         }
+
+        // close flash file
+        flash::closeFile(file);
+        flash::readFlashVerbose("/test.txt");
+        while(true); //!Flash testing
 
         while (!barometer::apogeeDetected()) //TODO add alternative timer apogee detection
         {
@@ -78,19 +77,12 @@ public:
             //*placeholder for battery data
 
             // writing to flash
-            flash::writeData(file, gd, md, bd, btd);
-            // // writing to SD card
-            // SDcard::writeData(fileSD, gd, md, bd, btd);
+            flash::writeData(file, gd, md, bd, btd, 2);
             delay(50);
         }
 
         // close flash file
         flash::closeFile(file);
-
-        // // close SD file
-        // SDcard::closeFile(fileSD);
-
-        // flash::readFlashVerbose("/test.txt"); // opening and reading file
 
         this->_context->RequestNextPhase();
         this->_context->Start();

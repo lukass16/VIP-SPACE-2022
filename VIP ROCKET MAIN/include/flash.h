@@ -120,7 +120,7 @@ namespace flash
     }
 
     //*Current data writing function
-    int writeData(File file, sens_data::GpsData gpsData, sens_data::IMUData imuData, sens_data::BarometerData barData, sens_data::BatteryData batData)
+    int writeData(File file, sens_data::GpsData gpsData, sens_data::IMUData imuData, sens_data::BarometerData barData, sens_data::BatteryData batData, int wrState)
     {
         //counter for closing and opening file
         static int counter;
@@ -150,17 +150,21 @@ namespace flash
        
         //Bat
         auto bat1 = (uint8_t *)(&batData.bat1); //3.1
-        auto bat2 = (uint8_t *)(&batData.bat2); //3.2
 
         //Mag
-        auto mag_x = (uint8_t *)(&imuData.mag_x); //4.1
-        auto mag_y = (uint8_t *)(&imuData.mag_y); //4.2
-        auto mag_z = (uint8_t *)(&imuData.mag_z); //4.3
         auto acc_x = (uint8_t *)(&imuData.acc_x); //4.4
         auto acc_y = (uint8_t *)(&imuData.acc_y); //4.5
         auto acc_z = (uint8_t *)(&imuData.acc_z); //4.6
+        auto gyr_x = (uint8_t *)(&imuData.gyr_x); //4.1
+        auto gyr_y = (uint8_t *)(&imuData.gyr_y); //4.2
+        auto gyr_z = (uint8_t *)(&imuData.gyr_z); //4.3
 
-        auto const buf_size = sizeof(time) + sizeof(lat) + sizeof(lng) + sizeof(alt) + sizeof(sats) + sizeof(pressure) + sizeof(altitude) + sizeof(f_altitude) + sizeof(f_velocity) + sizeof(f_acceleration) + sizeof(temperature) + sizeof(bat1) + sizeof(bat2) + sizeof(mag_x) + sizeof(mag_y) + sizeof(mag_z) + sizeof(acc_x) + sizeof(acc_y) + sizeof(acc_z);
+        //Other
+        float _rState = wrState;
+
+        auto rState = (uint8_t *)(&_rState);
+
+        auto const buf_size = sizeof(time) + sizeof(lat) + sizeof(lng) + sizeof(alt) + sizeof(sats) + sizeof(pressure) + sizeof(altitude) + sizeof(f_altitude) + sizeof(f_velocity) + sizeof(f_acceleration) + sizeof(temperature) + sizeof(bat1) + sizeof(acc_x) + sizeof(acc_y) + sizeof(acc_z) + sizeof(gyr_x) + sizeof(gyr_y) + sizeof(gyr_z) + sizeof(rState);
         Buffer<buf_size> buffer;
 
         buffer.push(time);
@@ -178,14 +182,15 @@ namespace flash
         buffer.push(temperature);
         
         buffer.push(bat1);
-        buffer.push(bat2);
         
-        buffer.push(mag_x);
-        buffer.push(mag_y);
-        buffer.push(mag_z);
         buffer.push(acc_x);
         buffer.push(acc_y);
         buffer.push(acc_z);
+        buffer.push(gyr_x);
+        buffer.push(gyr_y);
+        buffer.push(gyr_z);
+
+        buffer.push(rState);
 
         if (!file)
         {
@@ -263,34 +268,37 @@ namespace flash
             stream.getValue<float>(&bat1);
             Serial.println("bat1: " + String(bat1, 10));
 
-            float bat2 = 0;
-            stream.getValue<float>(&bat2);
-            Serial.println("bat2: " + String(bat2, 10));
             
             //Mag
-            float mag_x = 0;
-            stream.getValue<float>(&mag_x);
-            Serial.println("magx: " + String(mag_x, 10));
-
-            float mag_y = 0;
-            stream.getValue<float>(&mag_y);
-            Serial.println("magy: " + String(mag_y, 10));
-
-            float mag_z = 0;
-            stream.getValue<float>(&mag_z);
-            Serial.println("magz: " + String(mag_z, 10));
-
             float acc_x = 0;
             stream.getValue<float>(&acc_x);
-            Serial.println("magacc_x: " + String(acc_x, 10));
+            Serial.println("acc_x: " + String(acc_x, 10));
             
             float acc_y = 0;
             stream.getValue<float>(&acc_y);
-            Serial.println("magacc_y: " + String(acc_y, 10));
+            Serial.println("acc_y: " + String(acc_y, 10));
             
             float acc_z = 0;
             stream.getValue<float>(&acc_z);
-            Serial.println("magacc_z: " + String(acc_z, 10));
+            Serial.println("acc_z: " + String(acc_z, 10));
+             
+            float gyr_x = 0;
+            stream.getValue<float>(&gyr_x);
+            Serial.println("gyr_x: " + String(gyr_x, 10));
+
+            float gyr_y = 0;
+            stream.getValue<float>(&gyr_y);
+            Serial.println("gyr_y: " + String(gyr_y, 10));
+
+            float gyr_z = 0;
+            stream.getValue<float>(&gyr_z);
+            Serial.println("gyr_z: " + String(gyr_z, 10));
+
+
+            //Other
+            float rState = 0;
+            stream.getValue<float>(&rState);
+            Serial.println("rState: " + String(rState, 10));
 
             Serial.println();
 
@@ -302,7 +310,7 @@ namespace flash
     {
         File file = LITTLEFS.open(path);
         //This is the size of reading
-        auto const buf_size = sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float);   
+        auto const buf_size = sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float);   
         while (file.available())
         {
 
@@ -362,23 +370,8 @@ namespace flash
             stream.getValue<float>(&bat1);
             Serial.print(String(bat1, 4) + ",");
 
-            float bat2 = 0;
-            stream.getValue<float>(&bat2);
-            Serial.print(String(bat2, 4) + ",");
             
             //Mag
-            float mag_x = 0;
-            stream.getValue<float>(&mag_x);
-            Serial.print(String(mag_x, 4) + ",");
-
-            float mag_y = 0;
-            stream.getValue<float>(&mag_y);
-            Serial.print(String(mag_y, 4) + ",");
-
-            float mag_z = 0;
-            stream.getValue<float>(&mag_z);
-            Serial.print(String(mag_z, 4) + ",");
-
             float acc_x = 0;
             stream.getValue<float>(&acc_x);
             Serial.print(String(acc_x, 4) + ",");
@@ -391,6 +384,23 @@ namespace flash
             stream.getValue<float>(&acc_z);
             Serial.println(String(acc_z, 4));
 
+            float gyr_x = 0;
+            stream.getValue<float>(&gyr_x);
+            Serial.print(String(gyr_x, 4) + ",");
+
+            float gyr_y = 0;
+            stream.getValue<float>(&gyr_y);
+            Serial.print(String(gyr_y, 4) + ",");
+
+            float gyr_z = 0;
+            stream.getValue<float>(&gyr_z);
+            Serial.print(String(gyr_z, 4) + ",");
+
+
+            //Other
+            float rState = 0;
+            stream.getValue<float>(&rState);
+            Serial.print(String(rState, 4) + ",");
 
         }
         file.close();
