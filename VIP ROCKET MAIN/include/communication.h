@@ -4,10 +4,14 @@
 #include "sensor_data.h"
 #include "lora_wrapper.h"
 #include "thread_wrapper.h"
+#include "SD_card.h"
 
 
 namespace comms
 {
+    //variables for SD writing
+    int loops = 0, loop_interval = 30; 
+    SD_File fileSD;
 
     String serializeData();
     void loop(void *args);
@@ -15,6 +19,7 @@ namespace comms
     void setup(long frequency = 433E6)
     {
         lora::setup(frequency);
+        fileSD = SDcard::openFile();
         s_thread::setup(loop);  
     }
 
@@ -26,7 +31,7 @@ namespace comms
         while (true)
         {
             String serialized = comms::serializeData();
-            Serial.println("Sent data: " + String(serialized));
+            Serial.println("Sent data: " + String(serialized) + " at time: " + String(SDcard::getTimeElapsed()));
 
             //*option 1 - Not encoded
             lora::sendMessage(serialized, 1);
@@ -35,7 +40,16 @@ namespace comms
             // lora::encodeMessage();
             // lora::sendEncodedMessage(1);
 
-            delay(1000); //Changed form 400
+            //!Test SD writing in same thread with LoRa
+            SDcard::writeString(fileSD, serialized);
+
+            if(loops > loop_interval)
+            {
+                loops = 0; //reset amount of loops since last close-open
+                fileSD = SDcard::reloadFile(fileSD);
+            }
+            loops++;
+            delay(400);
         }
     }
 

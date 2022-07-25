@@ -12,6 +12,7 @@
 #include "barometer_wrapper_MS5607.h"
 #include "imu_wrapper_MPU9250.h"
 #include "eeprom_wrapper.h"
+#include "SD_card.h"
 
 //*Temporary variables
 bool clearEEPROM = true;
@@ -36,6 +37,9 @@ public:
 
         //*flash setup
         flash::setup();
+
+        //*SD setup
+        SDcard::setup();
 
         //*Sensor setups
         Wire.begin(21, 22); // initialize correct i2c lines
@@ -62,7 +66,7 @@ public:
 
         int loops = 0; 
         //!TODO change with while(!arming::armed) - add arming functionality 
-        while (loops < 100)
+        while (true)
         {
             //*gps
             gps::readGps();                             // reads in values from gps
@@ -83,8 +87,8 @@ public:
             sens_data::BatteryData btd;
 
             delay(50);
-            loops++;
-            Serial.println(loops);
+            // loops++;
+            // Serial.println(loops);
         }
 
         this->_context->RequestNextPhase();

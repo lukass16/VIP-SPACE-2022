@@ -15,6 +15,8 @@
 #define _SCLK 2
 #define _SD_CS 25
 
+unsigned long SD_time = millis();
+
 namespace SDcard
 {
 
@@ -43,11 +45,34 @@ namespace SDcard
 		fileSD.close();
 	}
 
+	SD_File reloadFile(SD_File fileSD) //returnds file handle
+	{
+		Serial.println("Reloading SD card file");
+		closeFile(fileSD);
+		return SD.open("data2.txt", FILE_WRITES);
+	}
+
+	float getTimeElapsed() //*Check overflow
+    {
+        return millis() - SD_time;
+    }
+
+	int writeString(SD_File fileSD, String serialized)
+    {
+		if(!fileSD) 
+		{
+			Serial.println("Unable to write to SD card");
+			return 0;
+		}
+		fileSD.println(serialized);
+		return 1;
+    }
+
 	int writeData(SD_File fileSD, sens_data::GpsData gpsData, sens_data::IMUData imuData, sens_data::BarometerData barData, sens_data::BatteryData batData, bool verbose = false)
     {
 		if(!fileSD) 
 		{
-			Serial.println("Unbale to write to SD card");
+			Serial.println("Unable to write to SD card");
 			return 0;
 		}
 
