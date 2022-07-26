@@ -18,8 +18,7 @@ public:
         Serial.println("MAIN STATE");
 
         File file = flash::openFile();       // opening flash file for writing during flight
-        // SD_File fileSD = SDcard::openFile(); // opening SD file for writing during main state
-        // SDcard::markMain(fileSD);
+        int flash_counter = 0;
 
         s_data.updateRocketState(); //update state that's written to LoRa messages  
 
@@ -49,11 +48,15 @@ public:
 
             //*placeholder for battery data
 
-            // writing to flash
-            flash::writeData(file, gd, md, bd, btd, 3);
+            flash_counter = flash::writeData(file, gd, md, bd, btd, 3); // writing data to flash memory
+            if (flash_counter % 100 == 1)
+            {
+                file = flash::closeOpen(file); // close and open the file every 100th reading
+            }
             delay(50);
         }
 
+        //mark main ejection in EEPROM
         eeprom::markMainEjection();
 
         // close flash file

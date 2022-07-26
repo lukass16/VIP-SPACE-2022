@@ -10,7 +10,7 @@
 unsigned long flash_time = millis();
 unsigned long start_descent_time;
 
-//to simplify the usage of the Flash header declared a different function - deleteFile - this serves as it's basis
+// to simplify the usage of the Flash header declared a different function - deleteFile - this serves as it's basis
 void delete_File(fs::FS &fs, const char *path)
 {
     Serial.printf("Deleting file: %s\r\n", path);
@@ -72,7 +72,7 @@ namespace flash
         if (!LITTLEFS.begin(FORMAT_LITTLEFS_IF_FAILED))
         {
             Serial.println("LITTLEFS Mount Failed. Its possible you need to format the partition with LITTLEFS.format() just once");
-            //LITTLEFS.format(); //comment this out - only for first time with testing flash
+            // LITTLEFS.format(); //comment this out - only for first time with testing flash
             return;
         }
         Serial.println("Flash setup");
@@ -89,9 +89,21 @@ namespace flash
         return file;
     }
 
+    void closeFile(File file)
+    {
+        file.close();
+    }
+
+    File closeOpen(File file)
+    {
+        flash::closeFile(file);
+        Serial.println("Closed and opened flash file");
+        return flash::openFile();
+    }
+
     float getTimeElapsed() //*Check overflow
     {
-        return millis()-flash_time;
+        return millis() - flash_time;
     }
 
     void testFileIO(File file, int multiplier)
@@ -122,44 +134,44 @@ namespace flash
     //*Current data writing function
     int writeData(File file, sens_data::GpsData gpsData, sens_data::IMUData imuData, sens_data::BarometerData barData, sens_data::BatteryData batData, int wrState)
     {
-        //counter for closing and opening file
+        // counter for closing and opening file
         static int counter;
 
-        //Flash timing
+        // Flash timing
         float _time = flash::getTimeElapsed();
         auto time = (uint8_t *)(&_time);
 
-        //GPS
-        float _lat = gpsData.lat; //1.1
-        float _lng = gpsData.lng; //1.2
-        float _alt = gpsData.alt; //1.3
-        float _sats = gpsData.sats; //1.4
+        // GPS
+        float _lat = gpsData.lat;   // 1.1
+        float _lng = gpsData.lng;   // 1.2
+        float _alt = gpsData.alt;   // 1.3
+        float _sats = gpsData.sats; // 1.4
 
         auto lat = (uint8_t *)(&_lat);
         auto lng = (uint8_t *)(&_lng);
         auto alt = (uint8_t *)(&_alt);
-        auto sats = (uint8_t *)(&_sats); //1.4
+        auto sats = (uint8_t *)(&_sats); // 1.4
 
-        //Bar
-        auto pressure = (uint8_t *)(&barData.pressure); //2.1
-        auto altitude = (uint8_t *)(&barData.altitude); //2.2
-        auto f_altitude = (uint8_t *)(&barData.f_altitude); //2.4
-        auto f_velocity = (uint8_t *)(&barData.f_velocity); //2.5
-        auto f_acceleration = (uint8_t *)(&barData.f_acceleration); //2.6
-        auto temperature = (uint8_t *)(&barData.temperature); //2.7
-       
-        //Bat
-        auto bat1 = (uint8_t *)(&batData.bat1); //3.1
+        // Bar
+        auto pressure = (uint8_t *)(&barData.pressure);             // 2.1
+        auto altitude = (uint8_t *)(&barData.altitude);             // 2.2
+        auto f_altitude = (uint8_t *)(&barData.f_altitude);         // 2.4
+        auto f_velocity = (uint8_t *)(&barData.f_velocity);         // 2.5
+        auto f_acceleration = (uint8_t *)(&barData.f_acceleration); // 2.6
+        auto temperature = (uint8_t *)(&barData.temperature);       // 2.7
 
-        //Mag
-        auto acc_x = (uint8_t *)(&imuData.acc_x); //4.4
-        auto acc_y = (uint8_t *)(&imuData.acc_y); //4.5
-        auto acc_z = (uint8_t *)(&imuData.acc_z); //4.6
-        auto gyr_x = (uint8_t *)(&imuData.gyr_x); //4.1
-        auto gyr_y = (uint8_t *)(&imuData.gyr_y); //4.2
-        auto gyr_z = (uint8_t *)(&imuData.gyr_z); //4.3
+        // Bat
+        auto bat1 = (uint8_t *)(&batData.bat1); // 3.1
 
-        //Other
+        // Mag
+        auto acc_x = (uint8_t *)(&imuData.acc_x); // 4.4
+        auto acc_y = (uint8_t *)(&imuData.acc_y); // 4.5
+        auto acc_z = (uint8_t *)(&imuData.acc_z); // 4.6
+        auto gyr_x = (uint8_t *)(&imuData.gyr_x); // 4.1
+        auto gyr_y = (uint8_t *)(&imuData.gyr_y); // 4.2
+        auto gyr_z = (uint8_t *)(&imuData.gyr_z); // 4.3
+
+        // Other
         float _rState = wrState;
 
         auto rState = (uint8_t *)(&_rState);
@@ -180,9 +192,9 @@ namespace flash
         buffer.push(f_velocity);
         buffer.push(f_acceleration);
         buffer.push(temperature);
-        
+
         buffer.push(bat1);
-        
+
         buffer.push(acc_x);
         buffer.push(acc_y);
         buffer.push(acc_z);
@@ -203,25 +215,23 @@ namespace flash
         return counter;
     }
 
-
     void readFlashVerbose(const char *path)
     {
         File file = LITTLEFS.open(path);
-        //This is the size of reading
-        auto const buf_size = sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float);   
+        // This is the size of reading
+        auto const buf_size = sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float);
         while (file.available())
         {
 
             StreamPipe<buf_size> stream;
             file.readBytes(stream.buf_out, buf_size);
- 
 
-            //Time
+            // Time
             float time = 0;
             stream.getValue<float>(&time);
             Serial.println("ellapsed time: " + String(time, 10));
 
-            //GPS
+            // GPS
             float lat = 0;
             stream.getValue<float>(&lat);
             Serial.println("lat: " + String(lat, 10));
@@ -238,7 +248,7 @@ namespace flash
             stream.getValue<float>(&sats);
             Serial.println("sats: " + String(sats, 10));
 
-            //Bar
+            // Bar
             float pressure = 0;
             stream.getValue<float>(&pressure);
             Serial.println("pressure: " + String(pressure, 10));
@@ -263,25 +273,24 @@ namespace flash
             stream.getValue<float>(&temperature);
             Serial.println("temperature: " + String(temperature, 10));
 
-            //Bat
+            // Bat
             float bat1 = 0;
             stream.getValue<float>(&bat1);
             Serial.println("bat1: " + String(bat1, 10));
 
-            
-            //Mag
+            // Mag
             float acc_x = 0;
             stream.getValue<float>(&acc_x);
             Serial.println("acc_x: " + String(acc_x, 10));
-            
+
             float acc_y = 0;
             stream.getValue<float>(&acc_y);
             Serial.println("acc_y: " + String(acc_y, 10));
-            
+
             float acc_z = 0;
             stream.getValue<float>(&acc_z);
             Serial.println("acc_z: " + String(acc_z, 10));
-             
+
             float gyr_x = 0;
             stream.getValue<float>(&gyr_x);
             Serial.println("gyr_x: " + String(gyr_x, 10));
@@ -294,14 +303,12 @@ namespace flash
             stream.getValue<float>(&gyr_z);
             Serial.println("gyr_z: " + String(gyr_z, 10));
 
-
-            //Other
+            // Other
             float rState = 0;
             stream.getValue<float>(&rState);
             Serial.println("rState: " + String(rState, 10));
 
             Serial.println();
-
         }
         file.close();
     }
@@ -309,21 +316,20 @@ namespace flash
     void readFlash(const char *path)
     {
         File file = LITTLEFS.open(path);
-        //This is the size of reading
-        auto const buf_size = sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float);   
+        // This is the size of reading
+        auto const buf_size = sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float);
         while (file.available())
         {
 
             StreamPipe<buf_size> stream;
             file.readBytes(stream.buf_out, buf_size);
- 
- 
-            //Time
+
+            // Time
             float time = 0;
             stream.getValue<float>(&time);
             Serial.print(String(time, 4) + ",");
 
-            //GPS
+            // GPS
             float lat = 0;
             stream.getValue<float>(&lat);
             Serial.print(String(lat, 4) + ",");
@@ -340,7 +346,7 @@ namespace flash
             stream.getValue<float>(&sats);
             Serial.print(String(sats, 4) + ",");
 
-            //Bar
+            // Bar
             float pressure = 0;
             stream.getValue<float>(&pressure);
             Serial.print(String(pressure, 4) + ",");
@@ -365,21 +371,20 @@ namespace flash
             stream.getValue<float>(&temperature);
             Serial.print(String(temperature, 4) + ",");
 
-            //Bat
+            // Bat
             float bat1 = 0;
             stream.getValue<float>(&bat1);
             Serial.print(String(bat1, 4) + ",");
 
-            
-            //Mag
+            // Mag
             float acc_x = 0;
             stream.getValue<float>(&acc_x);
             Serial.print(String(acc_x, 4) + ",");
-            
+
             float acc_y = 0;
             stream.getValue<float>(&acc_y);
             Serial.print(String(acc_y, 4) + ",");
-            
+
             float acc_z = 0;
             stream.getValue<float>(&acc_z);
             Serial.println(String(acc_z, 4));
@@ -396,12 +401,10 @@ namespace flash
             stream.getValue<float>(&gyr_z);
             Serial.print(String(gyr_z, 4) + ",");
 
-
-            //Other
+            // Other
             float rState = 0;
             stream.getValue<float>(&rState);
             Serial.print(String(rState, 4) + ",");
-
         }
         file.close();
     }
@@ -423,24 +426,22 @@ namespace flash
             Serial.println("Cannot delete flash - locked");
             return 1;
         }
-        else {return 0;}
-    }
-
-    void closeFile(File file)
-    {
-        file.close();
+        else
+        {
+            return 0;
+        }
     }
 
     bool flashEnded(File file, int flash_duration = 30000)
     {
         static bool firstCall = true;
         static bool ended = false;
-        if(firstCall)
+        if (firstCall)
         {
             start_descent_time = millis();
             firstCall = false;
         }
-        if(!ended && millis() - start_descent_time > flash_duration)
+        if (!ended && millis() - start_descent_time > flash_duration)
         {
             ended = true;
             file.close();

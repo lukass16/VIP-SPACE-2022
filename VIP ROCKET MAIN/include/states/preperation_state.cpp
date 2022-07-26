@@ -86,8 +86,8 @@ public:
         }
 
         int loops = 0; 
-        //!TODO change with while(!arming::armed) - add arming functionality 
-        while (loops < 100)
+         
+        while (loops < 100) //!TODO change with while(!arming::armed) - add arming functionality
         {
             //*gps
             gps::readGps();                             // reads in values from gps
@@ -109,7 +109,7 @@ public:
 
             delay(50);
             loops++;
-            // Serial.println(loops);
+            Serial.println(loops);
         }
 
         this->_context->RequestNextPhase();

@@ -17,8 +17,10 @@ public:
     {
         Serial.println("DROGUE STATE");
 
-        File file = flash::openFile();       // opening flash file for writing during flight
-        s_data.updateRocketState(); //update state that's written to LoRa messages
+        File file = flash::openFile(); // opening flash file for writing during flight
+        int flash_counter = 0;
+
+        s_data.updateRocketState(); // update state that's written to LoRa messages
 
         // variables for writing to memory
         sens_data::GpsData gd;
@@ -47,20 +49,15 @@ public:
 
             //*placeholder for battery data
 
-            // writing to flash
-            flash::writeData(file, gd, md, bd, btd, 2);
             delay(50);
         }
 
+        //mark launch in EEPROM
         eeprom::markLaunch();
         eeprom::lockFlash();
 
-        // close flash file
-        //flash::closeFile(file);
-        //flash::readFlashVerbose("/test.txt");
-        //while(true); //!Flash testing
 
-        while (!barometer::apogeeDetected()) //TODO add alternative timer apogee detection
+        while (!barometer::apogeeDetected()) // TODO add alternative timer apogee detection
         {
             //*gps
             gps::readGps();          // reads in values from gps
@@ -80,11 +77,15 @@ public:
 
             //*placeholder for battery data
 
-            // writing to flash
-            flash::writeData(file, gd, md, bd, btd, 2);
+            flash_counter = flash::writeData(file, gd, md, bd, btd, 2); // writing data to flash memory
+            if (flash_counter % 100 == 1)
+            {
+                file = flash::closeOpen(file); // close and open the file every 100th reading
+            }
             delay(50);
         }
 
+        // mark apogee in EEPROM
         eeprom::markApogee();
 
         // close flash file
