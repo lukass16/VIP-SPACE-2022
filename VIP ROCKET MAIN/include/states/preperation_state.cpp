@@ -12,7 +12,9 @@
 #include "barometer_wrapper_MS5607.h"
 #include "imu_wrapper_MPU9250.h"
 #include "eeprom_wrapper.h"
+#include "arming.h"
 #include "SD_card.h"
+
 
 //*Temporary variables
 bool clearEEPROM = true;
@@ -35,11 +37,14 @@ public:
         //*EEPROM setup
         eeprom::setup();
 
-        //*flash setup
+        //*Arming setup
+        arming::setup();
+
+        //*Flash setup
         flash::setup();
 
-        //*SD setup
-        SDcard::setup();
+        // //*SD setup
+        // SDcard::setup();
 
         //*Sensor setups
         Wire.begin(21, 22); // initialize correct i2c lines
@@ -51,10 +56,12 @@ public:
         s_data.updateRocketState(); //update state that's written to LoRa messages
 
         //*check if need to clear EEPROM
-        if(clearEEPROM) //TODO add dedicated clear function which clears all appropriate EEPROM addresses
+        if(arming::clearEEPROM())
         {
             eeprom::unlockFlash(); //only utility currently for EEPROM
         }
+
+        while(true);
 
         //*if flash not locked - delete file
         if(!eeprom::lockedFlash())
