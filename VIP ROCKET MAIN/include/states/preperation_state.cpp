@@ -87,7 +87,7 @@ public:
 
         int loops = 0; 
         //!TODO change with while(!arming::armed) - add arming functionality 
-        while (true)
+        while (loops < 100)
         {
             //*gps
             gps::readGps();                             // reads in values from gps
@@ -108,7 +108,7 @@ public:
             sens_data::BatteryData btd;
 
             delay(50);
-            // loops++;
+            loops++;
             // Serial.println(loops);
         }
 

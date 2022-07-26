@@ -62,6 +62,8 @@ public:
         // close flash file
         flash::closeFile(file);
 
+        while(true);
+
         flash::readFlashVerbose("/test.txt");
 
         delay(200000000);

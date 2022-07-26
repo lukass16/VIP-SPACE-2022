@@ -73,14 +73,14 @@ namespace eeprom
 
 	void markApogee()
 	{
-		Serial.println("Marking launch in EEPROM");
+		Serial.println("Marking apogee in EEPROM");
 		EEPROM.writeFloat(4, 2.0);
 		EEPROM.commit();
 	}
 
 	void markMainEjection()
 	{
-		Serial.println("Marking launch in EEPROM");
+		Serial.println("Marking main ejection in EEPROM");
 		EEPROM.writeFloat(4, 3.0);
 		EEPROM.commit();
 	}

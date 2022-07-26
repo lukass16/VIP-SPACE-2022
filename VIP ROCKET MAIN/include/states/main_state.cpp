@@ -8,6 +8,7 @@
 #include "gps_wrapper.h"
 #include "barometer_wrapper_MS5607.h"
 #include "imu_wrapper_MPU9250.h"
+#include "eeprom_wrapper.h"
 
 class MainState : public State
 {
@@ -52,6 +53,8 @@ public:
             flash::writeData(file, gd, md, bd, btd, 3);
             delay(50);
         }
+
+        eeprom::markMainEjection();
 
         // close flash file
         flash::closeFile(file);

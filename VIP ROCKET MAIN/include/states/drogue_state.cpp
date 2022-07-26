@@ -8,6 +8,7 @@
 #include "gps_wrapper.h"
 #include "barometer_wrapper_MS5607.h"
 #include "imu_wrapper_MPU9250.h"
+#include "eeprom_wrapper.h"
 
 class DrogueState : public State
 {
@@ -25,8 +26,8 @@ public:
         sens_data::IMUData md;
         sens_data::BatteryData btd;
 
-        // Detect launch using IMU acceleration *a* for *n* times
-        while (!imu::launchDetected())
+        // Detect launch using IMU acceleration *a* for *n* times, or if has been launch - skip
+        while (!imu::launchDetected() && !eeprom::hasBeenLaunch())
         {
             //*gps
             gps::readGps();          // reads in values from gps
@@ -51,10 +52,13 @@ public:
             delay(50);
         }
 
+        eeprom::markLaunch();
+        eeprom::lockFlash();
+
         // close flash file
-        flash::closeFile(file);
-        flash::readFlashVerbose("/test.txt");
-        while(true); //!Flash testing
+        //flash::closeFile(file);
+        //flash::readFlashVerbose("/test.txt");
+        //while(true); //!Flash testing
 
         while (!barometer::apogeeDetected()) //TODO add alternative timer apogee detection
         {
@@ -80,6 +84,8 @@ public:
             flash::writeData(file, gd, md, bd, btd, 2);
             delay(50);
         }
+
+        eeprom::markApogee();
 
         // close flash file
         flash::closeFile(file);
