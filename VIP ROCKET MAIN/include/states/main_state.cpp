@@ -34,6 +34,8 @@ public:
 
         while (!barometer::mainAltitudeDetected() && !arming::timerDetectMainEjection()) //*waiting until altitude is below threshold to eject main parachute
         {
+            buzzer::signalMain();
+            
             //*gps
             gps::readGps();          // reads in values from gps
             gd = gps::getGpsState(); // retrieve values from wrapper to be put in data object

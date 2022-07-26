@@ -9,8 +9,9 @@ namespace buzzer
     int piezo_pin = 23;
 
     //variable for the structure of the third switch beeping
-    bool thirdSwitchBeep = false, flightBeep = false, descentBeep = false;
+    bool thirdSwitchBeep = false, flightBeep = false, descentBeep = false, buzzing = false;
     unsigned long previousTime = 0, currentTime = 0;
+    int times_buzzed = 0;
 
     //declaring variables for PWM channel attributes
     int freq = 400, channel = 0, resolution = 8;
@@ -53,7 +54,9 @@ namespace buzzer
 
     void signalStart()
     {
-        buzzer::buzz(860);
+        digitalWrite(piezo_pin, HIGH);
+        delay(300);
+        digitalWrite(piezo_pin, LOW);
     }
 
     void signalCalibrationStart()
@@ -132,7 +135,7 @@ namespace buzzer
         }
     }
 
-    void signalDescent() //identical to previous function
+    void signalDescentLegacy() //identical to previous function
     {
         int interval = 2000; //interval time in milliseconds
         currentTime = millis();
@@ -163,7 +166,7 @@ namespace buzzer
         buzzer::buzzEnd();
     }
 
-    void signalEEPROMClear()
+    void signalEEPROMClearLegacy()
     {
         buzzer::buzz(2000);
         delay(200);
@@ -173,6 +176,149 @@ namespace buzzer
         delay(200);
         buzzer::buzzEnd();        
         delay(2000); //delay to differentiate signals
+    }
+
+    void signalEEPROMClear()
+    {
+        digitalWrite(piezo_pin, HIGH); // 1)
+        delay(50);
+        digitalWrite(piezo_pin, LOW);
+        delay(50);
+        digitalWrite(piezo_pin, HIGH); // 2)
+        delay(50);
+        digitalWrite(piezo_pin, LOW);
+        delay(50);
+        digitalWrite(piezo_pin, HIGH); // 3)
+        delay(50);
+        digitalWrite(piezo_pin, LOW);
+        delay(50);
+        digitalWrite(piezo_pin, HIGH); // 4)
+        delay(50);
+        digitalWrite(piezo_pin, LOW);
+        delay(50);
+        digitalWrite(piezo_pin, HIGH); // 5)
+        delay(200);
+        digitalWrite(piezo_pin, LOW);
+    }
+
+    void signalNotArmed()
+    {
+        int interval = 5000;
+        int duration = 200; //interval time in milliseconds
+        currentTime = millis();
+
+        if (currentTime - previousTime >= interval && !buzzing)
+        {
+            previousTime = currentTime; //save the last time that buzzer was toggled
+            digitalWrite(piezo_pin, HIGH);
+            buzzing = true;
+        }
+        else if(currentTime - previousTime >= duration && buzzing)
+        {
+            digitalWrite(piezo_pin, LOW);
+            buzzing = false;
+        }
+        
+    }
+
+    void signalDrogue()
+    {
+        int interval = 5000;
+        int pause = 200;
+        int duration = 200; //interval time in milliseconds
+        int times_to_buzz = 2;
+        currentTime = millis();
+
+        if (currentTime - previousTime >= pause && !buzzing && times_buzzed < times_to_buzz) //if hasn't buzzed the allowed times and isn't currently buzzing - starts buzz
+        {
+            previousTime = currentTime; //save the last time that buzzer was toggled
+            digitalWrite(piezo_pin, HIGH);
+            buzzing = true;
+        }
+        else if(currentTime - previousTime >= duration && buzzing) //if is currently buzzing and has buzzed more than allowed - ends buzz
+        {
+            previousTime = currentTime; //save the last time that buzzer was toggled
+            digitalWrite(piezo_pin, LOW);
+            buzzing = false;
+            times_buzzed++;
+        }
+        else if(currentTime - previousTime >= interval && !buzzing) //after every interval resets times the buzzr has buzzed
+        {
+            times_buzzed = 0;
+        }
+        
+    }
+
+    void signalMain()
+    {
+        int interval = 5000;
+        int pause = 200;
+        int duration = 200; //interval time in milliseconds
+        int times_to_buzz = 3;
+        currentTime = millis();
+
+        if (currentTime - previousTime >= pause && !buzzing && times_buzzed < times_to_buzz) //if hasn't buzzed the allowed times and isn't currently buzzing - starts buzz
+        {
+            previousTime = currentTime; //save the last time that buzzer was toggled
+            digitalWrite(piezo_pin, HIGH);
+            buzzing = true;
+        }
+        else if(currentTime - previousTime >= duration && buzzing) //if is currently buzzing and has buzzed more than allowed - ends buzz
+        {
+            previousTime = currentTime; //save the last time that buzzer was toggled
+            digitalWrite(piezo_pin, LOW);
+            buzzing = false;
+            times_buzzed++;
+        }
+        else if(currentTime - previousTime >= interval && !buzzing) //after every interval resets times the buzzr has buzzed
+        {
+            times_buzzed = 0;
+        }
+        
+    }
+
+    void signalDescent()
+    {
+        int interval = 5000;
+        int pause = 200;
+        int duration = 200; //interval time in milliseconds
+        int times_to_buzz = 4;
+        currentTime = millis();
+
+        if (currentTime - previousTime >= pause && !buzzing && times_buzzed < times_to_buzz) //if hasn't buzzed the allowed times and isn't currently buzzing - starts buzz
+        {
+            previousTime = currentTime; //save the last time that buzzer was toggled
+            digitalWrite(piezo_pin, HIGH);
+            buzzing = true;
+        }
+        else if(currentTime - previousTime >= duration && buzzing) //if is currently buzzing and has buzzed more than allowed - ends buzz
+        {
+            previousTime = currentTime; //save the last time that buzzer was toggled
+            digitalWrite(piezo_pin, LOW);
+            buzzing = false;
+            times_buzzed++;
+        }
+        else if(currentTime - previousTime >= interval && !buzzing) //after every interval resets times the buzzr has buzzed
+        {
+            times_buzzed = 0;
+        }
+        
+    }
+
+
+    void signalArmed()
+    {
+        digitalWrite(piezo_pin, HIGH); // 1)
+        delay(50);
+        digitalWrite(piezo_pin, LOW);
+        delay(50);
+        digitalWrite(piezo_pin, HIGH); // 2)
+        delay(50);
+        digitalWrite(piezo_pin, LOW);
+        delay(50);
+        digitalWrite(piezo_pin, HIGH); // 3)
+        delay(50);
+        digitalWrite(piezo_pin, LOW);
     }
 
     void test()

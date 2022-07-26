@@ -30,9 +30,8 @@ public:
 
         //*Buzzer test/signal start
         buzzer::setup();
+        buzzer::transitionToGeneratorMode();
         buzzer::signalStart();
-        delay(500);
-        buzzer::buzzEnd();
 
         //*EEPROM setup
         eeprom::setup();
@@ -58,6 +57,7 @@ public:
         //*check if need to clear EEPROM
         if(arming::clearEEPROM())
         {
+            buzzer::signalEEPROMClear();
             eeprom::clean(); //only utility currently for EEPROM
         }
 
@@ -89,6 +89,8 @@ public:
          
         while (loops < 100) //!TODO change with while(!arming::armed) - add arming functionality
         {
+            buzzer::signalNotArmed();
+
             //*gps
             gps::readGps();                             // reads in values from gps
             sens_data::GpsData gd = gps::getGpsState(); // retrieve values from wrapper to be put in data object
@@ -111,6 +113,8 @@ public:
             loops++;
             Serial.println(loops);
         }
+
+        buzzer::signalArmed();
 
         this->_context->RequestNextPhase();
         this->_context->Start();

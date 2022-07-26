@@ -28,6 +28,8 @@ public:
 
         while (true)
         {
+            buzzer::signalDescent();
+
             //*gps
             gps::readGps();          // reads in values from gps
             gd = gps::getGpsState(); // retrieve values from wrapper to be put in data object
@@ -53,13 +55,6 @@ public:
                 {
                     file = flash::closeOpen(file); // close and open the file every 100th reading
                 }
-            }
-
-            if(flash::flashEnded(file, flash_write_time))
-            {
-                //!testing
-                flash::readFlashVerbose("/test.txt");
-                while(true);
             }
 
             delay(200);

@@ -32,6 +32,8 @@ public:
         // Detect launch using IMU acceleration *a* for *n* times, or if has been launch - skip
         while (!imu::launchDetected() && !eeprom::hasBeenLaunch())
         {
+            buzzer::signalDrogue();
+
             //*gps
             gps::readGps();          // reads in values from gps
             gd = gps::getGpsState(); // retrieve values from wrapper to be put in data object
@@ -62,6 +64,8 @@ public:
 
         while (!barometer::apogeeDetected() && !arming::timerDetectApogee()) // TODO add alternative timer apogee detection
         {
+            buzzer::signalDrogue();
+            
             //*gps
             gps::readGps();          // reads in values from gps
             gd = gps::getGpsState(); // retrieve values from wrapper to be put in data object
