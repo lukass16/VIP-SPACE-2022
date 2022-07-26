@@ -9,6 +9,7 @@
 #include "barometer_wrapper_MS5607.h"
 #include "imu_wrapper_MPU9250.h"
 #include "eeprom_wrapper.h"
+#include "arming.h"
 
 class MainState : public State
 {
@@ -22,13 +23,16 @@ public:
 
         s_data.updateRocketState(); //update state that's written to LoRa messages  
 
+        //start main ejection timer
+        arming::startMainEjectionTimer();
+
         // variables for writing to memory
         sens_data::GpsData gd;
         sens_data::BarometerData bd;
         sens_data::IMUData md;
         sens_data::BatteryData btd;
 
-        while (!barometer::mainAltitudeDetected()) //*waiting until altitude is below threshold to eject main parachute
+        while (!barometer::mainAltitudeDetected() && !arming::timerDetectMainEjection()) //*waiting until altitude is below threshold to eject main parachute
         {
             //*gps
             gps::readGps();          // reads in values from gps

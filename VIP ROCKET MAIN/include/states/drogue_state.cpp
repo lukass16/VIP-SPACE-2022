@@ -9,6 +9,7 @@
 #include "barometer_wrapper_MS5607.h"
 #include "imu_wrapper_MPU9250.h"
 #include "eeprom_wrapper.h"
+#include "arming.h"
 
 class DrogueState : public State
 {
@@ -56,8 +57,10 @@ public:
         eeprom::markLaunch();
         eeprom::lockFlash();
 
+        //start apogee detection timer
+        arming::startApogeeTimer();
 
-        while (!barometer::apogeeDetected()) // TODO add alternative timer apogee detection
+        while (!barometer::apogeeDetected() && !arming::timerDetectApogee()) // TODO add alternative timer apogee detection
         {
             //*gps
             gps::readGps();          // reads in values from gps
