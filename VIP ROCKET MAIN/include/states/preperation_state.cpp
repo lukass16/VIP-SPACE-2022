@@ -58,10 +58,8 @@ public:
         //*check if need to clear EEPROM
         if(arming::clearEEPROM())
         {
-            eeprom::unlockFlash(); //only utility currently for EEPROM
+            eeprom::clean(); //only utility currently for EEPROM
         }
-
-        while(true);
 
         //*if flash not locked - delete file
         if(!eeprom::lockedFlash())
@@ -69,7 +67,23 @@ public:
             flash::deleteFile("/test.txt"); //*deleting file so as to reset it
         }
 
-        //TODO add EEPROM state transfer mechanism
+        //*Determine if has been reset - need to transfer to different state
+        eeprom::readPreviousState();
+        if(eeprom::hasBeenLaunch())
+        {
+            JumpToDrogue();
+            this->_context->Start();
+        }
+        else if(eeprom::hasBeenApogee())
+        {
+            JumpToMain();
+            this->_context->Start();
+        }
+        else if(eeprom::hasBeenMainEjection())
+        {
+            JumpToDescent();
+            this->_context->Start();
+        }
 
         int loops = 0; 
         //!TODO change with while(!arming::armed) - add arming functionality 
@@ -105,5 +119,21 @@ public:
     void HandleNextPhase() override
     {
         this->_context->TransitionTo(new DrogueState);
+    }
+
+    //Jumping functions for EEPROM transfer mechanism
+    void JumpToDrogue()
+    {
+        this->_context->TransitionTo(new DrogueState);
+    }
+
+    void JumpToMain()
+    {
+        this->_context->TransitionTo(new MainState);
+    }
+
+    void JumpToDescent()
+    {
+        this->_context->TransitionTo(new DescentState);
     }
 };
