@@ -29,6 +29,7 @@ void setup()
 	// 2) LoRa
 	Serial.println("\nTesting LoRa");
 	lora::setup();
+	String message = "TESTING LORA";
 	start_time = millis();
 	while (millis() - start_time < interval)
 	{
@@ -41,7 +42,6 @@ void setup()
 	Wire.begin(21, 22); // initialize correct i2c lines
 	Serial.println("\nTesting Barometer");
 	barometer::setup();
-	Serial.println("Get's past setup");
 	start_time = millis();
 	while (millis() - start_time < interval)
 	{
