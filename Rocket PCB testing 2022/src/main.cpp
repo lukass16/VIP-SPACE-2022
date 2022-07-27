@@ -26,29 +26,30 @@ void setup()
 	buzzer::transitionToGeneratorMode();
 
 	buzzer::signalTransition();
-	// 2) LoRa
-	Serial.println("\nTesting LoRa");
-	lora::setup();
-	String message = "TESTING LORA";
-	start_time = millis();
-	while (millis() - start_time < interval)
-	{
-		lora::sendMessage(message, 1);
-		delay(400);
-	}
+	// // 2) LoRa
+	// Serial.println("\nTesting LoRa");
+	// lora::setup();
+	// String message = "TESTING LORA";
+	// start_time = millis();
+	// while (millis() - start_time < interval)
+	// {
+	// 	lora::sendMessage(message, 1);
+	// 	delay(400);
+	// }
 
 	buzzer::signalTransition();
 	// 3) Barometer
-	Wire.begin(21, 22); // initialize correct i2c lines
-	Serial.println("\nTesting Barometer");
-	barometer::setup();
-	start_time = millis();
-	while (millis() - start_time < interval)
-	{
-		barometer::readSensor();
-		barometer::printAll();
-		delay(400);
-	}
+	// Wire.begin(21, 22); // initialize correct i2c lines
+	// Serial.println("\nTesting Barometer");
+	// barometer::setup();
+	// Serial.println("Got this far");
+	// start_time = millis();
+	// while (millis() - start_time < interval)
+	// {
+	// 	barometer::readSensor();
+	// 	barometer::printAll();
+	// 	delay(400);
+	// }
 
 	buzzer::signalTransition();
 	// 4) IMU

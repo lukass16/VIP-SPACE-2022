@@ -87,7 +87,7 @@ public:
 
         int loops = 0; 
          
-        while (loops < 100) //!TODO change with while(!arming::armed) - add arming functionality
+        while (!arming::armed()) //!TODO change with while(!arming::armed) - add arming functionality
         {
             buzzer::signalNotArmed();
 
