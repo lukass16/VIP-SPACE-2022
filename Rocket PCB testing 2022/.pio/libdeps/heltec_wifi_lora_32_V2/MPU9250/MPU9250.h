@@ -115,7 +115,7 @@ class MPU9250_ {
     // Other settings
     bool has_connected {false};
     bool b_ahrs {true};
-    bool b_verbose {false};
+    bool b_verbose {true};
 
     // I2C
     WireType* wire;
@@ -144,15 +144,15 @@ public:
             else {
                 if (b_verbose)
                     Serial.println("Could not connect to AK8963");
-                has_connected = false;
-                return false;
+                has_connected = true; //!changed
+                Serial.println("Forced connection to MPU9250");
+                return true; //!changed
             }
         } else {
             if (b_verbose)
                 Serial.println("Could not connect to MPU9250");
-            has_connected = true;
-            Serial.println("Forced connection to MPU9250");
-            return true;
+            has_connected = false;
+            return false;
         }
         has_connected = true;
         return true;

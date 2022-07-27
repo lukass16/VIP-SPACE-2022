@@ -38,6 +38,7 @@ void setup()
 	}
 
 	buzzer::signalTransition();
+	
 	// 3) Barometer
 	Serial.println("\nTesting Barometer");
 	Wire.begin(21, 22); // initialize correct i2c lines
