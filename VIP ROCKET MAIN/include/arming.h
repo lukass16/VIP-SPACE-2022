@@ -7,6 +7,8 @@
 #define PYROSENSE 36
 #define FIREPYRO 32
 
+float batVoltage = 0;
+
 namespace arming
 {
     //*GPIO
@@ -122,5 +124,29 @@ namespace arming
         }
         return 0;
     }
+
+    //WORK IN PROGRESS
+    float getBatteryVoltage()
+    {
+        if(armed == 0)
+        {
+            batVoltage = analogRead(SW1);
+        } else if (analogRead(SW1)+analogRead(SW2) >= 6500){
+            batVoltage = analogRead(SW1)+analogRead(SW2);
+        }
+
+        return batVoltage;
+    }
+
+    bool pyroCheck()
+    {
+        if(analogRead(PYROSENSE)>=1000)
+        {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+
 
 }
