@@ -13,12 +13,12 @@
 #define FIREPYRO 32
 
 unsigned long start_time = millis();
-int interval = 10000; // milliseconds
+int interval = 100000; // milliseconds
 
 void setup()
 {
 	Serial.begin(115200);
-
+	/*
 	// 1) Buzzer
 	Serial.println("\nTesting Buzzer");
 	buzzer::setup();
@@ -36,20 +36,20 @@ void setup()
 	// 	lora::sendMessage(message, 1);
 	// 	delay(400);
 	// }
-
+	*/
 	buzzer::signalTransition();
 	// 3) Barometer
-	// Wire.begin(21, 22); // initialize correct i2c lines
-	// Serial.println("\nTesting Barometer");
-	// barometer::setup();
-	// Serial.println("Got this far");
-	// start_time = millis();
-	// while (millis() - start_time < interval)
-	// {
-	// 	barometer::readSensor();
-	// 	barometer::printAll();
-	// 	delay(400);
-	// }
+	 Wire.begin(21, 22); // initialize correct i2c lines
+	 Serial.println("\nTesting Barometer");
+	 barometer::setup();
+	 Serial.println("Got this far");
+	 start_time = millis();
+	 while (millis() - start_time < interval)
+	 {
+	 	barometer::readSensor();
+	 	barometer::printAll();
+	 	delay(400);
+	 }
 
 	buzzer::signalTransition();
 	// 4) IMU

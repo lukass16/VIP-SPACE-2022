@@ -26,15 +26,15 @@ namespace barometer
     void setup()
     {
         start_t = millis();
-
+        /*
         while (MS5607.connect() > 0)
         { // barometer.connect starts wire and attempts to connect to sensor
             Serial.println(F("Error connecting..."));
             delay(500);
         }
         Serial.println(F("Connected to Sensor"));
-        delay(5);
-
+        //delay(5);
+        */
         //*Note potentially 44 ms in setup could be saved if the following code is reconstructed
         while (seaLevelPressure == 0)
         {
@@ -49,6 +49,7 @@ namespace barometer
                 Serial.println("Cycles ellapsed while barometer ready: " + String(counter));
             }
         }
+        
     }
 
     void readSensor(bool temperatureCorrected = false)
