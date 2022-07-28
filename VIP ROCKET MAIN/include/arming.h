@@ -125,16 +125,14 @@ namespace arming
         return 0;
     }
 
-    // needs testing without USB connected
+    //WORK IN PROGRESS
     float getBatteryVoltage()
     {
         if(armed == 0)
         {
-            batVoltage = analogRead(SW1)/835;
-
-        // the readings get wonky if both the second and third switch are pressed 
+            batVoltage = analogRead(SW1);
         } else if (analogRead(SW1)+analogRead(SW2) >= 6500){
-            batVoltage = (analogRead(SW1)+analogRead(SW2))/1745;
+            batVoltage = analogRead(SW1)+analogRead(SW2);
         }
 
         return batVoltage;
