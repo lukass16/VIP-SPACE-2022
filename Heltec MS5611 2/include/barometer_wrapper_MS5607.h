@@ -44,7 +44,7 @@ namespace barometer
             {
                 // Calculate predicted seaLevel pressure based off a known altitude in meters
                 sampledSeaLevelPressure = MS5607.getSeaLevel(0.0); // this functions also as the sea level setter for altitude calculations
-                Serial.println("Sea level pressure set as: " + String(seaLevelPressure));
+                Serial.println("Sea level pressure set as: " + String(sampledSeaLevelPressure));
                 Serial.println("Time ellapsed while sampled: " + String(millis() - start_t, 5)); 
                 Serial.println("Cycles ellapsed while sampled: " + String(counter));
             }

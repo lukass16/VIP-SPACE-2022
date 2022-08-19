@@ -11,7 +11,8 @@ namespace barometer
     double temp = 0;
     double pres = 0;
     double alt = 0;
-    double seaLevelPressure = 0;
+    double seaLevelPressure = 101667.00;
+    double sampledSeaLevelPressure = 0;
 
     // Kalman (filtered) readings
     float f_alt = 0;
@@ -27,8 +28,6 @@ namespace barometer
 
     void setup()
     {
-        start_t = millis();
-
         while (MS5607.connect() > 0)
         { // barometer.connect starts wire and attempts to connect to sensor
             Serial.println(F("Error connecting..."));
@@ -37,24 +36,32 @@ namespace barometer
         Serial.println(F("Connected to Sensor"));
         delay(5);
 
-        //*Note potentially 44 ms in setup could be saved if the following code is reconstructed
-        while (seaLevelPressure == 0)
-        {
-            counter++;
-            MS5607.checkUpdates();
-            if (MS5607.isReady())
-            {
-                // Calculate predicted seaLevel pressure based off a known altitude in meters
-                seaLevelPressure = MS5607.getSeaLevel(10.5); // this functions also as the sea level setter for altitude calculations //!This can only be used to setup the barometer on the ground (ground level)
-                Serial.println("Sea level pressure set as: " + String(seaLevelPressure));
-                Serial.println("Time ellapsed while barometer ready: " + String(millis() - start_t, 5)); //*the delay is about 44 ms which is quite okay - it results from multiple loops while the sensor gets first readings
-                Serial.println("Cycles ellapsed while barometer ready: " + String(counter));
-            }
-        }
+        //TODO add previous sea level pressure reading from EEPROM
+
+        // setting sea level pressure
+        MS5607.setSeaLevel(seaLevelPressure);
 
         // kalman setup
         kalman::predict(); // make first prediction
         kalman_t = millis();
+    }
+
+    float sampleSeaLevel() // using function from library to sample sea level pressure, sets the current altitude as 0
+    {
+        while (sampledSeaLevelPressure == 0)
+        {
+            MS5607.checkUpdates();
+            if (MS5607.isReady())
+            {
+                // Calculate predicted seaLevel pressure based off a known altitude in meters
+                sampledSeaLevelPressure = MS5607.getSeaLevel(0.0); // this functions also as the sea level setter for altitude calculations
+                Serial.println("Sea level pressure sampled as: " + String(sampledSeaLevelPressure));
+            }
+        }
+
+        //TODO add sampledSeaLevelPressure saving to EEPROM
+
+        return sampledSeaLevelPressure;
     }
 
     void readSensor(bool temperatureCorrected = false)

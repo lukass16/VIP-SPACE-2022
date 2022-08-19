@@ -106,6 +106,9 @@ class MS5x
 	void setTempF(); // Sets Temperature reading to Fahrenheit
 	void setTempK(); // Sets Temperature reading to Kelvin
 	void setSamples(uint8_t sampleRatio); // Sets the oversampling ratio the sensor will use to calculate pressure and temperature readings
+
+	//*Not included in standard library - custom function
+	void setSeaLevel(float seaLevelPressure); // Sets the pressure at seaLevel from given input
 		
 	uint8_t connect(uint8_t sampleRatio = MS5xxx_CMD_ADC_4096); // Connects to device and sets oversampling ratio.  Default is max oversampling
 	uint8_t CRCcodeTest(); // Check validity of CRC, not working currently
