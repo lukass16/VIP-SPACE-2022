@@ -9,7 +9,7 @@ namespace imu
 
     void setup()
     {
-        mpu.setup(0x69); //! Note if the sensor can't connect check that the setup is forced in the MPU9250.h file
+        mpu.setup(0x68); //! Note if the sensor can't connect check that the setup is forced in the MPU9250.h file
     }
 
     void calibrateAccelAndGyro()

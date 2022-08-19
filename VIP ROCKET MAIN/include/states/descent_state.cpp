@@ -56,7 +56,6 @@ public:
                     file = flash::closeOpen(file); // close and open the file every 100th reading
                 }
             }
-
             delay(200);
         }
     }
