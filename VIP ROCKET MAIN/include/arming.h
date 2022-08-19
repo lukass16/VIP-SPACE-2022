@@ -31,6 +31,15 @@ namespace arming
         return 0;
     }
 
+    bool armed()
+    {
+        if(digitalRead(SW1) == 0)
+        {
+            return 1;
+        }
+        return 0;
+    }
+
     //*TIMERS
     //* 1) Apogee detection
     // creating a variable for timer detection of apogee
