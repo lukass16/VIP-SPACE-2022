@@ -10,11 +10,13 @@ EEPROM is interfaced via writing floats, every 4 EEPROM indexes
 Adress list:
 *0 - flash lock
 *4 - state saving
+*8 - sampled pressure saving
 */
 
 namespace eeprom
 {
 	int prevState = 0;
+	float seaLevelPressure = 0;
 
 	void setup()
 	{
@@ -120,6 +122,20 @@ namespace eeprom
 			return 1;
 		}
 		return 0;
+	}
+
+	void writeSampledPressure(float sampledSeaLevelPressure)
+	{
+		Serial.println("Writing sampled sea level pressure to EEPROM");
+		EEPROM.writeFloat(8, sampledSeaLevelPressure);
+		EEPROM.commit();
+	}
+
+	float readSampledPressure()
+	{
+		seaLevelPressure = EEPROM.readFloat(8);
+		Serial.println("Sea level pressure in EEPROM read as: " + String(seaLevelPressure));
+		return seaLevelPressure;
 	}
 
 };

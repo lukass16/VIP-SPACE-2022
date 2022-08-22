@@ -3,6 +3,7 @@
 #include <MS5x.h>
 #include "sensor_data.h"
 #include "kalman.h"
+#include "eeprom_wrapper.h"
 
 namespace barometer
 {
@@ -36,10 +37,11 @@ namespace barometer
         Serial.println(F("Connected to Sensor"));
         delay(5);
 
-        //TODO add previous sea level pressure reading from EEPROM
+        seaLevelPressure = eeprom::readSampledPressure();
 
         // setting sea level pressure
         MS5607.setSeaLevel(seaLevelPressure);
+        Serial.println("Sea level pressure set to: " + String(seaLevelPressure) + " Pa");
 
         // kalman setup
         kalman::predict(); // make first prediction
@@ -59,7 +61,7 @@ namespace barometer
             }
         }
 
-        //TODO add sampledSeaLevelPressure saving to EEPROM
+        eeprom::writeSampledPressure(sampledSeaLevelPressure);
 
         return sampledSeaLevelPressure;
     }

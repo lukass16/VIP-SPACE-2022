@@ -85,6 +85,9 @@ public:
             this->_context->Start();
         }
 
+        //*perform barometer ground pressure sampling and save sampled pressure value to EEPROM
+        barometer::sampleSeaLevel();
+        
         int loops = 0; 
          
         while (!arming::armed())
