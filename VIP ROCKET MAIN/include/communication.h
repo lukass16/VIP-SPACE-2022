@@ -6,11 +6,12 @@
 #include "thread_wrapper.h"
 #include "SD_card.h"
 
-
 namespace comms
 {
-    //variables for SD writing
-    int loops = 0, loop_interval = 30; 
+    // variables for SD writing
+    int loops = 0, loop_interval = 30;
+    bool stopped = 0; //note - no protection used in case accessed from both threads simultaneously
+
     SD_File fileSD;
 
     String serializeData();
@@ -20,7 +21,19 @@ namespace comms
     {
         lora::setup(frequency);
         // fileSD = SDcard::openFile();
-        s_thread::setup(loop);  
+        s_thread::setup(loop);
+    }
+
+    void stop()
+    {
+        stopped = 1;
+        Serial.println("Communication stopped!");
+    }
+
+    void resume()
+    {
+        stopped = 0;
+        Serial.println("Communication resumed!");
     }
 
     // This is ran in a seperate thread
@@ -31,7 +44,7 @@ namespace comms
         while (true)
         {
             String serialized = comms::serializeData();
-            Serial.println("Sent data: " + String(serialized)/* + " at time: " + String(SDcard::getTimeElapsed())*/);
+            Serial.println("Sent data: " + String(serialized) /* + " at time: " + String(SDcard::getTimeElapsed())*/);
 
             //*option 1 - Not encoded
             lora::sendMessage(serialized, 1);
@@ -50,6 +63,11 @@ namespace comms
             // }
             // loops++;
             delay(400);
+
+            while (stopped) // stops the loop if necessary
+            {
+                delay(100);
+            }
         }
     }
 

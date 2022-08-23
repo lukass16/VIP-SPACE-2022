@@ -2,6 +2,7 @@
 #include <SPIFFS.h>
 #include <mySD.h>
 #include "sensor_data.h"
+#include "flash.h"
 
 // http://blog.tkjelectronics.dk/2012/09/a-practical-approach-to-kalman-filter-and-how-to-implement-it/
 // Slikts nosakums, bet šis ir HELTEC
