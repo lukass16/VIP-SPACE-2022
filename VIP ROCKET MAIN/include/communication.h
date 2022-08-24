@@ -47,21 +47,12 @@ namespace comms
             Serial.println("Sent data: " + String(serialized) /* + " at time: " + String(SDcard::getTimeElapsed())*/);
 
             //*option 1 - Not encoded
-            lora::sendMessage(serialized, 1);
+            // lora::sendMessage(serialized, 1);
 
             //*option 2 - Encoded
-            // lora::encodeMessage();
-            // lora::sendEncodedMessage(1);
+            lora::encodeMessage(); //!this has been changed for testing
+            lora::sendEncodedMessage(1);
 
-            // //!Test SD writing in same thread with LoRa
-            // SDcard::writeString(fileSD, serialized);
-
-            // if(loops > loop_interval)
-            // {
-            //     loops = 0; //reset amount of loops since last close-open
-            //     fileSD = SDcard::reloadFile(fileSD);
-            // }
-            // loops++;
             delay(400);
 
             while (stopped) // stops the loop if necessary

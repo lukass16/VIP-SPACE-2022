@@ -40,9 +40,11 @@ void LoraEncoder::writeMessage(double blat, double blng, double balt, int bsats,
     int32_t lat = blat * 10000;
     int32_t lng = blng * 10000;
     int8_t sign = 0;
-    if (balt < 0){
-         sign  = 1;
-         balt = balt * (-1);}
+    if (balt < 0)
+    {
+        sign = 1;
+        balt *= -1; //change sign
+    }
     int16_t alt = balt;
     int8_t sats = bsats;
 
@@ -87,7 +89,7 @@ void LoraEncoder::writeMessage(double blat, double blng, double balt, int bsats,
     // Other data
     _intToBytes(_buffer + 39, r_state, 1);
     _intToBytes(_buffer + 40, counter, 2);
-    _intToBytes (_buffer + 41, sign, 1);
+    _intToBytes(_buffer + 41, sign, 1);
 }
 
 void LoraEncoder::decodeMessage(byte *buf)

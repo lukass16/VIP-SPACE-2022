@@ -90,9 +90,9 @@ public:
         
         int loops = 0; 
          
-        while (!arming::armed())
+        while (true) //!changed from !arming::armed() for testing
         {
-            buzzer::signalNotArmed();
+            //buzzer::signalNotArmed();
 
             //*gps
             gps::readGps();                             // reads in values from gps
@@ -112,7 +112,7 @@ public:
             //*battery
             sens_data::BatteryData btd;
 
-            delay(50);
+            delay(200);
             loops++;
             Serial.println(loops);
         }
