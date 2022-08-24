@@ -1,92 +1,99 @@
-//LORA ENDODER .cpp
+// LORA ENDODER .cpp
 #if ARDUINO >= 100
-    #include "Arduino.h"
+#include "Arduino.h"
 #endif
 #include "LoraEncoder.h"
 
-LoraEncoder::LoraEncoder(byte *buffer) {
-  _buffer = buffer;
+LoraEncoder::LoraEncoder(byte *buffer)
+{
+    _buffer = buffer;
 }
 
-void LoraEncoder::_intToBytes(byte *buf, int32_t i, uint8_t byteSize) {
-    for(uint8_t x = 0; x < byteSize; x++) {
-        buf[x] = (byte) (i >> (x*8));
+void LoraEncoder::_intToBytes(byte *buf, int32_t i, uint8_t byteSize)
+{
+    for (uint8_t x = 0; x < byteSize; x++)
+    {
+        buf[x] = (byte)(i >> (x * 8));
     }
 }
 
-int LoraEncoder::_BytesToNum(byte *buf, int32_t start, uint8_t size) {
-    int num=0;
-    for(uint8_t x = start; x < start+size; x++) {
-        num = num + (int) (buf[x] << (x-start)*8);
+int LoraEncoder::_BytesToNum(byte *buf, int32_t start, uint8_t size)
+{
+    int num = 0;
+    for (uint8_t x = start; x < start + size; x++)
+    {
+        num = num + (int)(buf[x] << (x - start) * 8);
     }
     return num;
 }
 
-
-void LoraEncoder::writeUnixtime(uint32_t unixtime) {
+void LoraEncoder::writeUnixtime(uint32_t unixtime)
+{
     _intToBytes(_buffer, unixtime, 4);
     _buffer += 4;
 }
 
+void LoraEncoder::writeMessage(double blat, double blng, double balt, int bsats, float bacc_x, float bacc_y, float bacc_z, float bpressure, float baltitude, float bf_altitude, float bf_velocity, float bbat1, int br_state, int bcounter)
+{
 
-
-void LoraEncoder::writeMessage(double blat, double blng, double balt, int bsats, float bacc_x, float bacc_y, float bacc_z, float bpressure, float baltitude, float bf_altitude, float bf_velocity, float bbat1, int br_state, int bcounter) {
-    
-    //GPS
-    int32_t lat = blat*10000;
-    int32_t lng = blng*10000;
+    // GPS
+    int32_t lat = blat * 10000;
+    int32_t lng = blng * 10000;
+    int8_t sign = 0;
+    if (balt < 0){
+         sign  = 1;
+         balt = balt * (-1);}
     int16_t alt = balt;
     int8_t sats = bsats;
 
-    //IMU
-    int32_t acc_x = bacc_x*100;
-    int32_t acc_y = bacc_y*100;
-    int32_t acc_z = bacc_z*100;
-    
-    //Barometer
+    // IMU
+    int32_t acc_x = bacc_x * 100;
+    int32_t acc_y = bacc_y * 100;
+    int32_t acc_z = bacc_z * 100;
+
+    // Barometer
     int16_t pres = bpressure;
-    int32_t altitude = baltitude*10;
-    int32_t f_altitude = bf_altitude*10;
+    int32_t altitude = baltitude * 10;
+    int32_t f_altitude = bf_altitude * 10;
     int32_t f_velocity = bf_velocity;
 
-    //Battery
-    int16_t bat1 = bbat1*10;
+    // Battery
+    int16_t bat1 = bbat1 * 10;
 
-    //Other
+    // Other
     int8_t r_state = br_state;
-    int16_t counter = bcounter; 
-    
+    int16_t counter = bcounter;
 
-    //GPS data
+    // GPS data
     _intToBytes(_buffer, lat, 4);
     _intToBytes(_buffer + 4, lng, 4);
     _intToBytes(_buffer + 8, alt, 2);
     _intToBytes(_buffer + 10, sats, 1);
 
-    //IMU data
+    // IMU data
     _intToBytes(_buffer + 11, acc_x, 4);
     _intToBytes(_buffer + 15, acc_y, 4);
     _intToBytes(_buffer + 19, acc_z, 4);
-    
-    //Barometer data
+
+    // Barometer data
     _intToBytes(_buffer + 23, pres, 2);
     _intToBytes(_buffer + 25, altitude, 4);
     _intToBytes(_buffer + 29, f_altitude, 4);
     _intToBytes(_buffer + 33, f_velocity, 4);
-  
-    //Battery data
+
+    // Battery data
     _intToBytes(_buffer + 37, bat1, 2);
 
-    //Other data
+    // Other data
     _intToBytes(_buffer + 39, r_state, 1);
     _intToBytes(_buffer + 40, counter, 2);
-
+    _intToBytes (_buffer + 41, sign, 1);
 }
 
 void LoraEncoder::decodeMessage(byte *buf)
 {
-    int32_t s = 0; //buffer counter
-    
+    int32_t s = 0; // buffer counter
+
     // GPS data
     double lat = _BytesToNum(buf, s, 4) / 10000.0;
     double lng = _BytesToNum(buf, s + 4, 4) / 10000.0;
@@ -112,17 +119,16 @@ void LoraEncoder::decodeMessage(byte *buf)
     int counter = _BytesToNum(buf, s + 40, 2);
 
     Serial.printf("%7.4f,%7.4f,%5.0f,%2d,%4.2f,%4.2f,%4.2f,%5.0f,%6.1f,%6.1f,%3.0f,%2.1f,%1d,%4d\n", lat, lng, alt, sats, acc_x, acc_y, acc_z, pressure, altitude, f_altitude, f_velocity, bat1, current_rocket_state, counter);
-
 }
 
-void LoraEncoder::writeUint16(uint16_t i) {
+void LoraEncoder::writeUint16(uint16_t i)
+{
     _intToBytes(_buffer, i, 2);
     _buffer += 2;
 }
 
-void LoraEncoder::writeUint8(uint8_t i) {
+void LoraEncoder::writeUint8(uint8_t i)
+{
     _intToBytes(_buffer, i, 1);
     _buffer += 1;
 }
-
-

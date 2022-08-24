@@ -31,7 +31,7 @@ namespace lora
     String outgoing; // outgoing message
 
     // defining received message buffer
-    char received[90];
+    char received[42];
 
     int syncWord = 0xF3;
 

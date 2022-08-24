@@ -42,6 +42,11 @@ namespace lora
         sens_data::BarometerData bar = s_data.getBarometerData();
         sens_data::BatteryData bat = s_data.getBatteryData();
         int r_state = s_data.getRocketState();
+
+        gps.lat = 53.1234;
+        gps.lng = 21.4321;
+        gps.alt = -27;
+        gps.sats  = 20;
         // encode
         encoder.writeMessage(gps.lat, gps.lng, gps.alt, gps.sats, imu.acc_x, imu.acc_y, imu.acc_z, bar.pressure, bar.altitude, bar.f_altitude, bar.f_velocity, bat.bat1, r_state, counter);
         
