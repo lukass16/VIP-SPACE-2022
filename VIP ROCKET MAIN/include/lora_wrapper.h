@@ -49,6 +49,17 @@ namespace lora
         gps.alt = -27;
         gps.sats = 20;
 
+        imu.acc_x = -99;
+        imu.acc_y = -98;
+        imu.acc_z = -97;
+
+        bar.pressure = 10000;
+        bar.altitude = -9999;
+        bar.f_altitude = -9999;
+        bar.f_velocity = -500;
+
+        bat.bat1 = 3.21;
+
         // encode
         encoder.writeMessage(gps.lat, gps.lng, gps.alt, gps.sats, imu.acc_x, imu.acc_y, imu.acc_z, bar.pressure, bar.altitude, bar.f_altitude, bar.f_velocity, bat.bat1, r_state, counter);
         

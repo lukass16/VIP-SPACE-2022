@@ -47,11 +47,11 @@ namespace comms
             Serial.println("Sent data: " + String(serialized) /* + " at time: " + String(SDcard::getTimeElapsed())*/);
 
             //*option 1 - Not encoded
-            // lora::sendMessage(serialized, 1);
+            lora::sendMessage(serialized, 1);
 
             //*option 2 - Encoded
-            lora::encodeMessage(); //!this has been changed for testing
-            lora::sendEncodedMessage(1);
+            // lora::encodeMessage(); //!this has been changed for testing
+            // lora::sendEncodedMessage(1);
 
             delay(400);
 
