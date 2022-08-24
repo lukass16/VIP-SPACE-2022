@@ -16,7 +16,7 @@
 #define MISO 19
 #define MOSI 27
 
-#define B_SIZE 42
+#define B_SIZE 49
 
 namespace lora
 {
@@ -48,6 +48,7 @@ namespace lora
         gps.lng = 21.4321;
         gps.alt = -27;
         gps.sats = 20;
+
         // encode
         encoder.writeMessage(gps.lat, gps.lng, gps.alt, gps.sats, imu.acc_x, imu.acc_y, imu.acc_z, bar.pressure, bar.altitude, bar.f_altitude, bar.f_velocity, bat.bat1, r_state, counter);
         

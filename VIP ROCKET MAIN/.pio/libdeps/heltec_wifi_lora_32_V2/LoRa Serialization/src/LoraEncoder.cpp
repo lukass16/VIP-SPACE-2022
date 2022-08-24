@@ -39,24 +39,60 @@ void LoraEncoder::writeMessage(double blat, double blng, double balt, int bsats,
     // GPS
     int32_t lat = blat * 10000;
     int32_t lng = blng * 10000;
-    int8_t sign = 0;
-    if (balt < 0)
+    int8_t sign_alt = 0;
+    if (balt < 0) 
     {
-        sign = 1;
-        balt *= -1; //change sign
+        sign_alt = 1;
+        balt *= -1;
     }
     int16_t alt = balt;
     int8_t sats = bsats;
 
     // IMU
+    int8_t sign_acc_x = 0;
+    if (bacc_x < 0) 
+    {
+        sign_acc_x = 1;
+        bacc_x *= -1; //change sign
+    }
     int32_t acc_x = bacc_x * 100;
+    int8_t sign_acc_y = 0;
+    if (bacc_y < 0) 
+    {
+        sign_acc_y = 1;
+        bacc_y *= -1; //change sign
+    }
     int32_t acc_y = bacc_y * 100;
+    int8_t sign_acc_z = 0;
+    if (bacc_z < 0) 
+    {
+        sign_acc_z = 1;
+        bacc_z *= -1; //change sign
+    }
     int32_t acc_z = bacc_z * 100;
 
     // Barometer
     int16_t pres = bpressure;
+    int8_t sign_altitude = 0;
+    if (baltitude < 0) 
+    {
+        sign_altitude = 1;
+        baltitude *= -1; //change sign
+    }
     int32_t altitude = baltitude * 10;
+    int8_t sign_f_altitude = 0;
+    if (bf_altitude < 0) 
+    {
+        sign_f_altitude = 1;
+        bf_altitude *= -1; //change sign
+    }
     int32_t f_altitude = bf_altitude * 10;
+    int8_t sign_f_velocity = 0;
+    if (bf_velocity < 0) 
+    {
+        sign_f_velocity = 1;
+        bf_velocity *= -1; //change sign
+    }
     int32_t f_velocity = bf_velocity;
 
     // Battery
@@ -69,27 +105,33 @@ void LoraEncoder::writeMessage(double blat, double blng, double balt, int bsats,
     // GPS data
     _intToBytes(_buffer, lat, 4);
     _intToBytes(_buffer + 4, lng, 4);
-    _intToBytes(_buffer + 8, alt, 2);
-    _intToBytes(_buffer + 10, sats, 1);
+    _intToBytes(_buffer + 8, sign_alt, 1);
+    _intToBytes(_buffer + 9, alt, 2);
+    _intToBytes(_buffer + 11, sats, 1);
 
     // IMU data
-    _intToBytes(_buffer + 11, acc_x, 4);
-    _intToBytes(_buffer + 15, acc_y, 4);
-    _intToBytes(_buffer + 19, acc_z, 4);
+    _intToBytes(_buffer + 12, sign_acc_x, 1);
+    _intToBytes(_buffer + 13, acc_x, 4);
+    _intToBytes(_buffer + 17, sign_acc_y, 1);
+    _intToBytes(_buffer + 18, acc_y, 4);
+    _intToBytes(_buffer + 22, sign_acc_z, 1);
+    _intToBytes(_buffer + 23, acc_z, 4);
 
     // Barometer data
-    _intToBytes(_buffer + 23, pres, 2);
-    _intToBytes(_buffer + 25, altitude, 4);
-    _intToBytes(_buffer + 29, f_altitude, 4);
-    _intToBytes(_buffer + 33, f_velocity, 4);
+    _intToBytes(_buffer + 27, pres, 2);
+    _intToBytes(_buffer + 29, sign_altitude, 1);
+    _intToBytes(_buffer + 30, altitude, 4);
+    _intToBytes(_buffer + 34, sign_f_altitude, 1);
+    _intToBytes(_buffer + 35, f_altitude, 4);
+    _intToBytes(_buffer + 39, sign_f_velocity, 1);
+    _intToBytes(_buffer + 40, f_velocity, 4);
 
     // Battery data
-    _intToBytes(_buffer + 37, bat1, 2);
+    _intToBytes(_buffer + 44, bat1, 2);
 
     // Other data
-    _intToBytes(_buffer + 39, r_state, 1);
-    _intToBytes(_buffer + 40, counter, 2);
-    _intToBytes(_buffer + 41, sign, 1);
+    _intToBytes(_buffer + 46, r_state, 1);
+    _intToBytes(_buffer + 47, counter, 2);
 }
 
 void LoraEncoder::decodeMessage(byte *buf)
