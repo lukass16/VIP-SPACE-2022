@@ -18,7 +18,7 @@ public:
         Serial.println("DESCENT STATE");
 
         File file = flash::openFile(); // opening flash file for writing during descent
-        int flash_counter = 0, flash_write_time = 180000, touchdown_time = 200000;
+        int flash_counter = 0, flash_write_time = 10000, touchdown_time = 15000;
         unsigned long start_time = millis();
 
         SD_File fileSD;
@@ -75,7 +75,7 @@ public:
 
         SDcard::setup();
 
-        fileSD = SDcard::openFile();
+        fileSD = SDcard::openNextFile();
         flash::dumpContentsToSD("/test.txt", fileSD);
         SDcard::closeFile(fileSD);
 

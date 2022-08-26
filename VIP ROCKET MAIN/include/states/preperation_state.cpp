@@ -39,19 +39,6 @@ public:
         //*Arming setup
         arming::setup();
 
-        //! START Testing SD card dynamic file naming
-        SDcard::setup();
-
-        SD_File fileSD = SDcard::openNextFile();
-
-        SDcard::markPreparation(fileSD);
-        SDcard::closeFile(fileSD);
-
-        while(true);
-        //! END Testing SD card dynamic file naming
-
-
-
         //*Flash setup
         flash::setup();
 
