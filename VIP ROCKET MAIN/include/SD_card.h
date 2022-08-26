@@ -34,9 +34,28 @@ namespace SDcard
 		}
 	}
 
-	SD_File openFile() // returnds file handle
+	SD_File openFile() // returns file handle
 	{
 		SD_File fileSD = SD.open("data2.txt", FILE_WRITES);
+		return fileSD;
+	}
+
+	SD_File openNextFile() // returns file handle - opens iteratively
+	{
+		char filename[7] = "0.csv";
+		int it = 0;
+		String tester;
+
+		while(SD.exists(filename)) // while there already exists a file with such a name
+		{
+			it++;
+			tester = String(it) + ".csv";
+			tester.toCharArray(filename, 7);
+		}
+
+		Serial.println("Opening file: " + String(filename));
+
+		SD_File fileSD = SD.open(filename, FILE_WRITES);
 		return fileSD;
 	}
 
