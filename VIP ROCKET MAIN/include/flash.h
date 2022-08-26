@@ -506,7 +506,7 @@ namespace flash
         }
         file.close();
 
-        Serial.println("Finished dumping flash contents to SD card");
+        Serial.println("\nFinished dumping flash contents to SD card");
         return 1;
     }
 

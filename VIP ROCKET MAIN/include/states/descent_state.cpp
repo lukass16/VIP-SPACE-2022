@@ -18,7 +18,7 @@ public:
         Serial.println("DESCENT STATE");
 
         File file = flash::openFile(); // opening flash file for writing during descent
-        int flash_counter = 0, flash_write_time = 10000, touchdown_time = 15000;
+        int flash_counter = 0, flash_write_time = 180000, touchdown_time = 200000;
         unsigned long start_time = millis();
 
         SD_File fileSD;
@@ -61,7 +61,7 @@ public:
                     file = flash::closeOpen(file); // close and open the file every 100th reading
                 }
             }
-            delay(200);
+            delay(50);
         }
 
         Serial.println("Touchdown detected!");

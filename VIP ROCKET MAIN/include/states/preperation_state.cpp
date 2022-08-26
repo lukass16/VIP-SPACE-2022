@@ -112,7 +112,7 @@ public:
             //*battery
             sens_data::BatteryData btd;
 
-            delay(200);
+            delay(50);
             loops++;
             Serial.println(loops);
         }
