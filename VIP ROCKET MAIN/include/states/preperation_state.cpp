@@ -90,7 +90,7 @@ public:
         
         int loops = 0; 
          
-        while (true) //!changed from !arming::armed() for testing
+        while (!arming::armed())
         {
             //buzzer::signalNotArmed();
 

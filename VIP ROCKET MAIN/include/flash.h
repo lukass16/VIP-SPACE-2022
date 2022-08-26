@@ -2,6 +2,7 @@
 
 #include "FS.h"
 #include <LITTLEFS.h>
+#include "SD_card.h"
 #include "sensor_data.h"
 #include "eeprom_wrapper.h"
 
@@ -407,6 +408,106 @@ namespace flash
             Serial.print(String(rState, 4) + ",");
         }
         file.close();
+    }
+
+    int dumpContentsToSD(const char *path, SD_File fileSD)
+    {
+        int count = 0;
+
+        File file = LITTLEFS.open(path);
+        // This is the size of reading
+        auto const buf_size = sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float);
+        
+        //write header to SD
+        if(!SDcard::writeHeader(fileSD))
+        {
+            return 0;
+        }
+
+        Serial.println("Dumping flash contents to SD card");
+
+        while (file.available())
+        {
+
+            StreamPipe<buf_size> stream;
+            file.readBytes(stream.buf_out, buf_size);
+
+            // Time
+            float time = 0;
+            stream.getValue<float>(&time);
+
+            // GPS
+            float lat = 0;
+            stream.getValue<float>(&lat);
+
+            float lng = 0;
+            stream.getValue<float>(&lng);
+
+            float alt = 0;
+            stream.getValue<float>(&alt);
+
+            float sats = 0;
+            stream.getValue<float>(&sats);
+
+            // Bar
+            float pressure = 0;
+            stream.getValue<float>(&pressure);
+
+            float altitude = 0;
+            stream.getValue<float>(&altitude);
+
+            float f_altitude = 0;
+            stream.getValue<float>(&f_altitude);
+
+            float f_velocity = 0;
+            stream.getValue<float>(&f_velocity);
+
+            float f_acceleration = 0;
+            stream.getValue<float>(&f_acceleration);
+
+            float temperature = 0;
+            stream.getValue<float>(&temperature);
+
+            // Bat
+            float bat1 = 0;
+            stream.getValue<float>(&bat1);
+
+            // Mag
+            float acc_x = 0;
+            stream.getValue<float>(&acc_x);
+
+            float acc_y = 0;
+            stream.getValue<float>(&acc_y);
+
+            float acc_z = 0;
+            stream.getValue<float>(&acc_z);
+
+            float gyr_x = 0;
+            stream.getValue<float>(&gyr_x);
+
+            float gyr_y = 0;
+            stream.getValue<float>(&gyr_y);
+
+            float gyr_z = 0;
+            stream.getValue<float>(&gyr_z);
+
+            // Other
+            float rState = 0;
+            stream.getValue<float>(&rState);
+
+            //write to SD card
+            SDcard::writeData(fileSD, time, lat, lng, alt, sats, pressure, altitude, f_altitude, f_velocity, f_acceleration, temperature, bat1, acc_x, acc_y, acc_z, gyr_x, gyr_y, gyr_z, rState);
+
+            count++;
+            if(count % 500 == 0)
+            {
+                Serial.print(".");
+            }
+        }
+        file.close();
+
+        Serial.println("Finished dumping flash contents to SD card");
+        return 1;
     }
 
     void lock()

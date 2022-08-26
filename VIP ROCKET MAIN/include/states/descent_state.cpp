@@ -66,16 +66,25 @@ public:
 
         Serial.println("Touchdown detected!");
 
+        //!testing
+        unsigned long test_start_time = millis();
+        //!
+
         //* stop communication to not interfere with writing to SD card
         comms::stop();
 
         SDcard::setup();
-        //!testing
+
         fileSD = SDcard::openFile();
-        SDcard::markPreparation(fileSD);
+        flash::dumpContentsToSD("/test.txt", fileSD);
+        SDcard::closeFile(fileSD);
 
         //* resume communication
         comms::resume();
+
+        //!testing
+        Serial.println("Process took: " + String(millis()-test_start_time) + " ms");
+        //!
 
 
         
