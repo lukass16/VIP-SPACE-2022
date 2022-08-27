@@ -123,4 +123,45 @@ namespace arming
         return 0;
     }
 
+    //* 3) Touchdown detection
+    // creating a variable for timer detection of touchdown
+    volatile bool timerDetTouchdown = 0;
+    hw_timer_t *touchdownTimer = NULL;
+    portMUX_TYPE touchdownTimerMux = portMUX_INITIALIZER_UNLOCKED;
+
+    // creating the interrupt handling function - should be as short as possible
+    void IRAM_ATTR onTouchdownTimer()
+    {
+        portENTER_CRITICAL_ISR(&touchdownTimerMux);
+        timerDetTouchdown = 1;
+        portEXIT_CRITICAL_ISR(&touchdownTimerMux);
+    }
+
+    void startTouchdownTimer(int timerLength = 15000000) // timer length is given in microseconds
+    {
+        // initializing timer - setting the number of the timer, the value of the prescaler and stating that the counter should count up (true)
+       touchdownTimer = timerBegin(2, 80, true);
+
+        // binding the timer to a handling function
+        timerAttachInterrupt(touchdownTimer, &onTouchdownTimer, true);
+
+        // specifying the counter value in which the timer interrupt will be generated and indicating that the timer should not automatically reload (false) upon generating the interrupt
+        timerAlarmWrite(touchdownTimer, timerLength, false);
+
+        // enabling the timer
+        timerAlarmEnable(touchdownTimer);
+
+        Serial.println("Touchdown timer enabled");
+    }
+
+    bool timerDetectTouchdown()
+    {
+        if (timerDetTouchdown)
+        {
+            Serial.println("Timer detected Touchdown!");
+            return 1;
+        }
+        return 0;
+    }
+
 }

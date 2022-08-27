@@ -3,6 +3,7 @@
 #include "Arduino.h"
 #include "core/core.cpp"
 #include "communication.h"
+#include "arming.h"
 #include "flash.h"
 #include "SD_card.h"
 #include "buzzer.h"
@@ -18,8 +19,7 @@ public:
         Serial.println("DESCENT STATE");
 
         File file = flash::openFile(); // opening flash file for writing during descent
-        int flash_counter = 0, flash_write_time = 10000, touchdown_time = 15000;
-        unsigned long start_time = millis();
+        int flash_counter = 0, flash_write_time = 10000;
 
         SD_File fileSD;
 
@@ -31,7 +31,10 @@ public:
         sens_data::IMUData md;
         sens_data::BatteryData btd;
 
-        while (millis() - start_time < touchdown_time) // while touch down has not been declared by timer
+        //start touchdown detection timer
+        arming::startTouchdownTimer();
+
+        while (!arming::timerDetectTouchdown()) // while touch down has not been declared by timer
         {
             buzzer::signalDescent();
 
@@ -63,8 +66,6 @@ public:
             }
             delay(50);
         }
-
-        Serial.println("Touchdown detected!");
 
         //!testing
         unsigned long test_start_time = millis();
