@@ -28,10 +28,18 @@ public:
 
         Serial.println("PREP STATE");
 
-        //*Buzzer test/signal start
+        s_data.updateRocketState(); //update state
+
+        // variables for writing to memory
+        sens_data::GpsData gd;
+        sens_data::BarometerData bd;
+        sens_data::IMUData md;
+        sens_data::BatteryData btd;
+
+        //*Buzzer setup - signal start
         buzzer::setup();
         buzzer::transitionToGeneratorMode();
-        buzzer::signalStart();
+        buzzer::signalStart(); //process takes up 300 ms
 
         //*EEPROM setup
         eeprom::setup();
@@ -42,9 +50,6 @@ public:
         //*Flash setup
         flash::setup();
 
-        // //*SD setup
-        // SDcard::setup();
-
         //*Sensor setups
         Wire.begin(21, 22); // initialize correct i2c lines
         gps::setup();
@@ -52,19 +57,18 @@ public:
         imu::setup();
 
         comms::setup(433E6);
-        s_data.updateRocketState(); //update state that's written to LoRa messages
 
         //*check if need to clear EEPROM
         if(arming::clearEEPROM())
         {
             buzzer::signalEEPROMClear();
-            eeprom::clean(); //only utility currently for EEPROM
+            eeprom::clean();
         }
 
         //*if flash not locked - delete file
         if(!eeprom::lockedFlash())
         {
-            flash::deleteFile("/test.txt"); //*deleting file so as to reset it
+            flash::deleteFile("/data.txt"); //*deleting file so as to reset it
         }
 
         //*Determine if has been reset - need to transfer to different state
@@ -88,33 +92,29 @@ public:
         //*perform barometer ground pressure sampling and save sampled pressure value to EEPROM
         barometer::sampleSeaLevel();
         
-        int loops = 0; 
-         
+       
         while (!arming::armed())
         {
-            //buzzer::signalNotArmed();
+            buzzer::signalNotArmed();
 
             //*gps
-            gps::readGps();                             // reads in values from gps
-            sens_data::GpsData gd = gps::getGpsState(); // retrieve values from wrapper to be put in data object
+            gps::readGps();                             
+            gd = gps::getGpsState();
             s_data.setGpsData(gd);
 
             //*barometer
             barometer::readSensor();
-            sens_data::BarometerData bd = barometer::getBarometerState(); //reads and retrieves values from wrapper to be put in data object
+            bd = barometer::getBarometerState();
             s_data.setBarometerData(bd);
 
             //*imu
             imu::readSensor();
-            sens_data::IMUData md = imu::getIMUState();
+            md = imu::getIMUState();
             s_data.setIMUData(md);
 
             //*battery
-            sens_data::BatteryData btd;
 
             delay(50);
-            loops++;
-            Serial.println(loops);
         }
 
         buzzer::signalArmed();

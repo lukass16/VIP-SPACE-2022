@@ -21,7 +21,7 @@ public:
         File file = flash::openFile();       // opening flash file for writing during flight
         int flash_counter = 0;
 
-        s_data.updateRocketState(); //update state that's written to LoRa messages  
+        s_data.updateRocketState(); //update state
 
         //start main ejection timer
         arming::startMainEjectionTimer();
@@ -37,14 +37,13 @@ public:
             buzzer::signalMain();
             
             //*gps
-            gps::readGps();          // reads in values from gps
-            gd = gps::getGpsState(); // retrieve values from wrapper to be put in data object
+            gps::readGps();
+            gd = gps::getGpsState();
             s_data.setGpsData(gd);
 
             //*barometer
             barometer::readSensor();
-            barometer::printState();
-            bd = barometer::getBarometerState(); // reads and retrieves values from wrapper to be put in data object
+            bd = barometer::getBarometerState();
             s_data.setBarometerData(bd);
 
             //*imu
@@ -52,13 +51,17 @@ public:
             md = imu::getIMUState();
             s_data.setIMUData(md);
 
-            //*placeholder for battery data
+            //*battery data
+
+            //give necessary feedback during loop
+            barometer::printState();
 
             flash_counter = flash::writeData(file, gd, md, bd, btd, 3); // writing data to flash memory
             if (flash_counter % 100 == 1)
             {
                 file = flash::closeOpen(file); // close and open the file every 100th reading
             }
+
             delay(50);
         }
 

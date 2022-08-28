@@ -23,7 +23,7 @@ public:
 
         SD_File fileSD;
 
-        s_data.updateRocketState(); // update state that's written to LoRa messages
+        s_data.updateRocketState(); // update state
 
         // variables for writing to memory
         sens_data::GpsData gd;
@@ -34,19 +34,18 @@ public:
         //start touchdown detection timer
         arming::startTouchdownTimer();
 
-        while (!arming::timerDetectTouchdown()) // while touch down has not been declared by timer
+        while (!arming::timerDetectTouchdown()) // while touchdown has not been detected by timer
         {
             buzzer::signalDescent();
 
             //*gps
-            gps::readGps();          // reads in values from gps
-            gd = gps::getGpsState(); // retrieve values from wrapper to be put in data object
+            gps::readGps();
+            gd = gps::getGpsState();
             s_data.setGpsData(gd);
 
             //*barometer
             barometer::readSensor();
-            barometer::printState();
-            bd = barometer::getBarometerState(); // reads and retrieves values from wrapper to be put in data object
+            bd = barometer::getBarometerState();
             s_data.setBarometerData(bd);
 
             //*imu
@@ -54,9 +53,12 @@ public:
             md = imu::getIMUState();
             s_data.setIMUData(md);
 
-            //*placeholder for battery data
+            //*battery data
 
-            if (!flash::flashEnded(file, flash_write_time))
+            //give necessary feedback during loop
+            barometer::printState();
+
+            if (!flash::flashEnded(file, flash_write_time)) //if not finished writing to flash
             {
                 flash_counter = flash::writeData(file, gd, md, bd, btd, 4); // writing data to flash memory
                 if (flash_counter % 100 == 1)
@@ -64,44 +66,39 @@ public:
                     file = flash::closeOpen(file); // close and open the file every 100th reading
                 }
             }
+
             delay(50);
         }
 
-        //!testing
-        unsigned long test_start_time = millis();
-        //!
+
+        unsigned long process_start_time = millis();
 
         //* stop communication to not interfere with writing to SD card
         comms::stop();
 
         SDcard::setup();
-
         fileSD = SDcard::openNextFile();
-        flash::dumpContentsToSD("/test.txt", fileSD);
+        flash::dumpContentsToSD("/data.txt", fileSD);
         SDcard::closeFile(fileSD);
 
         //* resume communication
         comms::resume();
 
-        //!testing
-        Serial.println("Process took: " + String(millis()-test_start_time) + " ms");
-        //!
+        Serial.println("Process took: " + String(millis() - process_start_time) + " ms");
 
 
-        
         while (true) // post touchdown operations
         {
             buzzer::signalDescent();
 
             //*gps
-            gps::readGps();          // reads in values from gps
-            gd = gps::getGpsState(); // retrieve values from wrapper to be put in data object
+            gps::readGps();
+            gd = gps::getGpsState();
             s_data.setGpsData(gd);
 
             //*barometer
             barometer::readSensor();
-            barometer::printState();
-            bd = barometer::getBarometerState(); // reads and retrieves values from wrapper to be put in data object
+            bd = barometer::getBarometerState();
             s_data.setBarometerData(bd);
 
             //*imu
@@ -109,7 +106,10 @@ public:
             md = imu::getIMUState();
             s_data.setIMUData(md);
 
-            //*placeholder for battery data
+            //*battery data
+
+            //give necessary feedback during loop
+            barometer::printState();
 
             delay(200);
         }
@@ -117,6 +117,6 @@ public:
 
     void HandleNextPhase() override
     {
-        Serial.println("END of VIP ROCKET CODE");
+        Serial.println("END of RTU HPR ROCKET CODE");
     }
 };

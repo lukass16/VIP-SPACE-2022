@@ -84,7 +84,7 @@ namespace flash
         delete_File(LITTLEFS, path);
     }
 
-    File openFile(String filepath = "/test.txt")
+    File openFile(String filepath = "/data.txt")
     {
         File file = LITTLEFS.open(filepath, FILE_APPEND);
         return file;
