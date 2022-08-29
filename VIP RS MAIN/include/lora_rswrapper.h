@@ -16,7 +16,7 @@
 #define RST 14
 #define DIO0 26
 
-#define B_SIZE 42
+#define B_SIZE 37
 
 namespace lora
 {
