@@ -32,7 +32,7 @@ public:
         sens_data::IMUData md;
         sens_data::BatteryData btd;
 
-        while (!barometer::mainAltitudeDetected() && !arming::timerDetectMainEjection()) //*waiting until altitude is below threshold to eject main parachute
+        while (!barometer::mainAltitudeDetected()) //*waiting until altitude is below threshold to eject main parachute
         {
             buzzer::signalMain();
             

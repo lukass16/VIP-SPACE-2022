@@ -64,7 +64,7 @@ public:
         //start apogee detection timer
         arming::startApogeeTimer();
 
-        while (!barometer::apogeeDetected() && !arming::timerDetectApogee())
+        while (!arming::timerDetectApogee())
         {
             buzzer::signalDrogue();
             

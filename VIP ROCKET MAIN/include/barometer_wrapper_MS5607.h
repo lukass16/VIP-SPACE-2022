@@ -130,7 +130,7 @@ namespace barometer
         }
     }
 
-    bool mainAltitudeDetected(float threshold = 15.0, int times = 3) //threshold - threshold altitude to be detected (in m), times - times to detect altitude under threshold altitude for main ejection
+    bool mainAltitudeDetected(float threshold = 300.0, int times = 5) //threshold - threshold altitude to be detected (in m), times - times to detect altitude under threshold altitude for main ejection
     {
         static int counter = 0;
         if (f_alt < threshold)

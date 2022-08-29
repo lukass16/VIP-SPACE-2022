@@ -55,7 +55,7 @@ namespace arming
         portEXIT_CRITICAL_ISR(&apogeeTimerMux);
     }
 
-    void startApogeeTimer(int timerLength = 15000000) // timer length is given in microseconds
+    void startApogeeTimer(int timerLength = 20000000) // timer length is given in microseconds
     {
         // initializing timer - setting the number of the timer, the value of the prescaler and stating that the counter should count up (true)
         apogeeTimer = timerBegin(0, 80, true);

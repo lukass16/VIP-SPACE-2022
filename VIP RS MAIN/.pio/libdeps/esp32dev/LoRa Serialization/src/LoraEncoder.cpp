@@ -151,7 +151,7 @@ sens_data::SensorData LoraEncoder::decodeMessage(byte *buf)
     }
 
     // Battery data
-    s_data.batteryData.bat1 = _BytesToNum(buf, s + 44, 2) / 10.0;
+    s_data.batteryData.bat1 = _BytesToNum(buf, s + 44, 2) / 100.0;
 
     // Other data
     s_data.current_rocket_state = _BytesToNum(buf, s + 46, 1);

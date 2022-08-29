@@ -96,7 +96,7 @@ void LoraEncoder::writeMessage(double blat, double blng, double balt, int bsats,
     int32_t f_velocity = bf_velocity;
 
     // Battery
-    int16_t bat1 = bbat1 * 10;
+    int16_t bat1 = bbat1 * 100;
 
     // Other
     int8_t r_state = br_state;
@@ -156,7 +156,7 @@ void LoraEncoder::decodeMessage(byte *buf)
     float f_velocity = _BytesToNum(buf, s + 33, 4);
 
     // Battery data
-    float bat1 = _BytesToNum(buf, s + 37, 2) / 10.0;
+    float bat1 = _BytesToNum(buf, s + 37, 2) / 100.0;
 
     // Other data
     int current_rocket_state = _BytesToNum(buf, s + 39, 1);
