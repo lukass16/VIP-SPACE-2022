@@ -3,7 +3,6 @@
 #include "Arduino.h"
 #include "core/core.cpp"
 #include "drogue_state.cpp"
-#include "oled_wrapper.h"
 #include "communication.h"
 #include "wifiserver_wrapper.h"
 #include "flash.h"

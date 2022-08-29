@@ -102,34 +102,9 @@ namespace flash
         return flash::openFile();
     }
 
-    float getTimeElapsed() //*Check overflow
+    float getTimeElapsed()
     {
         return millis() - flash_time;
-    }
-
-    void testFileIO(File file, int multiplier)
-    {
-        float x_float = 0.0 + multiplier;
-        float y_float = 17.1212332 + multiplier;
-        float z_float = 99.9999 + multiplier;
-
-        auto x = (uint8_t *)(&x_float);
-        auto y = (uint8_t *)(&y_float);
-        auto z = (uint8_t *)(&z_float);
-
-        auto const buf_size = sizeof(x) + sizeof(y) + sizeof(z);
-        Buffer<buf_size> buffer;
-
-        buffer.push(x);
-        buffer.push(y);
-        buffer.push(z);
-
-        if (!file)
-        {
-            Serial.println("- failed to open file for writing");
-            return;
-        }
-        file.write(buffer.buf, buf_size);
     }
 
     //*Current data writing function
@@ -417,9 +392,9 @@ namespace flash
         File file = LITTLEFS.open(path);
         // This is the size of reading
         auto const buf_size = sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float);
-        
-        //write header to SD
-        if(!SDcard::writeHeader(fileSD))
+
+        // write header to SD
+        if (!SDcard::writeHeader(fileSD))
         {
             return 0;
         }
@@ -495,11 +470,11 @@ namespace flash
             float rState = 0;
             stream.getValue<float>(&rState);
 
-            //write to SD card
+            // write to SD card
             SDcard::writeData(fileSD, time, lat, lng, alt, sats, pressure, altitude, f_altitude, f_velocity, f_acceleration, temperature, bat1, acc_x, acc_y, acc_z, gyr_x, gyr_y, gyr_z, rState);
 
             count++;
-            if(count % 500 == 0)
+            if (count % 500 == 0)
             {
                 Serial.print(".");
             }
@@ -549,5 +524,30 @@ namespace flash
             Serial.println("Flash Writing Ended");
         }
         return ended;
+    }
+
+    void testFileIO(File file, int multiplier)
+    {
+        float x_float = 0.0 + multiplier;
+        float y_float = 17.1212332 + multiplier;
+        float z_float = 99.9999 + multiplier;
+
+        auto x = (uint8_t *)(&x_float);
+        auto y = (uint8_t *)(&y_float);
+        auto z = (uint8_t *)(&z_float);
+
+        auto const buf_size = sizeof(x) + sizeof(y) + sizeof(z);
+        Buffer<buf_size> buffer;
+
+        buffer.push(x);
+        buffer.push(y);
+        buffer.push(z);
+
+        if (!file)
+        {
+            Serial.println("Failed to open file for writing");
+            return;
+        }
+        file.write(buffer.buf, buf_size);
     }
 }

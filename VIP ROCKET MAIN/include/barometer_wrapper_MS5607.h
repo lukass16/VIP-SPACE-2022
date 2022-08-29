@@ -23,14 +23,11 @@ namespace barometer
     unsigned long kalman_t; // Kalman timer
     float t_change = 0;     // change of time from previous prediction to current
 
-    //*for testing
-    unsigned long start_t = 0; //*for testing
-    int counter = 0;
 
     void setup()
     {
-        while (MS5607.connect() > 0)
-        { // barometer.connect starts wire and attempts to connect to sensor
+        while (MS5607.connect() > 0) // barometer.connect starts wire and attempts to connect to sensor
+        { 
             Serial.println(F("Error connecting..."));
             delay(500);
         }
@@ -57,7 +54,7 @@ namespace barometer
             {
                 // Calculate predicted seaLevel pressure based off a known altitude in meters
                 sampledSeaLevelPressure = MS5607.getSeaLevel(0.0); // this functions also as the sea level setter for altitude calculations
-                Serial.println("Sea level pressure sampled as: " + String(sampledSeaLevelPressure));
+                Serial.println("Sea level pressure sampled and set as: " + String(sampledSeaLevelPressure));
             }
         }
 
@@ -73,7 +70,7 @@ namespace barometer
         {
             temp = MS5607.GetTemp();                        // Returns temperature in C
             pres = MS5607.GetPres();                        // Returns pressure in Pascals //*Note - saved and sent in hPa
-            alt = MS5607.getAltitude(temperatureCorrected); // Returns altitude in m - //*optionally temperature corrected
+            alt = MS5607.getAltitude(temperatureCorrected); // Returns altitude in m //*optionally temperature corrected
         }
 
         // kalman implementation
@@ -111,11 +108,6 @@ namespace barometer
         kalman::printKalmanState();
     }
  
-    float getVertVelocity() // todo make this
-    {
-        return 42.0;
-    }
-
     bool apogeeDetected(int times = 3, float minimum_height = 20.0) // times - times to detect the vertical speed being below zero, minimum_height - the minimum height at which apogee can be detected, otherwise apogee detection is prohibited
     {
         static int counter = 0;

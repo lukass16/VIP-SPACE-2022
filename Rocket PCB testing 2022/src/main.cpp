@@ -15,6 +15,7 @@
 unsigned long start_time = millis();
 int interval = 10000; // milliseconds
 int reading = 0;
+int threshold = 200;
 
 void setup()
 {
@@ -97,13 +98,22 @@ void setup()
 	{
 		reading = analogRead(SW1);
 		Serial.println("Switch 1 reads: " + String(reading));
-		for(int i = 0; i <= reading / 10; i++)
+
+		if(reading > threshold)
 		{
 			buzzer::buzzDigital();
 			delay(100);
 			buzzer::buzzEndDigital();
-			delay(100);
 		}
+
+		// for(int i = 0; i <= reading / 10; i++)
+		// {
+		// 	buzzer::buzzDigital();
+		// 	delay(100);
+		// 	buzzer::buzzEndDigital();
+		// 	delay(100);
+		// }
+		
 		delay(2000);
 	}
 

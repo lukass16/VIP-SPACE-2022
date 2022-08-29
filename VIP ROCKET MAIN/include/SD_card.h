@@ -4,11 +4,10 @@
 #include "sensor_data.h"
 
 // http://blog.tkjelectronics.dk/2012/09/a-practical-approach-to-kalman-filter-and-how-to-implement-it/
-// Slikts nosakums, bet šis ir HELTEC
-// iedvesma:	default esp32 SD sample code no libary ESP-FTP-Server-Lib
-//			https://github.com/LilyGO/TTGO-T-Beam/issues/9
+// Inspiration:	default esp32 SD sample code from library ESP-FTP-Server-Lib
+//https://github.com/LilyGO/TTGO-T-Beam/issues/9
 
-// thread par LoRa un SD konfliktu: https://stackoverflow.com/questions/57454066/how-to-use-2-spi-devices-lora-and-sd-card-on-esp32
+// thread about LoRa and SD conflict: https://stackoverflow.com/questions/57454066/how-to-use-2-spi-devices-lora-and-sd-card-on-esp32
 
 #define _MISO 13
 #define _MOSI 12
@@ -36,7 +35,7 @@ namespace SDcard
 
 	SD_File openFile() // returns file handle
 	{
-		SD_File fileSD = SD.open("data2.txt", FILE_WRITES);
+		SD_File fileSD = SD.open("data.txt", FILE_WRITES);
 		return fileSD;
 	}
 
@@ -68,10 +67,10 @@ namespace SDcard
 	{
 		Serial.println("Reloading SD card file");
 		closeFile(fileSD);
-		return SD.open("data2.txt", FILE_WRITES);
+		return SD.open("data.txt", FILE_WRITES);
 	}
 
-	float getTimeElapsed() //*Check overflow
+	float getTimeElapsed()
 	{
 		return millis() - SD_time;
 	}

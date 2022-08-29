@@ -10,7 +10,7 @@ namespace imu
 
     void setup()
     {
-        mpu.setup(0x68); //! Note if the sensor can't connect check that the setup is forced in the MPU9250.h file
+        mpu.setup(0x68); // Note if the sensor can't connect check that the setup is forced in the MPU9250.h file
     }
 
     void calibrateAccelAndGyro()
@@ -100,9 +100,9 @@ namespace imu
         md.gyr_y = gyr_y;
         md.gyr_z = gyr_z;
 
-        md.mag_x = 42.0; //*has no magnetometer readings
-        md.mag_y = 42.0;
-        md.mag_z = 42.0;
+        md.mag_x = 0.0; //*has no magnetometer readings
+        md.mag_y = 0.0;
+        md.mag_z = 0.0;
 
         return md;
     }
