@@ -157,7 +157,7 @@ sens_data::SensorData LoraEncoder::decodeMessage(byte *buf)
     s_data.current_rocket_state = _BytesToNum(buf, s + 34, 1);
     s_data.counter = _BytesToNum(buf, s + 35, 2);
 
-    Serial.printf("%7.4f,%7.4f,%5.0f,%2d,%4.2f,%4.2f,%4.2f,%5.0f,%6.1f,%6.1f,%3.0f,%2.1f,%1d,%4d", s_data.gpsData.lat, s_data.gpsData.lng, s_data.gpsData.alt, s_data.gpsData.sats, s_data.imuData.acc_x, s_data.imuData.acc_y, s_data.imuData.acc_z, s_data.barometerData.pressure, s_data.barometerData.altitude, s_data.barometerData.f_altitude, s_data.barometerData.f_velocity, s_data.batteryData.bat1, s_data.current_rocket_state, s_data.counter);
+    Serial.printf("%7.4f,%7.4f,%5.0f,%2d,%4.2f,%4.2f,%4.2f,%5.0f,%6.1f,%6.1f,%3.0f,%2.2f,%1d,%4d", s_data.gpsData.lat, s_data.gpsData.lng, s_data.gpsData.alt, s_data.gpsData.sats, s_data.imuData.acc_x, s_data.imuData.acc_y, s_data.imuData.acc_z, s_data.barometerData.pressure, s_data.barometerData.altitude, s_data.barometerData.f_altitude, s_data.barometerData.f_velocity, s_data.batteryData.bat1, s_data.current_rocket_state, s_data.counter);
 
     return s_data;
 }
