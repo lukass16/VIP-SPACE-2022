@@ -27,7 +27,7 @@ public:
 
         Serial.println("PREP STATE");
 
-        s_data.updateRocketState(); //update state
+        s_data.setRocketState(1); // set rocket state to preparation (1) state
 
         // variables for writing to memory
         sens_data::GpsData gd;

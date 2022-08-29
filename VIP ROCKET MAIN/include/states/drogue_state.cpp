@@ -21,7 +21,7 @@ public:
         File file = flash::openFile(); // opening flash file for writing during flight
         int flash_counter = 0;
 
-        s_data.updateRocketState(); // update state
+        s_data.setRocketState(2); // set rocket state to drogue (2) state
 
         // variables for writing to memory
         sens_data::GpsData gd;

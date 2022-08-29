@@ -23,7 +23,7 @@ public:
 
         SD_File fileSD;
 
-        s_data.updateRocketState(); // update state
+        s_data.setRocketState(4); // set rocket state to descent (4) state
 
         // variables for writing to memory
         sens_data::GpsData gd;

@@ -21,7 +21,7 @@ public:
         File file = flash::openFile();       // opening flash file for writing during flight
         int flash_counter = 0;
 
-        s_data.updateRocketState(); //update state
+        s_data.setRocketState(3); // set rocket state to main (3) state
 
         //start main ejection timer
         arming::startMainEjectionTimer();

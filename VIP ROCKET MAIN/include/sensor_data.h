@@ -64,10 +64,10 @@ namespace sens_data
             mtx.setup();
         };
 
-        void updateRocketState()
+        void setRocketState(int rs)
         {
             mtx.lock();
-            current_rocket_state++;
+            current_rocket_state = rs;
             mtx.unlock();
         }
 
