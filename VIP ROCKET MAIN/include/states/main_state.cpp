@@ -4,6 +4,7 @@
 #include "core/core.cpp"
 #include "descent_state.cpp"
 #include "flash.h"
+#include "arming.h"
 #include "buzzer.h"
 #include "gps_wrapper.h"
 #include "barometer_wrapper_MS5607.h"
@@ -22,9 +23,6 @@ public:
         int flash_counter = 0;
 
         s_data.setRocketState(3); // set rocket state to main (3) state
-
-        //start main ejection timer
-        arming::startMainEjectionTimer();
 
         // variables for writing to memory
         sens_data::GpsData gd;
@@ -64,6 +62,9 @@ public:
 
             delay(50);
         }
+
+        //fire main parachute pyro charge
+        //arming::fireMainCharge(); //! commented out for safety
 
         //mark main ejection in EEPROM
         eeprom::markMainEjection();

@@ -40,6 +40,12 @@ namespace arming
         return 0;
     }
 
+    void fireMainCharge()
+    {
+        digitalWrite(FIREPYRO, HIGH);
+        Serial.println("Fired main parachute pyro charge!");
+    }
+
     //*TIMERS
     //* 1) Apogee detection
     // creating a variable for timer detection of apogee
