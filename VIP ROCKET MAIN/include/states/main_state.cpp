@@ -21,6 +21,7 @@ public:
 
         File file = flash::openFile();       // opening flash file for writing during flight
         int flash_counter = 0;
+        int interval = 100; // amount of loops after which the flash is closed and opened
 
         s_data.setRocketState(3); // set rocket state to main (3) state
 
@@ -55,7 +56,7 @@ public:
             barometer::printState();
 
             flash_counter = flash::writeData(file, gd, md, bd, btd, 3); // writing data to flash memory
-            if (flash_counter % 100 == 1)
+            if (flash_counter % interval == 1)
             {
                 file = flash::closeOpen(file); // close and open the file every 100th reading
             }

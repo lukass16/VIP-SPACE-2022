@@ -20,6 +20,7 @@ public:
 
         File file = flash::openFile(); // opening flash file for writing during descent
         int flash_counter = 0, flash_write_time = 10000;
+        int interval = 100; // amount of loops after which the flash is closed and opened
 
         SD_File fileSD;
 
@@ -61,7 +62,7 @@ public:
             if (!flash::flashEnded(file, flash_write_time)) //if not finished writing to flash
             {
                 flash_counter = flash::writeData(file, gd, md, bd, btd, 4); // writing data to flash memory
-                if (flash_counter % 100 == 1)
+                if (flash_counter % interval == 1)
                 {
                     file = flash::closeOpen(file); // close and open the file every 100th reading
                 }
