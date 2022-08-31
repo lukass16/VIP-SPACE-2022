@@ -18,14 +18,6 @@ public:
     {
         Serial.println("DROGUE STATE");
 
-
-        //! START testing
-        unsigned long start_time = millis();
-        int loopnr = 0;
-
-
-        //! END testing
-
         File file = flash::openFile(); // opening flash file for writing during flight
         int flash_counter = 0;
 
@@ -74,14 +66,6 @@ public:
 
         while (!arming::timerDetectApogee())
         {
-
-            //! START testing
-            Serial.println(String(loopnr) + " Loop time: " + String(millis()-start_time) + " ms");
-            start_time = millis();
-            loopnr++;
-            //! END testing
-           
-
             buzzer::signalDrogue();
             
             //*gps
@@ -102,7 +86,7 @@ public:
             //*battery data
 
             //give necessary feedback during loop
-            //barometer::printState();
+            barometer::printState();
 
             flash_counter = flash::writeData(file, gd, md, bd, btd, 2); // writing data to flash memory
             if (flash_counter % 100 == 1)
@@ -111,12 +95,7 @@ public:
             }
             
             delay(50);
-            
         }
-
-         //! START testing
-        while(true);
-        //! END testing
 
         // mark apogee in EEPROM
         eeprom::markApogee();
