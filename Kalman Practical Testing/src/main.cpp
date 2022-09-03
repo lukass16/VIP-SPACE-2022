@@ -10,7 +10,7 @@ float t_change = 0;
 
 File file;
 SD_File fileSD;
-char sdfilename[50] = "kalman27.txt";
+char sdfilename[50] = "kalman32.txt";
 
 void setup()
 {
@@ -18,12 +18,7 @@ void setup()
 	Serial.println("Kalman Filter Testing");
 
 	barometer::setup();
-	flash::setup();
 	SDCard::setup();
-
-	//open flash file
-	if(!flash::locked()) flash::deleteFile("/kalman.txt");
-	file = flash::openFile();
 
 	//open SD file
 	fileSD = SD.open(sdfilename, FILE_WRITES); //*Note: if the code is run multiple times it will append to this file and will create multiple header files
@@ -49,27 +44,21 @@ void loop()
 	//printing info to Serial
 	kalman::printFullInfoPosition(barometer::alt);
 
-	//saving data to flash
-	flash::writeKalmanState(file, barometer::alt, kalman::getKalmanPosition(), kalman::getKalmanVelocity(), kalman::getKalmanAcceleration(), kalman::getPositionKalmanGain(), kalman::getPositionUncertainty());
-
 	//saving data to SD
 	fileSD.println(String(millis()-t_init) + "," + String(barometer::alt, 2) + "," + String(kalman::getKalmanPosition(), 2) + "," + String(kalman::getKalmanVelocity(), 2) + "," + String(kalman::getKalmanAcceleration(), 2) + "," + String(kalman::getPositionKalmanGain(), 5) + "," + String(kalman::getPositionUncertainty(), 5) );
 
 	if(millis() - t_init > 30000)
 	{
-		//flash close and read
-		flash::closeFile(file);
-		flash::readKalmanFlash("/kalman.txt");
-
 		//SD close and read
 		fileSD.close();
 		fileSD = SD.open(sdfilename); //open file for reading
-		SDCard::readSD(fileSD);
+		//SDCard::readSD(fileSD);
 
 		Serial.println("Testing Finished");
 		
-		delay(1000000);
+		while(true);
 	}
+	
 	delay(50);
 }
 

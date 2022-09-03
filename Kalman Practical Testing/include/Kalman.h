@@ -23,9 +23,9 @@ namespace kalman {
     float delT = 0.0f;
     bool isFirstStep = true;
 
-    BLA::Matrix<3, 3> Q = {0.01, 0, 0, //*Process Noise Uncertainty - how confident are you that the process is correct i.e. that the estimation model is valid
-                           0, 0.05, 0,
-                           0, 0, 0.1};
+    BLA::Matrix<3, 3> Q = {0.0001, 0, 0, //*Process Noise Uncertainty - how confident are you that the process is correct i.e. that the estimation model is valid
+                           0, 0.0001, 0,
+                           0, 0, 0.0001};
 
     BLA::Matrix<3, 3> T = {0.01, 0, 0, //*Time scaling matrix
                            0, 0.01, 0,
