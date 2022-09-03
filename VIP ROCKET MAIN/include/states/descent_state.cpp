@@ -21,6 +21,7 @@ public:
         File file = flash::openFile(); // opening flash file for writing during descent
         int flash_counter = 0, flash_write_time = 10000;
         int interval = 100; // amount of loops after which the flash is closed and opened
+        int descent_state_delay = 46; // delay used in descent state [ms]
 
         SD_File fileSD;
 
@@ -57,7 +58,7 @@ public:
             //*battery data
 
             //give necessary feedback during loop
-            barometer::printState();
+            //barometer::printState();
 
             if (!flash::flashEnded(file, flash_write_time)) //if not finished writing to flash
             {
@@ -68,7 +69,7 @@ public:
                 }
             }
 
-            delay(50);
+            delay(descent_state_delay);
         }
 
 
@@ -110,9 +111,9 @@ public:
             //*battery data
 
             //give necessary feedback during loop
-            barometer::printState();
+            //barometer::printState();
 
-            delay(200);
+            delay(descent_state_delay);
         }
     }
 

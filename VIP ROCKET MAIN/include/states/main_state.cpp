@@ -22,6 +22,7 @@ public:
         File file = flash::openFile();       // opening flash file for writing during flight
         int flash_counter = 0;
         int interval = 100; // amount of loops after which the flash is closed and opened
+        int main_state_delay = 16; // delay used in main state [ms]
 
         s_data.setRocketState(3); // set rocket state to main (3) state
 
@@ -53,7 +54,7 @@ public:
             //*battery data
 
             //give necessary feedback during loop
-            barometer::printState();
+            //barometer::printState();
 
             flash_counter = flash::writeData(file, gd, md, bd, btd, 3); // writing data to flash memory
             if (flash_counter % interval == 1)
@@ -61,7 +62,7 @@ public:
                 file = flash::closeOpen(file); // close and open the file every 100th reading
             }
 
-            delay(50);
+            delay(main_state_delay);
         }
 
         //fire main parachute pyro charge

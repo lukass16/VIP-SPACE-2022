@@ -21,6 +21,7 @@ public:
         File file = flash::openFile(); // opening flash file for writing during flight
         int flash_counter = 0;
         int interval = 100; // amount of loops after which the flash is closed and opened
+        int drogue_state_delay = 4; // delay used in drogue state [ms]
 
         s_data.setRocketState(2); // set rocket state to drogue (2) state
 
@@ -53,9 +54,9 @@ public:
             //*battery data
 
             //give necessary feedback during loop
-            imu::printAll();
+            //imu::printAll();
 
-            delay(50);
+            delay(drogue_state_delay);
         }
 
         //mark launch in EEPROM
@@ -87,7 +88,7 @@ public:
             //*battery data
 
             //give necessary feedback during loop
-            barometer::printState();
+            //barometer::printState();
 
             flash_counter = flash::writeData(file, gd, md, bd, btd, 2); // writing data to flash memory
             if (flash_counter % interval == 1)
@@ -95,7 +96,7 @@ public:
                 file = flash::closeOpen(file); // close and open the file every 100th reading
             }
             
-            delay(50);
+            delay(drogue_state_delay);
         }
 
         // mark apogee in EEPROM

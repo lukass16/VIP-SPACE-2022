@@ -4,7 +4,6 @@
 #include "core/core.cpp"
 #include "drogue_state.cpp"
 #include "communication.h"
-#include "wifiserver_wrapper.h"
 #include "flash.h"
 #include "buzzer.h"
 #include "gps_wrapper.h"
@@ -26,6 +25,8 @@ public:
     {
 
         Serial.println("PREP STATE");
+
+        int prep_state_delay = 50; // delay used in preparation state [ms]
 
         s_data.setRocketState(1); // set rocket state to preparation (1) state
 
@@ -113,7 +114,7 @@ public:
 
             //*battery
 
-            delay(50);
+            delay(prep_state_delay);
         }
 
         buzzer::signalArmed();
