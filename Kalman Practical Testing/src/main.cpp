@@ -10,19 +10,19 @@ float t_change = 0;
 
 File file;
 SD_File fileSD;
-char sdfilename[50] = "kalman32.txt";
+char sdfilename[50] = "1.txt";
 
 void setup()
 {
 	Serial.begin(115200);
 	Serial.println("Kalman Filter Testing");
-
+	
 	barometer::setup();
 	SDCard::setup();
 
 	//open SD file
 	fileSD = SD.open(sdfilename, FILE_WRITES); //*Note: if the code is run multiple times it will append to this file and will create multiple header files
-	fileSD.println("Time [s],Baro_P [m],Kalman_P [m],Kalman_V [m/s],Kalman_A [m/s^2],Kalman_Gain_P,Kalman_Uncertainty_P"); //print labels to file
+	fileSD.println("Time [s],Time Change [s],Baro_P [m],Kalman_P [m],Kalman_V [m/s],Kalman_A [m/s^2],Kalman_Gain_P,Kalman_Uncertainty_P"); //print labels to file
 
 	kalman::predict(); // make first prediction
 	timer = millis();
@@ -45,20 +45,18 @@ void loop()
 	kalman::printFullInfoPosition(barometer::alt);
 
 	//saving data to SD
-	fileSD.println(String(millis()-t_init) + "," + String(barometer::alt, 2) + "," + String(kalman::getKalmanPosition(), 2) + "," + String(kalman::getKalmanVelocity(), 2) + "," + String(kalman::getKalmanAcceleration(), 2) + "," + String(kalman::getPositionKalmanGain(), 5) + "," + String(kalman::getPositionUncertainty(), 5) );
+	fileSD.println(String(millis()-t_init) + "," + String(t_change, 4) + "," + String(barometer::alt, 2) + "," + String(kalman::getKalmanPosition(), 2) + "," + String(kalman::getKalmanVelocity(), 2) + "," + String(kalman::getKalmanAcceleration(), 2) + "," + String(kalman::getPositionKalmanGain(), 5) + "," + String(kalman::getPositionUncertainty(), 5) );
 
-	if(millis() - t_init > 30000)
+	if(millis() - t_init > 60000)
 	{
 		//SD close and read
 		fileSD.close();
-		fileSD = SD.open(sdfilename); //open file for reading
-		//SDCard::readSD(fileSD);
 
 		Serial.println("Testing Finished");
 		
 		while(true);
 	}
 	
-	delay(50);
+	delay(20);
 }
 
