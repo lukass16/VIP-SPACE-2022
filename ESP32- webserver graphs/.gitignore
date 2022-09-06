@@ -1,6 +1,5 @@
-.pio/*
-!.pio/libdeps
-.pio/libdeps/ttgo-t-beam/Arduino_JSON/*
+
+!.pio/libdeps/ttgo-t-beam/Arduino_JSON
 !.pio/libdeps/ttgo-t-beam/AsyncTCP-master
 !.pio/libdeps/ttgo-t-beam/ESPAsyncWebServer-master
 
