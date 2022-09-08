@@ -10,7 +10,7 @@ namespace imu
 
     void setup()
     {
-        mpu.setup(0x68); // Note if the sensor can't connect check that the setup is forced in the MPU9250.h file
+        mpu.setup(0x68); //! Note if the sensor can't connect check that the setup is forced in the MPU9250.h file
     }
 
     void calibrateAccelAndGyro()
@@ -71,10 +71,10 @@ namespace imu
         Serial.println("Gyro Z: " + String(gyr_z, 2));
     }
 
-    bool launchDetected(float threshold = -2, int times = 10) //threshold - threshold acceleration to be detected (in g), times - times for the threshold to be detected
+    bool launchDetected(float threshold = -2, int times = 30) //threshold - threshold acceleration to be detected (in g), times - times for the threshold to be detected (average loop duration is 8 ms)
     {
         static int counter = 0;
-        if (acc_y < threshold)
+        if (acc_y > threshold)
         {
             counter++;
         }
@@ -100,9 +100,9 @@ namespace imu
         md.gyr_y = gyr_y;
         md.gyr_z = gyr_z;
 
-        md.mag_x = 0.0; //*has no magnetometer readings
-        md.mag_y = 0.0;
-        md.mag_z = 0.0;
+        md.mag_x = 42.0; //*has no magnetometer readings
+        md.mag_y = 42.0;
+        md.mag_z = 42.0;
 
         return md;
     }

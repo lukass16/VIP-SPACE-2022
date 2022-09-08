@@ -26,15 +26,15 @@ namespace kalman {
     float delT = 0.0f;
     bool isFirstStep = true;
 
-    BLA::Matrix<3, 3> Q = {0.01, 0, 0, //*Process Noise Uncertainty - how confident are you that the process is correct i.e. that the estimation model is valid
-                           0, 0.05, 0,
-                           0, 0, 0.1};
+    BLA::Matrix<3, 3> Q = {0.001, 0, 0, //*Process Noise Uncertainty - how confident are you that the process is correct i.e. that the estimation model is valid
+                           0, 0.001, 0,
+                           0, 0, 0.00001};
 
     BLA::Matrix<3, 3> T = {0.01, 0, 0, //*Time scaling matrix
                            0, 0.01, 0,
                            0, 0, 0.01};
 
-    BLA::Matrix<1, 1> R_Baro = {0.0282}; //*Measurement Uncertainty - Variance in sensor measurement - measured to be 0.0282
+    BLA::Matrix<1, 1> R_Baro = {0.5}; //*Measurement Uncertainty - Variance in sensor measurement - measured to be 0.0282
 
     BLA::Matrix<3, 1> X = {
         0, //p
@@ -42,9 +42,9 @@ namespace kalman {
         0  //a
     };
 
-    BLA::Matrix<3, 3> P = {0.1, 0, 0, //*Estimate Uncertainty
-                           0, 0.1, 0,
-                           0, 0, 0.1};
+    BLA::Matrix<3, 3> P = {100.0, 0, 0, //*Estimate Uncertainty
+                           0, 100.0, 0,
+                           0, 0, 100.0};
 
     BLA::Matrix<3, 3> I = {1, 0, 0,
                            0, 1, 0,
@@ -81,11 +81,11 @@ namespace kalman {
                 0, 0, 1};
 
             //*Update scaling matrix - matrix consists of delT and scales Q according to delT
-            T.Fill(delT);
+            T.Fill(1); // removed time scaling for now
 
             //*State Extrapolation Equation
             X = F * X;
-            P = F * P * ~F + T * Q; //*to be more accurate the Q matrix is scaled with delT
+            P = F * P * ~F + Q;
         }
         isFirstStep = false;
     }
