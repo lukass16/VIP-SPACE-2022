@@ -4,6 +4,7 @@
 #include "core/core.cpp"
 #include "descent_state.cpp"
 #include "flash.h"
+#include "arming.h"
 #include "buzzer.h"
 #include "gps_wrapper.h"
 #include "barometer_wrapper_MS5607.h"
@@ -20,11 +21,10 @@ public:
 
         File file = flash::openFile();       // opening flash file for writing during flight
         int flash_counter = 0;
+        int interval = 100; // amount of loops after which the flash is closed and opened
+        int main_state_delay = 16; // delay used in main state [ms]
 
-        s_data.updateRocketState(); //update state that's written to LoRa messages  
-
-        //start main ejection timer
-        arming::startMainEjectionTimer();
+        s_data.setRocketState(3); // set rocket state to main (3) state
 
         // variables for writing to memory
         sens_data::GpsData gd;
@@ -32,19 +32,18 @@ public:
         sens_data::IMUData md;
         sens_data::BatteryData btd;
 
-        while (!barometer::mainAltitudeDetected() && !arming::timerDetectMainEjection()) //*waiting until altitude is below threshold to eject main parachute
+        while (!barometer::mainAltitudeDetected()) //*waiting until altitude is below threshold to eject main parachute
         {
             buzzer::signalMain();
             
             //*gps
-            gps::readGps();          // reads in values from gps
-            gd = gps::getGpsState(); // retrieve values from wrapper to be put in data object
+            gps::readGps();
+            gd = gps::getGpsState();
             s_data.setGpsData(gd);
 
             //*barometer
             barometer::readSensor();
-            barometer::printState();
-            bd = barometer::getBarometerState(); // reads and retrieves values from wrapper to be put in data object
+            bd = barometer::getBarometerState();
             s_data.setBarometerData(bd);
 
             //*imu
@@ -52,15 +51,22 @@ public:
             md = imu::getIMUState();
             s_data.setIMUData(md);
 
-            //*placeholder for battery data
+            //*battery data
+
+            //give necessary feedback during loop
+            //barometer::printState();
 
             flash_counter = flash::writeData(file, gd, md, bd, btd, 3); // writing data to flash memory
-            if (flash_counter % 100 == 1)
+            if (flash_counter % interval == 1)
             {
                 file = flash::closeOpen(file); // close and open the file every 100th reading
             }
-            delay(50);
+
+            delay(main_state_delay);
         }
+
+        //fire main parachute pyro charge
+        //arming::fireMainCharge(); //! commented out for safety
 
         //mark main ejection in EEPROM
         eeprom::markMainEjection();

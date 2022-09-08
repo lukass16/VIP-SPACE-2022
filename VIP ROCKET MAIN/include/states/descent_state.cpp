@@ -2,7 +2,10 @@
 
 #include "Arduino.h"
 #include "core/core.cpp"
+#include "communication.h"
+#include "arming.h"
 #include "flash.h"
+#include "SD_card.h"
 #include "buzzer.h"
 #include "gps_wrapper.h"
 #include "barometer_wrapper_MS5607.h"
@@ -16,9 +19,13 @@ public:
         Serial.println("DESCENT STATE");
 
         File file = flash::openFile(); // opening flash file for writing during descent
-        int flash_counter = 0, flash_write_time = 30000;
+        int flash_counter = 0, flash_write_time = 10000;
+        int interval = 100; // amount of loops after which the flash is closed and opened
+        int descent_state_delay = 46; // delay used in descent state [ms]
 
-        s_data.updateRocketState(); // update state that's written to LoRa messages
+        SD_File fileSD;
+
+        s_data.setRocketState(4); // set rocket state to descent (4) state
 
         // variables for writing to memory
         sens_data::GpsData gd;
@@ -26,19 +33,21 @@ public:
         sens_data::IMUData md;
         sens_data::BatteryData btd;
 
-        while (true)
+        //start touchdown detection timer
+        arming::startTouchdownTimer();
+
+        while (!arming::timerDetectTouchdown()) // while touchdown has not been detected by timer
         {
             buzzer::signalDescent();
 
             //*gps
-            gps::readGps();          // reads in values from gps
-            gd = gps::getGpsState(); // retrieve values from wrapper to be put in data object
+            gps::readGps();
+            gd = gps::getGpsState();
             s_data.setGpsData(gd);
 
             //*barometer
             barometer::readSensor();
-            barometer::printState();
-            bd = barometer::getBarometerState(); // reads and retrieves values from wrapper to be put in data object
+            bd = barometer::getBarometerState();
             s_data.setBarometerData(bd);
 
             //*imu
@@ -46,23 +55,70 @@ public:
             md = imu::getIMUState();
             s_data.setIMUData(md);
 
-            //*placeholder for battery data
+            //*battery data
 
-            if (!flash::flashEnded(file, flash_write_time))
+            //give necessary feedback during loop
+            //barometer::printState();
+
+            if (!flash::flashEnded(file, flash_write_time)) //if not finished writing to flash
             {
                 flash_counter = flash::writeData(file, gd, md, bd, btd, 4); // writing data to flash memory
-                if (flash_counter % 100 == 1)
+                if (flash_counter % interval == 1)
                 {
                     file = flash::closeOpen(file); // close and open the file every 100th reading
                 }
             }
 
-            delay(200);
+            delay(descent_state_delay);
+        }
+
+
+        unsigned long process_start_time = millis();
+
+        //* stop communication to not interfere with writing to SD card
+        comms::stop();
+
+        SDcard::setup();
+        fileSD = SDcard::openNextFile();
+        flash::dumpContentsToSD("/data.txt", fileSD);
+        SDcard::closeFile(fileSD);
+
+        //* resume communication
+        comms::resume();
+
+        Serial.println("Process took: " + String(millis() - process_start_time) + " ms");
+
+
+        while (true) // post touchdown operations
+        {
+            buzzer::signalDescent();
+
+            //*gps
+            gps::readGps();
+            gd = gps::getGpsState();
+            s_data.setGpsData(gd);
+
+            //*barometer
+            barometer::readSensor();
+            bd = barometer::getBarometerState();
+            s_data.setBarometerData(bd);
+
+            //*imu
+            imu::readSensor();
+            md = imu::getIMUState();
+            s_data.setIMUData(md);
+
+            //*battery data
+
+            //give necessary feedback during loop
+            //barometer::printState();
+
+            delay(descent_state_delay);
         }
     }
 
     void HandleNextPhase() override
     {
-        Serial.println("END of VIP ROCKET CODE");
+        Serial.println("END of RTU HPR ROCKET CODE");
     }
 };
