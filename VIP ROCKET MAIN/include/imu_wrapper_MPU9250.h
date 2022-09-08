@@ -71,7 +71,7 @@ namespace imu
         Serial.println("Gyro Z: " + String(gyr_z, 2));
     }
 
-    bool launchDetected(float threshold = -2, int times = 10) //threshold - threshold acceleration to be detected (in g), times - times for the threshold to be detected
+    bool launchDetected(float threshold = -2, int times = 30) //threshold - threshold acceleration to be detected (in g), times - times for the threshold to be detected (average loop duration is 8 ms)
     {
         static int counter = 0;
         if (acc_y < threshold)
