@@ -1,0 +1,60 @@
+#######################################
+# Syntax Coloring Map For MS5x
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+	MS5x			KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+	checkUpdates		KEYWORD2
+	reset			KEYWORD2
+	setI2Caddr		KEYWORD2
+	setDelay		KEYWORD2
+	setPOffset		KEYWORD2
+	setTOffset		KEYWORD2
+	setPressHg		KEYWORD2
+	setPressMbar		KEYWORD2
+	setPressPa		KEYWORD2
+	setTempC		KEYWORD2
+	setTempF		KEYWORD2
+	setTempK		KEYWORD2
+	setSamples		KEYWORD2
+	
+	connect			KEYWORD2
+	CRCcodeTest		KEYWORD2
+	
+	checkCRC		KEYWORD2
+	isReady			KEYWORD2
+	
+	getAltitude		KEYWORD2
+	getSeaLevel		KEYWORD2        
+	GetPres			KEYWORD2
+	GetTemp			KEYWORD2
+
+#######################################
+# Instances (KEYWORD2)
+#######################################
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
+	I2C_LOW			LITERAL1
+	I2C_HIGH		LITERAL1
+	MS5xxx_CMD_RESET	LITERAL1
+	MS5xxx_CMD_ADC_READ	LITERAL1
+	MS5xxx_CMD_ADC_CONV	LITERAL1
+	MS5xxx_CMD_ADC_D1	LITERAL1	
+	MS5xxx_CMD_ADC_D2	LITERAL1
+	MS5xxx_CMD_ADC_256	LITERAL1
+	MS5xxx_CMD_ADC_512	LITERAL1
+	MS5xxx_CMD_ADC_1024	LITERAL1
+	MS5xxx_CMD_ADC_2048	LITERAL1
+	MS5xxx_CMD_ADC_4096	LITERAL1
+	MS5xxx_CMD_PROM_RD	LITERAL1
