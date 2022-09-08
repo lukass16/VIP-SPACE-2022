@@ -93,7 +93,7 @@ public:
         barometer::sampleSeaLevel();
         
        
-        while (!arming::armed())
+        while (!arming::armed()) //nominal
         {
             buzzer::signalNotArmed();
 
