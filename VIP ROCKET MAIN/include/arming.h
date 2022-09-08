@@ -7,8 +7,6 @@
 #define PYROSENSE 36
 #define FIREPYRO 32
 
-float batVoltage = 0;
-
 namespace arming
 {
     //*GPIO
@@ -42,6 +40,12 @@ namespace arming
         return 0;
     }
 
+    void fireMainCharge()
+    {
+        digitalWrite(FIREPYRO, HIGH);
+        Serial.println("Fired main parachute pyro charge!");
+    }
+
     //*TIMERS
     //* 1) Apogee detection
     // creating a variable for timer detection of apogee
@@ -57,7 +61,7 @@ namespace arming
         portEXIT_CRITICAL_ISR(&apogeeTimerMux);
     }
 
-    void startApogeeTimer(int timerLength = 15000000) // timer length is given in microseconds
+    void startApogeeTimer(int timerLength = 20000000) // timer length is given in microseconds
     {
         // initializing timer - setting the number of the timer, the value of the prescaler and stating that the counter should count up (true)
         apogeeTimer = timerBegin(0, 80, true);
@@ -125,28 +129,45 @@ namespace arming
         return 0;
     }
 
-    //WORK IN PROGRESS
-    float getBatteryVoltage()
-    {
-        if(armed == 0)
-        {
-            batVoltage = analogRead(SW1);
-        } else if (analogRead(SW1)+analogRead(SW2) >= 6500){
-            batVoltage = analogRead(SW1)+analogRead(SW2);
-        }
+    //* 3) Touchdown detection
+    // creating a variable for timer detection of touchdown
+    volatile bool timerDetTouchdown = 0;
+    hw_timer_t *touchdownTimer = NULL;
+    portMUX_TYPE touchdownTimerMux = portMUX_INITIALIZER_UNLOCKED;
 
-        return batVoltage;
+    // creating the interrupt handling function - should be as short as possible
+    void IRAM_ATTR onTouchdownTimer()
+    {
+        portENTER_CRITICAL_ISR(&touchdownTimerMux);
+        timerDetTouchdown = 1;
+        portEXIT_CRITICAL_ISR(&touchdownTimerMux);
     }
 
-    bool pyroCheck()
+    void startTouchdownTimer(int timerLength = 15000000) // timer length is given in microseconds
     {
-        if(analogRead(PYROSENSE)>=1000)
+        // initializing timer - setting the number of the timer, the value of the prescaler and stating that the counter should count up (true)
+       touchdownTimer = timerBegin(2, 80, true);
+
+        // binding the timer to a handling function
+        timerAttachInterrupt(touchdownTimer, &onTouchdownTimer, true);
+
+        // specifying the counter value in which the timer interrupt will be generated and indicating that the timer should not automatically reload (false) upon generating the interrupt
+        timerAlarmWrite(touchdownTimer, timerLength, false);
+
+        // enabling the timer
+        timerAlarmEnable(touchdownTimer);
+
+        Serial.println("Touchdown timer enabled");
+    }
+
+    bool timerDetectTouchdown()
+    {
+        if (timerDetTouchdown)
         {
+            Serial.println("Timer detected Touchdown!");
             return 1;
-        } else {
-            return 0;
         }
+        return 0;
     }
-
 
 }
