@@ -2,8 +2,8 @@
 #include <TinyGPS++.h>
 #include "sensor_data.h"
 
-#define RXPIN 16 //(important to remember about crossover connection)
-#define TXPIN 17 //
+#define RXPIN 16  //(important to remember about crossover connection)
+#define TXPIN 17 // 
 
 namespace gps
 {
@@ -13,7 +13,7 @@ namespace gps
 
     void setup(uint gpsRate = 9600)
     {
-        Serial2.begin(gpsRate); // hardware serial 2 (RX-16, TX-17)
+        Serial2.begin(gpsRate); //hardware serial 2 (RX-16, TX-17)
         Serial.println("Init GPS: " + String(gpsRate));
     }
 
@@ -26,7 +26,7 @@ namespace gps
             gps.encode(Serial2.read());
             hasData = true;
         }
-        /*
+/*
         if (hasData)
         {
             Serial.print("LAT=");
@@ -37,12 +37,12 @@ namespace gps
             Serial.println(gps.altitude.meters(), 1);
             Serial.println();
         }
-        */
+*/
     }
 
     double lastLatitude()
     {
-        return gps.location.lat();
+        return gps.location.lat(); 
     }
 
     double lastLongitude()
@@ -75,25 +75,25 @@ namespace gps
         return gps.time.second();
     }
 
-    sens_data::GpsData getGpsState()
-    {
-        sens_data::GpsData gd;
-        if (gps.location.isValid())
+        sens_data::GpsData getGpsState()
         {
-            // adding last good values
-            lastData.lat = lastLatitude();
-            lastData.lng = lastLongitude();
-            lastData.alt = lastAltitude();
-            gd.lat = lastLatitude();
-            gd.lng = lastLongitude();
-            gd.alt = lastAltitude();
-            gd.sats = getSatellites();
-            return gd;
+            sens_data::GpsData gd;
+            if(gps.location.isValid())
+            {
+                //adding last good values
+                lastData.lat = lastLatitude();
+                lastData.lng = lastLongitude();
+                lastData.alt = lastAltitude();
+                gd.lat = lastLatitude();
+                gd.lng = lastLongitude();
+                gd.alt = lastAltitude();
+                gd.sats = getSatellites();
+                return gd;
+            }
+            else
+            {
+                return lastData;
+            }
         }
-        else
-        {
-            return lastData;
-        }
-    }
 
 }

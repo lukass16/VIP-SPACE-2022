@@ -11,12 +11,7 @@ void setup()
 
 void loop()
 {
-	for(int i = 0; i < 10; i++)
-	{
-		barometer::readSensor(false);
-		barometer::printAll();
-		delay(100);
-	}
-
-	Serial.println("Sampled sea level pressure: " + String(barometer::sampleSeaLevel()));
+	barometer::readSensor(false);
+	barometer::printAll();
+	delay(100);
 }

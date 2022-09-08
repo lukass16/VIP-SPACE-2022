@@ -20,10 +20,8 @@ public:
 
         File file = flash::openFile(); // opening flash file for writing during flight
         int flash_counter = 0;
-        int interval = 100; // amount of loops after which the flash is closed and opened
-        int drogue_state_delay = 4; // delay used in drogue state [ms]
 
-        s_data.setRocketState(2); // set rocket state to drogue (2) state
+        s_data.updateRocketState(); // update state that's written to LoRa messages
 
         // variables for writing to memory
         sens_data::GpsData gd;
@@ -37,26 +35,24 @@ public:
             buzzer::signalDrogue();
 
             //*gps
-            gps::readGps();
-            gd = gps::getGpsState();
+            gps::readGps();          // reads in values from gps
+            gd = gps::getGpsState(); // retrieve values from wrapper to be put in data object
             s_data.setGpsData(gd);
 
             //*barometer
             barometer::readSensor();
-            bd = barometer::getBarometerState();
+            bd = barometer::getBarometerState(); // reads and retrieves values from wrapper to be put in data object
             s_data.setBarometerData(bd);
 
             //*imu
             imu::readSensor();
+            imu::printAll();
             md = imu::getIMUState();
             s_data.setIMUData(md);
 
-            //*battery data
+            //*placeholder for battery data
 
-            //give necessary feedback during loop
-            //imu::printAll();
-
-            delay(drogue_state_delay);
+            delay(50);
         }
 
         //mark launch in EEPROM
@@ -66,18 +62,19 @@ public:
         //start apogee detection timer
         arming::startApogeeTimer();
 
-        while (!arming::timerDetectApogee())
+        while (!barometer::apogeeDetected() && !arming::timerDetectApogee()) // TODO add alternative timer apogee detection
         {
             buzzer::signalDrogue();
             
             //*gps
-            gps::readGps();
-            gd = gps::getGpsState();
+            gps::readGps();          // reads in values from gps
+            gd = gps::getGpsState(); // retrieve values from wrapper to be put in data object
             s_data.setGpsData(gd);
 
             //*barometer
             barometer::readSensor();
-            bd = barometer::getBarometerState();
+            barometer::printState();
+            bd = barometer::getBarometerState(); // reads and retrieves values from wrapper to be put in data object
             s_data.setBarometerData(bd);
 
             //*imu
@@ -85,18 +82,14 @@ public:
             md = imu::getIMUState();
             s_data.setIMUData(md);
 
-            //*battery data
-
-            //give necessary feedback during loop
-            //barometer::printState();
+            //*placeholder for battery data
 
             flash_counter = flash::writeData(file, gd, md, bd, btd, 2); // writing data to flash memory
-            if (flash_counter % interval == 1)
+            if (flash_counter % 100 == 1)
             {
                 file = flash::closeOpen(file); // close and open the file every 100th reading
             }
-            
-            delay(drogue_state_delay);
+            delay(50);
         }
 
         // mark apogee in EEPROM

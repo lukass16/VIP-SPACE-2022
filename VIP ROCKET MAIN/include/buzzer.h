@@ -9,7 +9,7 @@ namespace buzzer
     int piezo_pin = 23;
 
     //variable for the structure of the third switch beeping
-    bool buzzing = false;
+    bool thirdSwitchBeep = false, flightBeep = false, descentBeep = false, buzzing = false;
     unsigned long previousTime = 0, currentTime = 0;
     int times_buzzed = 0;
 
@@ -77,7 +77,7 @@ namespace buzzer
         buzzer::buzzEnd();
     }
 
-    void signalCalibrationSkip()
+    void signalCalibrationSkip() //change xd
     {
         Serial.println("Calibration skipped - EEPROM shows as calibrated");
         signalCalibrationStart();
@@ -93,6 +93,66 @@ namespace buzzer
         buzzer::buzz(1080);
         delay(100);
         buzzer::buzzEnd();
+    }
+
+    void signalThirdSwitchLockout()
+    {
+        int interval = 1000; //interval time in milliseconds
+        currentTime = millis();
+        if (currentTime - previousTime >= interval)
+        {
+            previousTime = currentTime; //save the last time that buzzer was toggled
+            if (!thirdSwitchBeep)       //if not buzzing
+            {
+                buzzer::buzz(520);
+                thirdSwitchBeep = true;
+            }
+            else
+            {
+                buzzer::buzzEnd();
+                thirdSwitchBeep = false;
+            }
+        }
+    }
+
+    void signalFlight()
+    {
+        int interval = 500; //interval time in milliseconds
+        currentTime = millis();
+        if (currentTime - previousTime >= interval)
+        {
+            previousTime = currentTime; //save the last time that buzzer was toggled
+            if (!flightBeep)       //if not buzzing
+            {
+                digitalWrite(piezo_pin, HIGH);
+                flightBeep = true;
+            }
+            else
+            {
+                digitalWrite(piezo_pin, LOW);
+                flightBeep = false;
+            }
+        }
+    }
+
+    void signalDescentLegacy() //identical to previous function
+    {
+        int interval = 2000; //interval time in milliseconds
+        currentTime = millis();
+        if (currentTime - previousTime >= interval)
+        {
+            previousTime = currentTime; //save the last time that buzzer was toggled
+            if (!descentBeep)       //if not buzzing
+            {
+                digitalWrite(piezo_pin, HIGH);
+                descentBeep = true;
+            }
+            else
+            {
+                digitalWrite(piezo_pin, LOW);
+                descentBeep = false;
+            }
+        }
     }
 
     void signalSavedValues()
@@ -245,6 +305,7 @@ namespace buzzer
         
     }
 
+
     void signalArmed()
     {
         digitalWrite(piezo_pin, HIGH); // 1)
@@ -258,6 +319,17 @@ namespace buzzer
         digitalWrite(piezo_pin, HIGH); // 3)
         delay(50);
         digitalWrite(piezo_pin, LOW);
+    }
+
+    void test()
+    {
+        buzzer::buzzCustom(127, 200);
+        delay(500);
+        buzzer::buzzCustom(127, 500);
+        delay(500);
+        buzzer::buzzCustom(127, 800);
+        delay(500);
+        buzzer::buzzEnd();
     }
 
 }

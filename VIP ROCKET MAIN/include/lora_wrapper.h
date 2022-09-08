@@ -4,7 +4,6 @@
 #include "LoraMessage.h"
 #include <LoraEncoder.h>
 #include "sensor_data.h"
-
 // https://randomnerdtutorials.com/ttgo-lora32-sx1276-arduino-ide/
 // https://github.com/sandeepmistry/arduino-LoRa/blob/master/examples/LoRaDuplex/LoRaDuplex.ino
 // https://www.thethingsnetwork.org/docs/devices/bytes/
@@ -17,7 +16,7 @@
 #define MISO 19
 #define MOSI 27
 
-#define B_SIZE 37
+#define B_SIZE 42
 
 namespace lora
 {
@@ -30,7 +29,7 @@ namespace lora
 
     boolean _canPrintHeaderMessage = false;
 
-    //*START Encoding
+    //*ENCODING
     byte data[B_SIZE]; // main buffer that is linked with encoder
     LoraEncoder encoder(data);
 
@@ -43,7 +42,6 @@ namespace lora
         sens_data::BarometerData bar = s_data.getBarometerData();
         sens_data::BatteryData bat = s_data.getBatteryData();
         int r_state = s_data.getRocketState();
-
         // encode
         encoder.writeMessage(gps.lat, gps.lng, gps.alt, gps.sats, imu.acc_x, imu.acc_y, imu.acc_z, bar.pressure, bar.altitude, bar.f_altitude, bar.f_velocity, bat.bat1, r_state, counter);
         
@@ -64,6 +62,12 @@ namespace lora
         LoRa.write(B_SIZE);
         LoRa.write(data, B_SIZE);
         LoRa.endPacket();
+        // Serial.println("Printing data:");
+        // for (int i = 0; i < B_SIZE; i++)
+        // {
+        //     Serial.print(String(i) + ": ");
+        //     Serial.println(data[i]);
+        // }
     }
 
     void printBuffer()
@@ -77,7 +81,7 @@ namespace lora
         Serial.println();
     }
 
-    //*END Encoding
+    //*
 
     void sendMessage(String outgoing, int lora_message_id);
 

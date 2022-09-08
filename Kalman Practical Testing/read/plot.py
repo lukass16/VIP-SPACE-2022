@@ -15,7 +15,7 @@ import csv
 #    Reading the .txt, putting it in a pandas dataframe
 #----------------------------------------------------------------------------
 
-ID = 32
+ID = 27
 
 data = pd.read_csv("KALMAN{}.TXT".format(ID), sep=',')
 

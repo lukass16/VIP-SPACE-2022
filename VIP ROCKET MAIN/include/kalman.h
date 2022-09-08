@@ -5,16 +5,18 @@
 * TUNABLE PARAMETERS:
 Q - regulates how much you trust the dynamics of the chosen model - gets scaled with time (seconds)
 P - estimate uncertainty - how much you trust your estimate (but initially this just means how much you trust your initial estimate)
-R - measurement uncertainty - for the MS5607 sensor this uncertainty (variance) was measured to be 0.0282 - the higher this is the less you trust your sensor measurements
+R - measurement uncertainty - for the MS5607 sensor this uncertainty (variance) was measured to be 0.0282 - the gihger this is the lest you trust your sensor measurements
 
 * SEQUENCE OF CALCULATIONS  
 1) Calculate delT - time interval from last estimate
 2) Predict current state
-3) Update estimate according to prediction and measurement (updateBaro())
+3) Update estimate according to predcition and measurement (updateBaro())
 */
 
 //https://www.youtube.com/watch?v=G2Ohf9GpHf4
 //https://www.kalmanfilter.net/multiSummary.html
+
+//?Could simplify code if internalized delT calculations
 
 
 using namespace BLA;
@@ -138,6 +140,7 @@ namespace kalman {
     }
 
 
+    //*TESTING
     void printKalmanState()
     {
         Serial.println("P: " + String(getKalmanPosition()) + " V: " + String(getKalmanVelocity())+ " A: " + String(getKalmanAcceleration()));

@@ -3,7 +3,6 @@
 #include <MS5x.h>
 #include "sensor_data.h"
 #include "kalman.h"
-#include "eeprom_wrapper.h"
 
 namespace barometer
 {
@@ -12,8 +11,7 @@ namespace barometer
     double temp = 0;
     double pres = 0;
     double alt = 0;
-    double seaLevelPressure = 101667.00;
-    double sampledSeaLevelPressure = 0;
+    double seaLevelPressure = 0;
 
     // Kalman (filtered) readings
     float f_alt = 0;
@@ -23,44 +21,40 @@ namespace barometer
     unsigned long kalman_t; // Kalman timer
     float t_change = 0;     // change of time from previous prediction to current
 
+    //*for testing
+    unsigned long start_t = 0; //*for testing
+    int counter = 0;
 
     void setup()
     {
-        while (MS5607.connect() > 0) // barometer.connect starts wire and attempts to connect to sensor
-        { 
+        start_t = millis();
+
+        while (MS5607.connect() > 0)
+        { // barometer.connect starts wire and attempts to connect to sensor
             Serial.println(F("Error connecting..."));
             delay(500);
         }
         Serial.println(F("Connected to Sensor"));
         delay(5);
 
-        seaLevelPressure = eeprom::readSampledPressure();
-
-        // setting sea level pressure
-        MS5607.setSeaLevel(seaLevelPressure);
-        Serial.println("Sea level pressure set to: " + String(seaLevelPressure) + " Pa");
-
-        // kalman setup
-        kalman::predict(); // make first prediction
-        kalman_t = millis();
-    }
-
-    float sampleSeaLevel() // using function from library to sample sea level pressure, sets the current altitude as 0
-    {
-        while (sampledSeaLevelPressure == 0)
+        //*Note potentially 44 ms in setup could be saved if the following code is reconstructed
+        while (seaLevelPressure == 0)
         {
+            counter++;
             MS5607.checkUpdates();
             if (MS5607.isReady())
             {
                 // Calculate predicted seaLevel pressure based off a known altitude in meters
-                sampledSeaLevelPressure = MS5607.getSeaLevel(0.0); // this functions also as the sea level setter for altitude calculations
-                Serial.println("Sea level pressure sampled and set as: " + String(sampledSeaLevelPressure));
+                seaLevelPressure = MS5607.getSeaLevel(10.5); // this functions also as the sea level setter for altitude calculations //!This can only be used to setup the barometer on the ground (ground level)
+                Serial.println("Sea level pressure set as: " + String(seaLevelPressure));
+                Serial.println("Time ellapsed while barometer ready: " + String(millis() - start_t, 5)); //*the delay is about 44 ms which is quite okay - it results from multiple loops while the sensor gets first readings
+                Serial.println("Cycles ellapsed while barometer ready: " + String(counter));
             }
         }
 
-        eeprom::writeSampledPressure(sampledSeaLevelPressure);
-
-        return sampledSeaLevelPressure;
+        // kalman setup
+        kalman::predict(); // make first prediction
+        kalman_t = millis();
     }
 
     void readSensor(bool temperatureCorrected = false)
@@ -70,7 +64,7 @@ namespace barometer
         {
             temp = MS5607.GetTemp();                        // Returns temperature in C
             pres = MS5607.GetPres();                        // Returns pressure in Pascals //*Note - saved and sent in hPa
-            alt = MS5607.getAltitude(temperatureCorrected); // Returns altitude in m //*optionally temperature corrected
+            alt = MS5607.getAltitude(temperatureCorrected); // Returns altitude in m - //*optionally temperature corrected
         }
 
         // kalman implementation
@@ -108,6 +102,11 @@ namespace barometer
         kalman::printKalmanState();
     }
  
+    float getVertVelocity() // todo make this
+    {
+        return 42.0;
+    }
+
     bool apogeeDetected(int times = 3, float minimum_height = 20.0) // times - times to detect the vertical speed being below zero, minimum_height - the minimum height at which apogee can be detected, otherwise apogee detection is prohibited
     {
         static int counter = 0;
@@ -130,7 +129,7 @@ namespace barometer
         }
     }
 
-    bool mainAltitudeDetected(float threshold = 300.0, int times = 5) //threshold - threshold altitude to be detected (in m), times - times to detect altitude under threshold altitude for main ejection
+    bool mainAltitudeDetected(float threshold = 15.0, int times = 3) //threshold - threshold altitude to be detected (in m), times - times to detect altitude under threshold altitude for main ejection
     {
         static int counter = 0;
         if (f_alt < threshold)

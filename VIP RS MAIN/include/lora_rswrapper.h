@@ -16,7 +16,7 @@
 #define RST 14
 #define DIO0 26
 
-#define B_SIZE 37
+#define B_SIZE 42
 
 namespace lora
 {
@@ -31,7 +31,7 @@ namespace lora
     String outgoing; // outgoing message
 
     // defining received message buffer
-    char received[49];
+    char received[90];
 
     int syncWord = 0xF3;
 

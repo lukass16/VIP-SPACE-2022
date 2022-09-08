@@ -302,11 +302,6 @@ void MS5x::setSamples(uint8_t sampleRatio) {
 	}
 }
 
-void MS5x::setSeaLevel(float seaLevelPressure)
-{
-	_SEALEVELPRESS = seaLevelPressure;
-}
-
 //******************************************************** 
 //! @brief Calculates CRC based on 16 bits reserved for manufacturer,
 //! 6 calibration coefficents, and final CRC address.

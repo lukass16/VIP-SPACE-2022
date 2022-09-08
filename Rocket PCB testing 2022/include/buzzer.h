@@ -40,11 +40,6 @@ namespace buzzer
         ledcWrite(channel, 127);
     }
 
-    void buzzDigital()
-    {
-        digitalWrite(piezo_pin, HIGH);
-    }
-
     void buzzCustom(u_int soundLevel, uint freq = freq)
     {
         ledcWriteTone(channel, freq);
@@ -54,11 +49,6 @@ namespace buzzer
     void buzzEnd()
     {
         buzzer::buzzCustom(0, 0);
-    }
-
-    void buzzEndDigital()
-    {
-        digitalWrite(piezo_pin, LOW);
     }
 
     void signalTestStart()

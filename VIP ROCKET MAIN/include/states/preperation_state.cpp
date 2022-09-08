@@ -3,7 +3,9 @@
 #include "Arduino.h"
 #include "core/core.cpp"
 #include "drogue_state.cpp"
+#include "oled_wrapper.h"
 #include "communication.h"
+#include "wifiserver_wrapper.h"
 #include "flash.h"
 #include "buzzer.h"
 #include "gps_wrapper.h"
@@ -26,20 +28,10 @@ public:
 
         Serial.println("PREP STATE");
 
-        int prep_state_delay = 50; // delay used in preparation state [ms]
-
-        s_data.setRocketState(1); // set rocket state to preparation (1) state
-
-        // variables for writing to memory
-        sens_data::GpsData gd;
-        sens_data::BarometerData bd;
-        sens_data::IMUData md;
-        sens_data::BatteryData btd;
-
-        //*Buzzer setup - signal start
+        //*Buzzer test/signal start
         buzzer::setup();
         buzzer::transitionToGeneratorMode();
-        buzzer::signalStart(); //process takes up 300 ms
+        buzzer::signalStart();
 
         //*EEPROM setup
         eeprom::setup();
@@ -50,6 +42,9 @@ public:
         //*Flash setup
         flash::setup();
 
+        // //*SD setup
+        // SDcard::setup();
+
         //*Sensor setups
         Wire.begin(21, 22); // initialize correct i2c lines
         gps::setup();
@@ -57,18 +52,19 @@ public:
         imu::setup();
 
         comms::setup(433E6);
+        s_data.updateRocketState(); //update state that's written to LoRa messages
 
         //*check if need to clear EEPROM
         if(arming::clearEEPROM())
         {
             buzzer::signalEEPROMClear();
-            eeprom::clean();
+            eeprom::clean(); //only utility currently for EEPROM
         }
 
         //*if flash not locked - delete file
         if(!eeprom::lockedFlash())
         {
-            flash::deleteFile("/data.txt"); //*deleting file so as to reset it
+            flash::deleteFile("/test.txt"); //*deleting file so as to reset it
         }
 
         //*Determine if has been reset - need to transfer to different state
@@ -89,32 +85,33 @@ public:
             this->_context->Start();
         }
 
-        //*perform barometer ground pressure sampling and save sampled pressure value to EEPROM
-        barometer::sampleSeaLevel();
-        
-       
-        while (!arming::armed())
+        int loops = 0; 
+         
+        while (!arming::armed()) //!TODO change with while(!arming::armed) - add arming functionality
         {
             buzzer::signalNotArmed();
 
             //*gps
-            gps::readGps();                             
-            gd = gps::getGpsState();
+            gps::readGps();                             // reads in values from gps
+            sens_data::GpsData gd = gps::getGpsState(); // retrieve values from wrapper to be put in data object
             s_data.setGpsData(gd);
 
             //*barometer
             barometer::readSensor();
-            bd = barometer::getBarometerState();
+            sens_data::BarometerData bd = barometer::getBarometerState(); //reads and retrieves values from wrapper to be put in data object
             s_data.setBarometerData(bd);
 
             //*imu
             imu::readSensor();
-            md = imu::getIMUState();
+            sens_data::IMUData md = imu::getIMUState();
             s_data.setIMUData(md);
 
             //*battery
+            sens_data::BatteryData btd;
 
-            delay(prep_state_delay);
+            delay(50);
+            loops++;
+            Serial.println(loops);
         }
 
         buzzer::signalArmed();
