@@ -14,14 +14,6 @@
   The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 *********/
 
-#include <LoRa.h>
-#include <SPI.h>
-#include <lora_rswrapper.h>
-#include "flash_rswrapper.h"
-#include "sensor_data.h"
-//#include "FS.h"
-#include "SPIFFS.h"
-#include "LITTLEFS.h"
 #include <WiFi.h>
 #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
@@ -31,8 +23,8 @@
 #include <Arduino_JSON.h>
 
 // Replace with your network credentials
-const char *ssid = "Monjiik phone";
-const char *password = "pelmenis";
+const char *ssid = "HUAWEI-9EFF";
+const char *password = "39016644";
 
 // Create AsyncWebServer object on port 80
 AsyncWebServer server(80);
@@ -63,10 +55,10 @@ unsigned long timerDelay = 3000;
 //DeviceAddress sensor4 = { 0x28, 0xFF, 0x11, 0x28, 0x33, 0x18, 0x1, 0x6B };
 
 // Get Sensor Readings and return JSON object
-String getSensorReadings(int bar_alt, int f_vel){
+String getSensorReadings(){
   //sensors.requestTemperatures();
-  readings["sensor1"] = bar_alt;
-  readings["sensor2"] = f_vel;
+  readings["sensor1"] = random(30);
+  readings["sensor2"] = 1;
   readings["sensor3"] = 2;
   readings["sensor4"] = 3;
 
@@ -96,89 +88,6 @@ void initWiFi() {
   Serial.println(WiFi.localIP());
 }
 
-
-
-sens_data::SensorData s_data;
-
-// defining message string and deserialization buffer
-String message = "";
-char buffer[80] = "";
-
-// defining receivable sensor variables
-double lat = 0;
-double lng = 0;
-double alt = 0;
-
-float acc_x = 0;
-float acc_y = 0;
-float acc_z = 0;
-
-float pres = 0;
-float bar_alt = 0;
-float f_alt = 0;
-float f_vel = 0;
-float bat1;
-
-int r_state = 0;
-int counter = 0;
-
-
-// Flash writing logic
-bool holdBoth = 0;
-unsigned long start_hold = millis();
-unsigned long hold_time = 0;
-bool canWriteToFlash = 0;
-bool prevCanWriteToFlash = 0;
-bool newPacket = 0;
-File file;
-
-
-// defining necessary functional variables
-double prevDistance = 0;
-double distance = 0;
-double course = 0;
-double sats = 0;
-bool gpsValid = 0;
-
-void allotData(sens_data::SensorData s_data)
-{
-	// GPS data
-	lat = s_data.gpsData.lat;
-	lng = s_data.gpsData.lng;
-	alt = s_data.gpsData.alt;
-	sats = s_data.gpsData.sats;
-
-	// IMU data
-	acc_x = s_data.imuData.acc_x;
-	acc_y = s_data.imuData.acc_y;
-	acc_z = s_data.imuData.acc_z;
-
-	// Barometer data
-	pres = s_data.barometerData.pressure;
-	bar_alt = s_data.barometerData.altitude;
-	f_alt = s_data.barometerData.f_altitude;
-	f_vel = s_data.barometerData.f_velocity;
-
-	// Battery data
-	bat1 = s_data.batteryData.bat1;
-
-	// Other data
-	r_state = s_data.current_rocket_state;
-	counter = s_data.counter;
-}
-
-void printData()
-{
-	Serial.printf("%7.4f,%7.4f,%5.0f,%2d,%4.2f,%4.2f,%4.2f,%5.0f,%6.1f,%6.1f,%3.0f,%2.1f,%1d,%4d\n", lat, lng, alt, sats, acc_x, acc_y, acc_z, pres, bar_alt, f_alt, f_vel, bat1, r_state, counter);
-}
-
-void deserializeData(char buffer[])
-{
-	sscanf(buffer, "%lf,%lf,%lf,%d,%f,%f,%f,%f,%f,%f,%f,%f,%d,%d", &lat, &lng, &alt, &sats, &acc_x, &acc_y, &acc_z, &pres, &bar_alt, &f_alt, &f_vel, &bat1, &r_state, &counter); // for deserialization double ahs to vbe specified as %lf
-}
-
-
-
 void setup() {
   // Serial port for debugging purposes
   Serial.begin(115200);
@@ -195,7 +104,7 @@ void setup() {
 
   // Request for the latest sensor readings
   server.on("/readings", HTTP_GET, [](AsyncWebServerRequest *request){
-    String json = getSensorReadings(0,0);
+    String json = getSensorReadings();
     request->send(200, "application/json", json);
     json = String();
   });
@@ -214,18 +123,7 @@ void setup() {
   server.addHandler(&events);
 
 
-  
-
-	Serial.println("Serial connected");
-
-	// LoRa
-	Serial.println("Setup LoRa");
-	lora::setup();
-
-	// Flash
-	//flash::setup();
-
-  // Start server
+    // Start server
   server.begin();
 }
 
@@ -234,28 +132,7 @@ void loop() {
   if ((millis() - lastTime) > timerDelay) {
     // Send Events to the client with the Sensor Readings Every 10 seconds
     events.send("ping",NULL,millis());
-    events.send(getSensorReadings(bar_alt, f_vel).c_str(),"new_readings" ,millis());
+    events.send(getSensorReadings().c_str(),"new_readings" ,millis());
     lastTime = millis();
   }
-
-  
-	s_data = lora::readEncodedMessage();
-	if (s_data.counter != -1) // ja tika saņemta ziņa
-	{
-		allotData(s_data);
-	}
-
-	// LoRa parametri
-	//receivedRSSI = lora::getPacketRssi();
-	//receivedSNR = lora::getPacketSNR();
-	//freqError = lora::freqError();
-
-
-	// if (newPacket) //ja pienākusi jauna - rakstam iekšā flash;
-	// {
-	// 	flash::writeData(file, canWriteToFlash, lat, lng, alt, sats, acc_x, acc_y, acc_z, pres, bar_alt, f_alt, f_vel, bat1, r_state, counter); //ja nav atļauts 
-	// }
 }
-
-
-

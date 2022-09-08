@@ -2,38 +2,6 @@
 
 // Get current sensor readings when the page loads
 window.addEventListener('load', getReadings);
-var chartL = new Highcharts.Chart({
-  chart:{
-    renderTo:'chart-altitude'
-  },
-  series: [
-    {
-      name: 'Altitude #1',
-      type: 'line',
-      color: '#101D42',
-      marker: {
-        symbol: 'circle',
-        radius: 3,
-        fillColor: '#101D42',
-      }
-    }
-  ],
-  title: {
-    text: undefined
-  },
-  xAxis: {
-    type: 'datetime',
-    dateTimeLabelFormats: { second: '%H:%M:%S' }
-  },
-  yAxis: {
-    title: {
-      text: 'altitude, m'
-    }
-  },
-  credits: {
-    enabled: false
-  }
-});
 
 // Create Temperature Chart
 var chartT = new Highcharts.Chart({
@@ -42,17 +10,17 @@ var chartT = new Highcharts.Chart({
   },
   series: [
     {
-      name: 'Velocity #1',
+      name: 'Temperature #1',
       type: 'line',
-      color: '#FFFFFF',
+      color: '#101D42',
       marker: {
         symbol: 'circle',
         radius: 3,
-        fillColor: '#FFFFFF',
+        fillColor: '#101D42',
       }
     },
     {
-      name: 'Velocity #2',
+      name: 'Temperature #2',
       type: 'line',
       color: '#00A6A6',
       marker: {
@@ -60,7 +28,27 @@ var chartT = new Highcharts.Chart({
         radius: 3,
         fillColor: '#00A6A6',
       }
-    }
+    },
+    {
+      name: 'FUCK',
+      type: 'line',
+      color: '#8B2635',
+      marker: {
+        symbol: 'triangle',
+        radius: 3,
+        fillColor: '#8B2635',
+      }
+    },
+    {
+      name: 'YEAH',
+      type: 'line',
+      color: '#71B48D',
+      marker: {
+        symbol: 'triangle-down',
+        radius: 3,
+        fillColor: '#71B48D',
+      }
+    },
   ],
   title: {
     text: undefined
@@ -71,7 +59,7 @@ var chartT = new Highcharts.Chart({
   },
   yAxis: {
     title: {
-      text: 'Velocity, m/s'
+      text: 'Temperature Celsius Degrees'
     }
   },
   credits: {
@@ -79,9 +67,8 @@ var chartT = new Highcharts.Chart({
   }
 });
 
-// Create Altitude Chart
 
-
+//Plot temperature in the temperature chart
 function plotTemperature(jsonValue) {
 
   var keys = Object.keys(jsonValue);
@@ -101,14 +88,8 @@ function plotTemperature(jsonValue) {
       chartT.series[i].addPoint([x, y], true, false, true);
     }
 
-    if(chartL.series[i].data.length > 40) {
-      chartL.series[i].addPoint([x, y], true, true, true);
-    } else {
-      chartL.series[i].addPoint([x, y], true, false, true);
-    }
   }
 }
-
 
 // Function to get current readings on the webpage when it loads for the first time
 function getReadings(){
