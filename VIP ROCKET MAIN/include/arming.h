@@ -1,5 +1,6 @@
 #pragma once
 #include <Arduino.h>
+#include "sensor_data.h"
 
 #define EEPROMCLEAR 37
 #define SW1 38
@@ -9,6 +10,9 @@
 
 namespace arming
 {
+    int n_volt_readings = 50, sum1 = 0;
+    float bat1 = 0, coef1 = 841.5;
+
     //*GPIO
     void setup()
     {
@@ -40,10 +44,29 @@ namespace arming
         return 0;
     }
 
+    void readBatteryVoltage() // Reading battery voltage with averaging
+    {
+        static int counter = 0;
+        counter++;
+        sum1 += analogRead(SW2);
+        if(counter % n_volt_readings == 0) // update battery voltage every *n* readings
+        {
+            bat1 = (sum1 / n_volt_readings) / coef1;
+            sum1 = 0;
+        }
+    }
+
     void fireMainCharge()
     {
         digitalWrite(FIREPYRO, HIGH);
         Serial.println("Fired main parachute pyro charge!");
+    }
+
+    sens_data::BatteryData getBatteryState()
+    {
+        sens_data::BatteryData btd;
+        btd.bat1 = bat1;
+        return btd;
     }
 
     //*TIMERS

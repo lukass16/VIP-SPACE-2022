@@ -56,6 +56,9 @@ public:
             s_data.setIMUData(md);
 
             //*battery data
+            arming::readBatteryVoltage();
+            btd = arming::getBatteryState();
+            s_data.setBatteryData(btd);
 
             //give necessary feedback during loop
             //barometer::printState();
@@ -109,6 +112,9 @@ public:
             s_data.setIMUData(md);
 
             //*battery data
+            arming::readBatteryVoltage();
+            btd = arming::getBatteryState();
+            s_data.setBatteryData(btd);
 
             //give necessary feedback during loop
             //barometer::printState();

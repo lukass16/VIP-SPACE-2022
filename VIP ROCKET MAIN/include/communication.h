@@ -66,7 +66,7 @@ namespace comms
         sens_data::BarometerData bar = s_data.getBarometerData();
         sens_data::BatteryData bat = s_data.getBatteryData();
         int r_state = s_data.getRocketState();
-        sprintf(outgoing, "%7.4f,%7.4f,%5.0f,%2d,%4.2f,%4.2f,%4.2f,%5.0f,%6.1f,%6.1f,%4.0f,%2.1f,%1d,%4d", gps.lat, gps.lng, gps.alt, gps.sats, imu.acc_x, imu.acc_y, imu.acc_z, bar.pressure, bar.altitude, bar.f_altitude, bar.f_velocity, bat.bat1, r_state, counter);
+        sprintf(outgoing, "%7.4f,%7.4f,%5.0f,%2d,%4.2f,%4.2f,%4.2f,%5.0f,%6.1f,%6.1f,%4.0f,%3.2f,%1d,%4d", gps.lat, gps.lng, gps.alt, gps.sats, imu.acc_x, imu.acc_y, imu.acc_z, bar.pressure, bar.altitude, bar.f_altitude, bar.f_velocity, bat.bat1, r_state, counter);
         counter++;
         return outgoing;
     }

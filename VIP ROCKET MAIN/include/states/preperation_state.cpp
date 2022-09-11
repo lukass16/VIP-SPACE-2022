@@ -113,7 +113,10 @@ public:
             s_data.setIMUData(md);
 
             //*battery
-
+            arming::readBatteryVoltage();
+            btd = arming::getBatteryState();
+            s_data.setBatteryData(btd);
+            
             delay(prep_state_delay);
         }
 
