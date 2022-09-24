@@ -94,7 +94,7 @@ public:
 
         while (true) // post touchdown operations
         {
-            buzzer::signalDescent();
+            buzzer::signalTouchdown();
 
             //*gps
             gps::readGps();

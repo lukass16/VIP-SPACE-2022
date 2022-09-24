@@ -173,8 +173,8 @@ namespace buzzer
     void signalDrogue()
     {
         int interval = 5000;
-        int pause = 200;
-        int duration = 200; // interval time in milliseconds
+        int pause = BOP;
+        int duration = BOP; // interval time in milliseconds
         int times_to_buzz = 2;
         currentTime = millis();
 
@@ -200,8 +200,8 @@ namespace buzzer
     void signalMain()
     {
         int interval = 5000;
-        int pause = 200;
-        int duration = 200; // interval time in milliseconds
+        int pause = BOP;
+        int duration = BOP; // interval time in milliseconds
         int times_to_buzz = 3;
         currentTime = millis();
 
@@ -227,8 +227,35 @@ namespace buzzer
     void signalDescent()
     {
         int interval = 5000;
-        int pause = 200;
-        int duration = 200; // interval time in milliseconds
+        int pause = BOP;
+        int duration = BOP; // interval time in milliseconds
+        int times_to_buzz = 4;
+        currentTime = millis();
+
+        if (currentTime - previousTime >= pause && !buzzing && times_buzzed < times_to_buzz) // if hasn't buzzed the allowed times and isn't currently buzzing - starts buzz
+        {
+            previousTime = currentTime; // save the last time that buzzer was toggled
+            digitalWrite(piezo_pin, HIGH);
+            buzzing = true;
+        }
+        else if (currentTime - previousTime >= duration && buzzing) // if is currently buzzing and has buzzed more than allowed - ends buzz
+        {
+            previousTime = currentTime; // save the last time that buzzer was toggled
+            digitalWrite(piezo_pin, LOW);
+            buzzing = false;
+            times_buzzed++;
+        }
+        else if (currentTime - previousTime >= interval && !buzzing) // after every interval resets times the buzzr has buzzed
+        {
+            times_buzzed = 0;
+        }
+    }
+
+    void signalTouchdown()
+    {
+        int interval = 5000;
+        int pause = BEEP;
+        int duration = BEEP; // interval time in milliseconds
         int times_to_buzz = 4;
         currentTime = millis();
 
