@@ -11,6 +11,7 @@
 namespace arming
 {
     int n_volt_readings = 50, sum1 = 0;
+    int pyroReading = 0;
     float bat1 = 0, coef1 = 841.5;
 
     //*GPIO
@@ -37,11 +38,21 @@ namespace arming
 
     bool armed()
     {
-        if(digitalRead(SW1) == 0)
+        if (digitalRead(SW1) == 0)
         {
             return 1;
         }
         return 0;
+    }
+
+    bool isPyroContinuity()
+    {
+        pyroReading = analogRead(PYROSENSE);
+        if (pyroReading > 400)
+        {
+            return true;
+        }
+        return false;
     }
 
     void readBatteryVoltage() // Reading battery voltage with averaging
@@ -49,7 +60,7 @@ namespace arming
         static int counter = 0;
         counter++;
         sum1 += analogRead(SW2);
-        if(counter % n_volt_readings == 0) // update battery voltage every *n* readings
+        if (counter % n_volt_readings == 0) // update battery voltage every *n* readings
         {
             bat1 = (sum1 / n_volt_readings) / coef1;
             sum1 = 0;
@@ -174,7 +185,7 @@ namespace arming
     void startTouchdownTimer(int timerLength = 15000000) // timer length is given in microseconds
     {
         // initializing timer - setting the number of the timer, the value of the prescaler and stating that the counter should count up (true)
-       touchdownTimer = timerBegin(2, 80, true);
+        touchdownTimer = timerBegin(2, 80, true);
 
         // binding the timer to a handling function
         timerAttachInterrupt(touchdownTimer, &onTouchdownTimer, true);

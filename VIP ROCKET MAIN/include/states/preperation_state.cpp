@@ -97,7 +97,7 @@ public:
 
         while (!arming::armed()) // nominal
         {
-            buzzer::signalNotArmed();
+            buzzer::signalPreparation();
 
             //*gps
             gps::readGps();

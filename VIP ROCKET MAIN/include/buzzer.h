@@ -5,7 +5,7 @@
 
 #define RESONATING_FREQ 2500
 #define BOP 200
-#define BEEP 500
+#define BEEP 1000
 
 namespace buzzer
 {
@@ -145,10 +145,16 @@ namespace buzzer
         digitalWrite(piezo_pin, LOW);
     }
 
-    void signalNotArmed()
+    void signalPreparation()
     {
         int interval = 5000;
-        int duration = 200; // interval time in milliseconds
+        int duration = BOP; // interval time in milliseconds
+
+        if (!arming::isPyroContinuity()) // if there is no pyro continuity signal with BEEP
+        {
+            duration = BEEP;
+        }
+
         currentTime = millis();
 
         if (currentTime - previousTime >= interval && !buzzing)
