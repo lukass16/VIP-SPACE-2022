@@ -13,14 +13,12 @@
 #include "arming.h"
 #include "SD_card.h"
 
-
 //*Temporary variables
 bool clearEEPROM = true;
 
 class PreperationState : public State
 {
 public:
-
     void start() override
     {
 
@@ -39,7 +37,6 @@ public:
         //*Buzzer setup - signal start
         buzzer::setup();
         buzzer::transitionToGeneratorMode();
-        buzzer::signalStart(); //process takes up 300 ms
 
         //*EEPROM setup
         eeprom::setup();
@@ -58,32 +55,38 @@ public:
 
         comms::setup(433E6);
 
+        //*inform about battery voltage
+        if (eeprom::readPreviousState() == 0)
+        {
+            buzzer::signalBatteryVoltage();
+        }
+
         //*check if need to clear EEPROM
-        if(arming::clearEEPROM())
+        if (arming::clearEEPROM())
         {
             buzzer::signalEEPROMClear();
             eeprom::clean();
         }
 
         //*if flash not locked - delete file
-        if(!eeprom::lockedFlash())
+        if (!eeprom::lockedFlash())
         {
             flash::deleteFile("/data.txt"); //*deleting file so as to reset it
         }
 
-        //*Determine if has been reset - need to transfer to different state
+        //*determine if has been reset - need to transfer to different state
         eeprom::readPreviousState();
-        if(eeprom::hasBeenLaunch())
+        if (eeprom::hasBeenLaunch())
         {
             JumpToDrogue();
             this->_context->Start();
         }
-        else if(eeprom::hasBeenApogee())
+        else if (eeprom::hasBeenApogee())
         {
             JumpToMain();
             this->_context->Start();
         }
-        else if(eeprom::hasBeenMainEjection())
+        else if (eeprom::hasBeenMainEjection())
         {
             JumpToDescent();
             this->_context->Start();
@@ -91,14 +94,13 @@ public:
 
         //*perform barometer ground pressure sampling and save sampled pressure value to EEPROM
         barometer::sampleSeaLevel();
-        
-       
-        while (!arming::armed()) //nominal
+
+        while (!arming::armed()) // nominal
         {
             buzzer::signalNotArmed();
 
             //*gps
-            gps::readGps();                             
+            gps::readGps();
             gd = gps::getGpsState();
             s_data.setGpsData(gd);
 
@@ -116,7 +118,7 @@ public:
             arming::readBatteryVoltage();
             btd = arming::getBatteryState();
             s_data.setBatteryData(btd);
-            
+
             delay(prep_state_delay);
         }
 
@@ -131,7 +133,7 @@ public:
         this->_context->TransitionTo(new DrogueState);
     }
 
-    //Jumping functions for EEPROM transfer mechanism
+    // Jumping functions for EEPROM transfer mechanism
     void JumpToDrogue()
     {
         this->_context->TransitionTo(new DrogueState);

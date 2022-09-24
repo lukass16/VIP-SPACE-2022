@@ -56,6 +56,11 @@ namespace arming
         }
     }
 
+    float getBatteryVoltage()
+    {
+        return (analogRead(SW2) / coef1);
+    }
+
     void fireMainCharge()
     {
         digitalWrite(FIREPYRO, HIGH);
