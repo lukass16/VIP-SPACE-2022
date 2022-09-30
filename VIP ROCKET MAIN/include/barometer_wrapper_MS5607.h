@@ -20,6 +20,9 @@ namespace barometer
     float f_vel = 0;
     float f_acc = 0;
 
+    // Abnormal descent speed detection parameter
+    float abn_speed = -45.0; // m/s
+
     unsigned long kalman_t; // Kalman timer
     float t_change = 0;     // change of time from previous prediction to current
 
@@ -130,10 +133,14 @@ namespace barometer
         }
     }
 
-    bool mainAltitudeDetected(float threshold = 300.0, int times = 5) //threshold - threshold altitude to be detected (in m), times - times to detect altitude under threshold altitude for main ejection
+    bool mainAltitudeDetected(float threshold = 300.0, float min_altitude = 100.0, int times = 5) //threshold - threshold altitude to be detected (in m), min_altitude - minimum altitude at which the main ejection conditions can be detected (part of low main ejection safety) times - times to detect altitude under threshold altitude for main ejection
     {
         static int counter = 0;
-        if (f_alt < threshold)
+        if (f_alt < threshold && f_alt > min_altitude) // Note: if altitude is below minimum ejection altitude the flash will still be written to, and will need clearing after
+        {
+            counter++;
+        }
+        else if (f_vel < abn_speed) // if abnormal descent speed is detected
         {
             counter++;
         }
