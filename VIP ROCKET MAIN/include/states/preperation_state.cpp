@@ -91,6 +91,11 @@ public:
             JumpToDescent();
             this->_context->Start();
         }
+        else if (eeprom::hasBeenTouchdown())
+        {
+            JumpToDescent();
+            this->_context->Start();
+        }
 
         //*perform barometer ground pressure sampling and save sampled pressure value to EEPROM
         barometer::sampleSeaLevel();

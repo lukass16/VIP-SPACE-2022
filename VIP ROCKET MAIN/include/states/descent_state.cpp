@@ -3,6 +3,7 @@
 #include "Arduino.h"
 #include "core/core.cpp"
 #include "communication.h"
+#include "eeprom_wrapper.h"
 #include "arming.h"
 #include "flash.h"
 #include "SD_card.h"
@@ -36,7 +37,7 @@ public:
         //start touchdown detection timer
         arming::startTouchdownTimer();
 
-        while (!arming::timerDetectTouchdown()) // while touchdown has not been detected by timer
+        while (!arming::timerDetectTouchdown() && !eeprom::hasBeenTouchdown()) // while touchdown has not been detected by timer
         {
             buzzer::signalDescent();
 
@@ -74,6 +75,9 @@ public:
 
             delay(descent_state_delay);
         }
+
+        //mark touchdown in EEPROM
+        eeprom::markTouchdown();
 
 
         unsigned long process_start_time = millis();

@@ -64,6 +64,7 @@ namespace eeprom
 	1 - Launch has been detected
 	2 - Apogee has been detected
 	3 - Main ejection has happened
+	4 - Touchdown has been detected
 	*/
 
 	void markLaunch()
@@ -84,6 +85,13 @@ namespace eeprom
 	{
 		Serial.println("Marking main ejection in EEPROM");
 		EEPROM.writeFloat(4, 3.0);
+		EEPROM.commit();
+	}
+
+	void markTouchdown()
+	{
+		Serial.println("Marking touchdown in EEPROM");
+		EEPROM.writeFloat(4, 4.0);
 		EEPROM.commit();
 	}
 
@@ -119,6 +127,16 @@ namespace eeprom
 		if(prevState == 3)
 		{
 			Serial.println("Main ejection detected in EEPROM!");
+			return 1;
+		}
+		return 0;
+	}
+
+	bool hasBeenTouchdown()
+	{
+		if(prevState == 4)
+		{
+			Serial.println("Touchdown detected in EEPROM!");
 			return 1;
 		}
 		return 0;

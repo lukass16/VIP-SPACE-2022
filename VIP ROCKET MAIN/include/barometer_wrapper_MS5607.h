@@ -135,8 +135,9 @@ namespace barometer
 
     bool mainAltitudeDetected(float threshold = 300.0, float min_altitude = 100.0, int times = 5) //threshold - threshold altitude to be detected (in m), min_altitude - minimum altitude at which the main ejection conditions can be detected (part of low main ejection safety) times - times to detect altitude under threshold altitude for main ejection
     {
-        static int counter = 0;
-        if (f_alt < threshold && f_alt > min_altitude) // Note: if altitude is below minimum ejection altitude the flash will still be written to, and will need clearing after
+        static int counter = 0; 
+        // ! Commented out low ejection safety for testing
+        if (f_alt < threshold /*&& f_alt > min_altitude*/) // Note: if altitude is below minimum ejection altitude the flash will still be written to, and will need clearing after
         {
             counter++;
         }
