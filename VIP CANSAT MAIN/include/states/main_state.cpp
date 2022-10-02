@@ -19,12 +19,14 @@ public:
     {
         Serial.println("MAIN STATE");
 
-        File file = flash::openFile();       // opening flash file for writing during flight
+        SD_File fileSD = SDcard::openFile();
+
+        File file = flash::openFile(); // opening flash file for writing during flight
         int flash_counter = 0;
-        int interval = 100; // amount of loops after which the flash is closed and opened
+        int interval = 100;        // amount of loops after which the flash is closed and opened
         int main_state_delay = 16; // delay used in main state [ms]
 
-        s_data.setRocketState(3); // set rocket state to main (3) state
+        s_data.setRocketState(2); // set rocket state to main (3) state
 
         // variables for writing to memory
         sens_data::GpsData gd;
@@ -32,10 +34,13 @@ public:
         sens_data::IMUData md;
         sens_data::BatteryData btd;
 
-        while (!barometer::mainAltitudeDetected()) //*waiting until altitude is below threshold to eject main parachute
+        // start apogee detection timer
+        arming::startApogeeTimer();
+
+        while (!arming::timerDetectApogee())
         {
             buzzer::signalMain();
-            
+
             //*gps
             gps::readGps();
             gd = gps::getGpsState();
@@ -56,25 +61,26 @@ public:
             btd = arming::getBatteryState();
             s_data.setBatteryData(btd);
 
-            //give necessary feedback during loop
-            //barometer::printState();
+            // give necessary feedback during loop
+            // barometer::printState();
 
-            flash_counter = flash::writeData(file, gd, md, bd, btd, 3); // writing data to flash memory
+            //*writing to flash
+            flash_counter = flash::writeData(file, gd, md, bd, btd, 2); // writing data to flash memory
             if (flash_counter % interval == 1)
             {
                 file = flash::closeOpen(file); // close and open the file every 100th reading
             }
 
+            //* writing to SD card
+            SDcard::writeDataStruct(fileSD, flash::getTimeElapsed(), gd, md, bd, btd, 2);
+
             delay(main_state_delay);
         }
 
-        //fire main parachute pyro charge
-        //arming::fireMainCharge(); //! commented out for safety
+        //*close SD file
+        SDcard::closeFile(fileSD);
 
-        //mark main ejection in EEPROM
-        eeprom::markMainEjection();
-
-        // close flash file
+        //*close flash file
         flash::closeFile(file);
 
         this->_context->RequestNextPhase();

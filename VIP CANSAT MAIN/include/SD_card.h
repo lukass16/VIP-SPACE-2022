@@ -18,6 +18,7 @@ unsigned long SD_time = millis();
 
 namespace SDcard
 {
+	char filename[7] = "0.csv";
 
 	void setup()
 	{
@@ -35,13 +36,12 @@ namespace SDcard
 
 	SD_File openFile() // returns file handle
 	{
-		SD_File fileSD = SD.open("data.txt", FILE_WRITES);
+		SD_File fileSD = SD.open(filename, FILE_WRITES);
 		return fileSD;
 	}
 
-	SD_File openNextFile() // returns file handle - opens iteratively
+	void getFileName() // returns file handle - opens iteratively
 	{
-		char filename[7] = "0.csv";
 		int it = 0;
 		String tester;
 
@@ -53,9 +53,6 @@ namespace SDcard
 		}
 
 		Serial.println("Opening file: " + String(filename));
-
-		SD_File fileSD = SD.open(filename, FILE_WRITES);
-		return fileSD;
 	}
 
 	void closeFile(SD_File fileSD)
@@ -106,7 +103,7 @@ namespace SDcard
 		}
 	}
 
-	int writeDataStruct(SD_File fileSD, float time, sens_data::GpsData gpsData, sens_data::IMUData imuData, sens_data::BarometerData barData, sens_data::BatteryData batData, bool verbose = false)
+	int writeDataStruct(SD_File fileSD, float time, sens_data::GpsData gpsData, sens_data::IMUData imuData, sens_data::BarometerData barData, sens_data::BatteryData batData, int r_state, bool verbose = false)
 	{
 		if (!fileSD)
 		{
@@ -130,22 +127,21 @@ namespace SDcard
 
 		// Bat
 		float bat1 = batData.bat1; // 3.1
-		float bat2 = batData.bat2; // 3.2
 
 		// Mag
-		float mag_x = imuData.mag_x; // 4.1
-		float mag_y = imuData.mag_y; // 4.2
-		float mag_z = imuData.mag_z; // 4.3
-		float acc_x = imuData.acc_x; // 4.4
-		float acc_y = imuData.acc_y; // 4.5
-		float acc_z = imuData.acc_z; // 4.6
+		float acc_x = imuData.acc_x; // 4.1
+		float acc_y = imuData.acc_y; // 4.2
+		float acc_z = imuData.acc_z; // 4.3
+		float gyr_x = imuData.gyr_x; // 4.4
+		float gyr_y = imuData.gyr_y; // 4.5
+		float gyr_z = imuData.gyr_z; // 4.6
 
 		if (verbose)
 		{
-			Serial.println(String(time, 2) + "," + String(lat, 4) + "," + String(lng, 4) + "," + String(alt, 2) + "," + String(sats) + "," + String(pressure, 2) + "," + String(altitude, 2) + "," + String(f_altitude, 2) + "," + String(f_velocity, 2) + "," + String(f_acceleration, 2) + "," + String(temperature, 1) + "," + String(bat1, 2) + "," + String(bat2, 2) + "," + String(mag_x, 2) + "," + String(mag_y, 2) + "," + String(mag_z, 2) + "," + String(acc_x, 2) + "," + String(acc_y, 2) + "," + String(acc_z, 2));
+			Serial.println(String(time, 2) + "," + String(lat, 4) + "," + String(lng, 4) + "," + String(alt, 2) + "," + String(sats) + "," + String(pressure, 2) + "," + String(altitude, 2) + "," + String(f_altitude, 2) + "," + String(f_velocity, 2) + "," + String(f_acceleration, 2) + "," + String(temperature, 1) + "," + String(bat1, 2) + "," + String(acc_x, 2) + "," + String(acc_y, 2) + "," + String(acc_z, 2) + "," + String(gyr_x, 2) + "," + String(gyr_y, 2) + "," + String(gyr_z, 2) + "," + String(r_state));
 		}
 
-		fileSD.println(String(time, 2) + "," + String(lat, 4) + "," + String(lng, 4) + "," + String(alt, 2) + "," + String(sats) + "," + String(pressure, 2) + "," + String(altitude, 2) + "," + String(f_altitude, 2) + "," + String(f_velocity, 2) + "," + String(f_acceleration, 2) + "," + String(temperature, 1) + "," + String(bat1, 2) + "," + String(bat2, 2) + "," + String(mag_x, 2) + "," + String(mag_y, 2) + "," + String(mag_z, 2) + "," + String(acc_x, 2) + "," + String(acc_y, 2) + "," + String(acc_z, 2));
+		fileSD.println(String(time, 2) + "," + String(lat, 4) + "," + String(lng, 4) + "," + String(alt, 2) + "," + String(sats) + "," + String(pressure, 2) + "," + String(altitude, 2) + "," + String(f_altitude, 2) + "," + String(f_velocity, 2) + "," + String(f_acceleration, 2) + "," + String(temperature, 1) + "," + String(bat1, 2) + "," + String(acc_x, 2) + "," + String(acc_y, 2) + "," + String(acc_z, 2) + "," + String(gyr_x, 2) + "," + String(gyr_y, 2) + "," + String(gyr_z, 2) + "," + String(r_state));
 		return 1;
 	}
 

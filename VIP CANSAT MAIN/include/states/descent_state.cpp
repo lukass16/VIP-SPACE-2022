@@ -19,14 +19,14 @@ public:
     {
         Serial.println("DESCENT STATE");
 
+        SD_File fileSD = SDcard::openFile();
+
         File file = flash::openFile(); // opening flash file for writing during descent
         int flash_counter = 0, flash_write_time = 10000;
-        int interval = 100; // amount of loops after which the flash is closed and opened
+        int interval = 100;           // amount of loops after which the flash is closed and opened
         int descent_state_delay = 46; // delay used in descent state [ms]
 
-        SD_File fileSD;
-
-        s_data.setRocketState(4); // set rocket state to descent (4) state
+        s_data.setRocketState(3); // set rocket state to descent (4) state
 
         // variables for writing to memory
         sens_data::GpsData gd;
@@ -34,10 +34,10 @@ public:
         sens_data::IMUData md;
         sens_data::BatteryData btd;
 
-        //start touchdown detection timer
+        // start touchdown detection timer
         arming::startTouchdownTimer();
 
-        while (!arming::timerDetectTouchdown() && !eeprom::hasBeenTouchdown()) // while touchdown has not been detected by timer
+        while (!arming::timerDetectTouchdown()) // while touchdown has not been detected by timer
         {
             buzzer::signalDescent();
 
@@ -61,10 +61,11 @@ public:
             btd = arming::getBatteryState();
             s_data.setBatteryData(btd);
 
-            //give necessary feedback during loop
-            //barometer::printState();
+            // give necessary feedback during loop
+            // barometer::printState();
 
-            if (!flash::flashEnded(file, flash_write_time)) //if not finished writing to flash
+            //*writing to flash
+            if (!flash::flashEnded(file, flash_write_time)) // if not finished writing to flash
             {
                 flash_counter = flash::writeData(file, gd, md, bd, btd, 4); // writing data to flash memory
                 if (flash_counter % interval == 1)
@@ -73,28 +74,14 @@ public:
                 }
             }
 
+            //* writing to SD card
+            SDcard::writeDataStruct(fileSD, flash::getTimeElapsed(), gd, md, bd, btd, 3);
+
             delay(descent_state_delay);
         }
 
-        //mark touchdown in EEPROM
-        eeprom::markTouchdown();
-
-
-        unsigned long process_start_time = millis();
-
-        //* stop communication to not interfere with writing to SD card
-        comms::stop();
-
-        SDcard::setup();
-        fileSD = SDcard::openNextFile();
-        flash::dumpContentsToSD("/data.txt", fileSD);
+        //*close SD file
         SDcard::closeFile(fileSD);
-
-        //* resume communication
-        comms::resume();
-
-        Serial.println("Process took: " + String(millis() - process_start_time) + " ms");
-
 
         while (true) // post touchdown operations
         {
@@ -120,8 +107,8 @@ public:
             btd = arming::getBatteryState();
             s_data.setBatteryData(btd);
 
-            //give necessary feedback during loop
-            //barometer::printState();
+            // give necessary feedback during loop
+            // barometer::printState();
 
             delay(descent_state_delay);
         }

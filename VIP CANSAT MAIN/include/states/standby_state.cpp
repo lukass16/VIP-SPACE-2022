@@ -2,7 +2,7 @@
 
 #include "Arduino.h"
 #include "core/core.cpp"
-#include "drogue_state.cpp"
+#include "main_state.cpp"
 #include "communication.h"
 #include "flash.h"
 #include "buzzer.h"
@@ -16,15 +16,15 @@
 //*Temporary variables
 bool clearEEPROM = true;
 
-class PreperationState : public State
+class StandByState : public State
 {
 public:
     void start() override
     {
 
-        Serial.println("PREP STATE");
+        Serial.println("STANDBY STATE");
 
-        int prep_state_delay = 50; // delay used in preparation state [ms]
+        int standby_state_delay = 50; // delay used in preparation state [ms]
 
         s_data.setRocketState(1); // set rocket state to preparation (1) state
 
@@ -46,6 +46,12 @@ public:
 
         //*Flash setup
         flash::setup();
+        
+        //*SD card setup
+        SDcard::setup();
+        SDcard::getFileName();
+        SD_File fileSD = SDcard::openFile();
+        SDcard::writeHeader(fileSD);
 
         //*Sensor setups
         Wire.begin(21, 22); // initialize correct i2c lines
@@ -53,13 +59,10 @@ public:
         barometer::setup();
         imu::setup();
 
-        comms::setup(433E6);
 
-        //*inform about battery voltage
-        if (eeprom::readPreviousState() == 0)
-        {
-            buzzer::signalBatteryVoltage();
-        }
+        // Signal battery voltage
+        buzzer::signalBatteryVoltage();
+        
 
         //*check if need to clear EEPROM
         if (arming::clearEEPROM())
@@ -74,35 +77,15 @@ public:
             flash::deleteFile("/data.txt"); //*deleting file so as to reset it
         }
 
-        //*determine if has been reset - need to transfer to different state
-        eeprom::readPreviousState();
-        if (eeprom::hasBeenLaunch())
-        {
-            JumpToDrogue();
-            this->_context->Start();
-        }
-        else if (eeprom::hasBeenApogee())
-        {
-            JumpToMain();
-            this->_context->Start();
-        }
-        else if (eeprom::hasBeenMainEjection())
-        {
-            JumpToDescent();
-            this->_context->Start();
-        }
-        else if (eeprom::hasBeenTouchdown())
-        {
-            JumpToDescent();
-            this->_context->Start();
-        }
 
         //*perform barometer ground pressure sampling and save sampled pressure value to EEPROM
         barometer::sampleSeaLevel();
 
-        while (!arming::armed()) // nominal
+
+        // Detect launch using IMU acceleration *a* for *n* times, or if has been launch - skip
+        while (!imu::launchDetected())
         {
-            buzzer::signalPreparation();
+            buzzer::signalStandBy();
 
             //*gps
             gps::readGps();
@@ -119,15 +102,24 @@ public:
             md = imu::getIMUState();
             s_data.setIMUData(md);
 
-            //*battery
+            //*battery data
             arming::readBatteryVoltage();
             btd = arming::getBatteryState();
             s_data.setBatteryData(btd);
 
-            delay(prep_state_delay);
+            //give necessary feedback during loop
+            //imu::printAll();
+
+            //* writing to SD card
+            SDcard::writeDataStruct(fileSD, flash::getTimeElapsed(), gd, md, bd, btd, 1);
+
+            delay(standby_state_delay);
         }
 
-        buzzer::signalArmed();
+        //*close SD file
+        SDcard::closeFile(fileSD);
+
+        eeprom::lockFlash();
 
         this->_context->RequestNextPhase();
         this->_context->Start();
@@ -135,22 +127,7 @@ public:
 
     void HandleNextPhase() override
     {
-        this->_context->TransitionTo(new DrogueState);
-    }
-
-    // Jumping functions for EEPROM transfer mechanism
-    void JumpToDrogue()
-    {
-        this->_context->TransitionTo(new DrogueState);
-    }
-
-    void JumpToMain()
-    {
         this->_context->TransitionTo(new MainState);
     }
 
-    void JumpToDescent()
-    {
-        this->_context->TransitionTo(new DescentState);
-    }
 };
