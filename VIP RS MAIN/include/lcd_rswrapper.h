@@ -4,11 +4,11 @@
 #include <string>
 #include <sstream>
 
-//https://github.com/johnrickman/LiquidCrystal_I2C
-//https://docs.google.com/document/d/1Fbtc8zCtQmf6O5GGj64akNSewvqAAdK0V5oWDq2YLxc/edit
+// https://github.com/johnrickman/LiquidCrystal_I2C
+// https://docs.google.com/document/d/1Fbtc8zCtQmf6O5GGj64akNSewvqAAdK0V5oWDq2YLxc/edit
 
-
-namespace lcd {
+namespace lcd
+{
 
     LiquidCrystal_I2C lcd(0x27, 20, 4);
 
@@ -16,9 +16,8 @@ namespace lcd {
     {
         lcd.init();
         lcd.backlight();
-        lcd.setCursor(1, 0); //Pirmais skaitlis ir kolonna, otrais skatilis ir rinda
-        lcd.print("Press <> to begin"); 
-      
+        lcd.setCursor(1, 0); // Pirmais skaitlis ir kolonna, otrais skatilis ir rinda
+        lcd.print("Press <> to begin");
     }
 
     void writeLat(double lat)
@@ -26,10 +25,13 @@ namespace lcd {
         lcd.setCursor(0, 0);
         lcd.print("Lat:");
         lcd.setCursor(4, 0);
-        if(lat!=0){
-        lcd.print(lat, 4);
-        } else {
-        lcd.print("NL");           
+        if (lat != 0)
+        {
+            lcd.print(lat, 4);
+        }
+        else
+        {
+            lcd.print("NL");
         }
     }
 
@@ -38,10 +40,13 @@ namespace lcd {
         lcd.setCursor(0, 1);
         lcd.print("Lon:");
         lcd.setCursor(4, 1);
-        if(lon!=0){
-        lcd.print(lon, 4);
-        } else {
-        lcd.print("NL");           
+        if (lon != 0)
+        {
+            lcd.print(lon, 4);
+        }
+        else
+        {
+            lcd.print("NL");
         }
     }
 
@@ -51,7 +56,7 @@ namespace lcd {
         lcd.print("Dist:");
         lcd.setCursor(5, 2);
         lcd.print(dist, 0);
-        lcd.setCursor(8, 2);  //pieņemu, ka distace < 1000m
+        lcd.setCursor(8, 2); // pieņemu, ka distace < 1000m
         lcd.print("m");
     }
 
@@ -68,22 +73,15 @@ namespace lcd {
         lcd.setCursor(11, 2);
         lcd.print("Alt:");
         lcd.setCursor(15, 2);
-        lcd.print(bar_alt, 0); //Using barometric altitude rather than GPS
-        lcd.setCursor(19, 2);  
+        lcd.print(bar_alt, 0); // Using barometric altitude rather than GPS
+        lcd.setCursor(19, 2);
         lcd.print("m");
     }
 
-    void writeGpsStatus(bool status)
+    void writeState(int r_state)
     {
         lcd.setCursor(19, 0);
-        if(status)
-        {
-            lcd.print("*");
-        }
-        else
-        {
-            lcd.print("O");
-        }
+        lcd.print(r_state);
     }
 
     void writeSpeed(float spd)
@@ -102,46 +100,54 @@ namespace lcd {
         lcd.print(counter);
     }
 
-//GPS Prep wrapperis
-    void RSinfo(int sats, bool canWriteToFlash)
+    void showRSinfo(int sats, int gpsValid, bool canWriteToFlash)
     {
         lcd.clear();
-        if(sats <= 3)
+        if (sats <= 3)
         {
             lcd.setCursor(0, 0);
             lcd.print("Finding GPS sats");
-        } else {
+        }
+        else
+        {
             lcd.setCursor(0, 0);
             lcd.print("3D Lock Established");
         }
+        // print visible sats
         lcd.setCursor(0, 1);
         lcd.print("Sats visible: ");
         lcd.print(sats);
-        if(canWriteToFlash)
+
+        //print if local GPS is getting valid readings
+        lcd.setCursor(0, 2);
+        lcd.print("GPS is valid: ");
+        lcd.print(gpsValid);
+
+        if (canWriteToFlash)
         {
             lcd.setCursor(19, 3);
             lcd.print("W");
         }
-
     }
-    
-    void LoRaSetup(int lastCounter, int lostPackets, double successRate, float receivedRSSI, float receivedSNR, int corruptedPackets)
-    {   int droppedPackets = 0;
+
+    void showLoRaInfo(int lastCounter, int lostPackets, double successRate, float receivedRSSI, float receivedSNR, int corruptedPackets)
+    {
+        int droppedPackets = 0;
         lcd.clear();
-        lcd.setCursor(0,0);
+        lcd.setCursor(0, 0);
         lcd.print("Received:");
-        lcd.print(lastCounter-lostPackets);
+        lcd.print(lastCounter - lostPackets);
         lcd.print("/");
         lcd.print(lastCounter);
 
-        lcd.setCursor(0,1);
-        lcd.print("CRPT:"); 
+        lcd.setCursor(0, 1);
+        lcd.print("CRPT:");
         lcd.print(corruptedPackets);
         lcd.print("    DROP:");
-        droppedPackets = lostPackets-corruptedPackets;
+        droppedPackets = lostPackets - corruptedPackets;
         lcd.print(droppedPackets);
 
-        lcd.setCursor(0,2);
+        lcd.setCursor(0, 2);
         lcd.print("SNR:");
         lcd.print(receivedSNR, 0);
         lcd.print("dB   OK:");
@@ -152,10 +158,9 @@ namespace lcd {
         lcd.print("RSSI:");
         lcd.print(receivedRSSI, 0);
         lcd.print("dBm");
-
     }
 
-    void writeAll(double lat, double lon, double dist, double course, double alt, float spd, bool status, int counter)
+    void showIncomingData(double lat, double lon, double dist, double course, double alt, float spd, int r_state, int counter)
     {
         lcd.clear();
         writeLat(lat);
@@ -164,9 +169,8 @@ namespace lcd {
         writeHeading(course);
         writeAltitude(alt);
         writeSpeed(spd);
-        writeGpsStatus(status);
+        writeState(r_state);
         writeCounter(counter);
-        }
+    }
 
 }
-

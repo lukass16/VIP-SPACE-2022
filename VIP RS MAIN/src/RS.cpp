@@ -284,7 +284,7 @@ void loop()
 	{
 		if (counter >= 1 || lastCounter == 0) // ja pakete nav koruptēta vai ja vēl nav neviena pakete pienākusi
 		{
-			lcd::writeAll(lat, lng, distance, course, bar_alt, f_vel, gpsValid, counter);
+			lcd::showIncomingData(lat, lng, distance, course, bar_alt, f_vel, r_state, counter);
 			prevDisplayedCounter = counter;
 			prevDistance = distance;
 			currentScreen = 2;
@@ -294,7 +294,7 @@ void loop()
 	// Ja pg counter == 1 un ekrāns pārslēgts vai mainās satelītu skaits, tad atsvaidzina
 	else if (pageCounter == 1 && (currentScreen != 1 || prevSats != sats || canWriteToFlash != prevCanWriteToFlash))
 	{
-		lcd::RSinfo(sats, canWriteToFlash);
+		lcd::showRSinfo(sats, gpsValid, canWriteToFlash);
 		prevSats = sats;
 		prevCanWriteToFlash = canWriteToFlash;
 		currentScreen = 1;
@@ -303,7 +303,7 @@ void loop()
 	// Ja pg counter == 0 un ekrāns pārslēgts vai mainās pakešu skaits, tad atsvaidzina
 	else if (pageCounter == 0 && (currentScreen != 0 || prevDisplayedCounter != counter))
 	{
-		lcd::LoRaSetup(lastCounter, lostPackets, successRate, receivedRSSI, receivedSNR, corruptedPackets);
+		lcd::showLoRaInfo(lastCounter, lostPackets, successRate, receivedRSSI, receivedSNR, corruptedPackets);
 		prevDisplayedCounter = counter;
 		currentScreen = 0;
 	}
