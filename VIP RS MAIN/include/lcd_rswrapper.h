@@ -56,8 +56,6 @@ namespace lcd
         lcd.print("Dist:");
         lcd.setCursor(5, 2);
         lcd.print(dist, 0);
-        lcd.setCursor(8, 2); // pieņemu, ka distace < 1000m
-        lcd.print("m");
     }
 
     void writeHeading(double course)
@@ -70,26 +68,26 @@ namespace lcd
 
     void writeAltitude(double bar_alt)
     {
-        lcd.setCursor(11, 2);
+        lcd.setCursor(12, 2);
         lcd.print("Alt:");
-        lcd.setCursor(15, 2);
+        lcd.setCursor(16, 2);
         lcd.print(bar_alt, 0); // Using barometric altitude rather than GPS
-        lcd.setCursor(19, 2);
-        lcd.print("m");
     }
 
     void writeState(int r_state)
     {
-        lcd.setCursor(19, 0);
+        lcd.setCursor(12, 1);
+        lcd.print("S:");
+        lcd.setCursor(14, 1);
         lcd.print(r_state);
     }
 
     void writeSpeed(float spd)
     {
-        lcd.setCursor(11, 3);
+        lcd.setCursor(12, 3);
         lcd.print("SPD:");
-        lcd.setCursor(15, 3);
-        lcd.print(spd, 1);
+        lcd.setCursor(16, 3);
+        lcd.print(spd, 0);
     }
 
     void writeCounter(int counter)
