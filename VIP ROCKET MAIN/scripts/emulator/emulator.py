@@ -403,11 +403,11 @@ plt.figure(figsize=(10,6))
 plt.title("Kalman Gain Position: Case 'D'")
 plt.plot(t_l, k_l, color="c", label = "Kalman Gain - Position")
 plt.legend()
-
 """
 
-###____CASE 'E'____###
 
+###____CASE 'E'____###
+"""
 ### Read in data
 data = pd.read_csv("openrocketsim.csv", sep=',')
 
@@ -480,9 +480,219 @@ plt.plot(t_l[start:end], f_alt_l[start:end], color="r", label = "Filtered Altitu
 plt.legend()
 #plt.savefig("Ealt2_Set_2.png", dpi=1000)
 
-"""
+
 plt.figure(figsize=(10,6))
 plt.title("Kalman Gain Position: Case 'D'")
+plt.plot(t_l[start:end], k_l[start:end], color="c", label = "Kalman Gain - Position")
+plt.legend()
+plt.show()
+"""
+
+
+###____CASE 'F'____###
+"""
+### Read in data
+data = pd.read_csv("real3.csv", sep=',')
+
+t = data["Time"].to_list()
+p = data["Altitude"].to_list()
+
+e_t = 0.0 # Emulator time
+last_t = 0.0
+
+alt_l = list()
+f_alt_l = list()
+t_l = list()
+k_l = list()
+
+### Define reading
+def getReading(i):
+    return p[i]
+    
+### Start simulation
+print("Simulating Case 'E'")
+predict()
+
+for i in range(len(t)):
+
+    # First step: iterate
+    e_t = t[i]
+    
+    # Second step: get reading
+    reading = getReading(i)
+    
+    # Third step: calculate change in time
+    setDelT(e_t - last_t)
+    last_t = e_t
+    
+    # Fourth step: predict 
+    predict()
+    
+    # Fifth step: update estimation with reading
+    updateBaro(reading)
+    
+    # Sixth step: get estimation, save values to lists
+    t_l.append(e_t)
+    alt_l.append(reading)
+    f_alt_l.append(X[0,0])
+    k_l.append(K_Baro[0, 0])
+    
+    
+### Plotting
+
+plt.figure(figsize=(10,6))
+plt.title("Raw Altitude vs Filtered Altitude: Case 'F'")
+plt.plot(t_l, alt_l, color="b", label = "Raw Altitude [m]")
+plt.plot(t_l, f_alt_l, color="r", label = "Filtered Altitude [m]")
+plt.legend()
+
+
+plt.figure(figsize=(10,6))
+plt.title("Kalman Gain Position: Case 'D'")
+plt.plot(t_l[start:end], k_l[start:end], color="c", label = "Kalman Gain - Position")
+plt.legend()
+plt.show()
+"""
+
+
+###____CASE 'G'____###
+"""
+### Read in data
+data = pd.read_csv("real2.csv", sep=',')
+
+t_r = data["timestamp_s"].to_list()
+t = list()
+
+start_t = t_r[0]
+for i, el in enumerate(t_r):
+    t.append((el - start_t) / 1000.0)
+p = data["baro_height"].to_list()
+
+e_t = 0.0 # Emulator time
+last_t = 0.0
+
+alt_l = list()
+f_alt_l = list()
+t_l = list()
+k_l = list()
+
+### Define reading
+def getReading(i):
+    return p[i]
+    
+### Start simulation
+print("Simulating Case 'E'")
+predict()
+
+for i in range(len(t)):
+
+    # First step: iterate
+    e_t = t[i]
+    
+    # Second step: get reading
+    reading = getReading(i)
+    
+    # Third step: calculate change in time
+    setDelT(e_t - last_t)
+    last_t = e_t
+    
+    # Fourth step: predict 
+    predict()
+    
+    # Fifth step: update estimation with reading
+    updateBaro(reading)
+    
+    # Sixth step: get estimation, save values to lists
+    t_l.append(e_t)
+    alt_l.append(reading)
+    f_alt_l.append(X[0,0])
+    k_l.append(K_Baro[0, 0])
+    
+    
+### Plotting
+
+plt.figure(figsize=(10,6))
+plt.title("Raw Altitude vs Filtered Altitude: Case 'G'")
+plt.plot(t_l, alt_l, color="b", label = "Raw Altitude [m]")
+plt.plot(t_l, f_alt_l, color="r", label = "Filtered Altitude [m]")
+plt.legend()
+
+
+
+plt.figure(figsize=(10,6))
+plt.title("Kalman Gain Position: Case 'G'")
+plt.plot(t_l[start:end], k_l[start:end], color="c", label = "Kalman Gain - Position")
+plt.legend()
+plt.show()
+"""
+
+
+###____CASE 'H'____###
+"""
+### Read in data
+data = pd.read_csv("real1.csv", sep=',')
+
+t_r = data["timestamp_s"].to_list()
+t = list()
+
+start_t = t_r[0]
+for i, el in enumerate(t_r):
+    t.append((el - start_t) / 1000.0)
+p = data["baro_height"].to_list()
+
+e_t = 0.0 # Emulator time
+last_t = 0.0
+
+alt_l = list()
+f_alt_l = list()
+t_l = list()
+k_l = list()
+
+### Define reading
+def getReading(i):
+    return p[i]
+    
+### Start simulation
+print("Simulating Case 'E'")
+predict()
+
+for i in range(len(t)):
+
+    # First step: iterate
+    e_t = t[i]
+    
+    # Second step: get reading
+    reading = getReading(i)
+    
+    # Third step: calculate change in time
+    setDelT(e_t - last_t)
+    last_t = e_t
+    
+    # Fourth step: predict 
+    predict()
+    
+    # Fifth step: update estimation with reading
+    updateBaro(reading)
+    
+    # Sixth step: get estimation, save values to lists
+    t_l.append(e_t)
+    alt_l.append(reading)
+    f_alt_l.append(X[0,0])
+    k_l.append(K_Baro[0, 0])
+    
+    
+### Plotting
+
+plt.figure(figsize=(10,6))
+plt.title("Raw Altitude vs Filtered Altitude: Case 'H'")
+plt.plot(t_l, alt_l, color="b", label = "Raw Altitude [m]")
+plt.plot(t_l, f_alt_l, color="r", label = "Filtered Altitude [m]")
+plt.legend()
+
+
+
+plt.figure(figsize=(10,6))
+plt.title("Kalman Gain Position: Case 'H'")
 plt.plot(t_l[start:end], k_l[start:end], color="c", label = "Kalman Gain - Position")
 plt.legend()
 plt.show()
