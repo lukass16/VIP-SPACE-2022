@@ -1,7 +1,7 @@
 #include "imu_wrapper_BNO055.h"
 
 /* Set the delay between fresh samples */
-uint16_t BNO055_SAMPLERATE_DELAY_MS = 8;
+uint16_t BNO055_SAMPLERATE_DELAY_MS = 20;
 
 void setup(void)
 {

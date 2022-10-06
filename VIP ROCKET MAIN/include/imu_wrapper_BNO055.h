@@ -39,9 +39,9 @@ namespace imu
         bno.getEvent(&angVelocityData, Adafruit_BNO055::VECTOR_GYROSCOPE);
         accEvent = &accelerometerData;
         gyrEvent = &angVelocityData;
-        acc_x = accEvent->acceleration.x;
-        acc_y = accEvent->acceleration.y;
-        acc_z = accEvent->acceleration.z;
+        acc_x = accEvent->acceleration.x / 9.82; //converting to [g]
+        acc_y = accEvent->acceleration.y / 9.82;
+        acc_z = accEvent->acceleration.z / 9.82;
         gyr_x = gyrEvent->gyro.x;
         gyr_y = gyrEvent->gyro.y;
         gyr_z = gyrEvent->gyro.z;
@@ -96,10 +96,10 @@ namespace imu
         Serial.println(err);
     }
 
-    bool launchDetected(float threshold = -2, int times = 10) // threshold - threshold acceleration to be detected (in g), times - times for the threshold to be detected
+    bool launchDetected(float threshold = 2, int times = 10) // threshold - threshold acceleration to be detected (in g), times - times for the threshold to be detected
     {
         static int counter = 0;
-        if (acc_y < threshold)
+        if (acc_x > threshold)
         {
             counter++;
         }
