@@ -34,6 +34,10 @@
 
 #include "Adafruit_BNO055.h"
 
+#define ACC_CONFIG 0x08     // BNO page 1 register: Accelerometer Config
+#define GYR_CONFIG_0 0X0A
+#define PAGE_ID 0x07  // BNO register: page select
+
 /*!
  *  @brief  Instantiates a new Adafruit_BNO055 class
  *  @param  sensorID
@@ -52,6 +56,16 @@ Adafruit_BNO055::Adafruit_BNO055(int32_t sensorID, uint8_t address,
 
   _sensorID = sensorID;
   i2c_dev = new Adafruit_I2CDevice(address, theWire);
+}
+
+
+//*custom functions
+void bno_write(uint8_t i2c_addr, uint8_t reg, uint8_t data) // write one BNO register
+{
+  Wire.beginTransmission(i2c_addr);
+  Wire.write(reg);
+  Wire.write(data);
+  Wire.endTransmission(true); // send stop
 }
 
 /*!
@@ -104,6 +118,10 @@ bool Adafruit_BNO055::begin(adafruit_bno055_opmode_t mode) {
   /* Set to normal power mode */
   write8(BNO055_PWR_MODE_ADDR, POWER_MODE_NORMAL);
   delay(10);
+
+  bno_write(0x29, PAGE_ID, 1);          // register page 1
+  bno_write(0x29, ACC_CONFIG, 0x13);    // change accel range
+  bno_write(0x29, GYR_CONFIG_0, 0x10);    // change gyro range
 
   write8(BNO055_PAGE_ID_ADDR, 0);
 
