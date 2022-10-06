@@ -10,9 +10,9 @@
 
 namespace arming
 {
-    int n_volt_readings = 50, sum1 = 0;
+    int n_volt_readings = 10, sum1 = 0;
     int pyroReading = 0;
-    float bat1 = 0, coef1 = 841.5;
+    float bat1 = 0, coef1 = 762.5;
 
     //*GPIO
     void setup()
@@ -28,7 +28,7 @@ namespace arming
 
     bool clearEEPROM()
     {
-        if (digitalRead(EEPROMCLEAR) == 0)
+        if (digitalRead(EEPROMCLEAR) == 1)
         {
             Serial.println("Clearing EEPROM");
             return 1;
