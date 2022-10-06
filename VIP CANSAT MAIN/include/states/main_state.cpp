@@ -8,7 +8,7 @@
 #include "buzzer.h"
 #include "gps_wrapper.h"
 #include "barometer_wrapper_MS5607.h"
-#include "imu_wrapper_MPU9250.h"
+#include "imu_wrapper_BNO055.h"
 #include "eeprom_wrapper.h"
 #include "arming.h"
 

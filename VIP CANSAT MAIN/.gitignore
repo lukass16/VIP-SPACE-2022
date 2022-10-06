@@ -5,6 +5,7 @@
 !.pio/libdeps/heltec_wifi_lora_32_V2/Lora Serialization
 !.pio/libdeps/heltec_wifi_lora_32_V2/MS5x
 !.pio/libdeps/heltec_wifi_lora_32_V2/MPU9250
+!.pio/libdeps/heltec_wifi_lora_32_V2/Adafruit BNO055
 
 .vscode/.browse.c_cpp.db*
 .vscode/c_cpp_properties.json
