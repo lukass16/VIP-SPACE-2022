@@ -182,7 +182,7 @@ namespace arming
         portEXIT_CRITICAL_ISR(&touchdownTimerMux);
     }
 
-    void startTouchdownTimer(int timerLength = 15000000) // timer length is given in microseconds
+    void startTouchdownTimer(int timerLength = 150e6) // timer length is given in microseconds
     {
         // initializing timer - setting the number of the timer, the value of the prescaler and stating that the counter should count up (true)
         touchdownTimer = timerBegin(2, 80, true);

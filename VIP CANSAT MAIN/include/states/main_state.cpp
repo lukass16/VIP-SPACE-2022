@@ -23,9 +23,9 @@ public:
 
         File file = flash::openFile(); // opening flash file for writing during flight
         int flash_counter = 0;
-        int interval = 100;        // amount of loops after which the flash is closed and opened
-        int main_state_delay = 16; // delay used in main state [ms]
-
+        int interval = 200;        // amount of loops after which the flash is closed and opened
+        int main_state_delay = 4; // delay used in main state [ms]
+        //? A main state delay time of 4 ms means an approximate frequency of 125 Hz, amount of data written in this state (20 s) is about 2500 loop buffers
         s_data.setRocketState(2); // set rocket state to main (3) state
 
         // variables for writing to memory

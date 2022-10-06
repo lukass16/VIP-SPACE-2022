@@ -24,8 +24,9 @@ public:
 
         Serial.println("STANDBY STATE");
 
-        int standby_state_delay = 50; // delay used in preparation state [ms]
-
+        int standby_state_delay = 16; // delay used in preparation state [ms]
+        //? A standby state delay time of 16 ms means an approximate frequency of 50 Hz
+        
         s_data.setRocketState(1); // set rocket state to preparation (1) state
 
         // variables for writing to memory

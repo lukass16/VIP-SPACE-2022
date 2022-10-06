@@ -96,7 +96,7 @@ namespace imu
         Serial.println(err);
     }
 
-    bool launchDetected(float threshold = 2, int times = 10) // threshold - threshold acceleration to be detected (in g), times - times for the threshold to be detected
+    bool launchDetected(float threshold = 3.5, int times = 10) // threshold - threshold acceleration to be detected (in g), times - times for the threshold to be detected
     {
         static int counter = 0;
         if (acc_x > threshold)
