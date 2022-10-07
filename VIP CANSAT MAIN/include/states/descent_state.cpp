@@ -22,9 +22,9 @@ public:
         SD_File fileSD = SDcard::openFile();
 
         File file = flash::openFile(); // opening flash file for writing during descent
-        int flash_counter = 0, flash_write_time = 100000;
+        int flash_counter = 0, flash_write_time = 140000;
         int interval = 200;           // amount of loops after which the flash is closed and opened
-        int descent_state_delay = 0; // delay used in descent state [ms]
+        int descent_state_delay = 15; // delay used in descent state [ms]
         //? A descent state delay time of 16 ms means an approximate frequency of 50 Hz, amount of data written in this state (50 s) is about 5000 loop buffers
         s_data.setRocketState(3); // set rocket state to descent (4) state
 

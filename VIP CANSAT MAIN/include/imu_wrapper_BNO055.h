@@ -103,6 +103,10 @@ namespace imu
         {
             counter++;
         }
+        else
+        {
+            counter = 0; // reset counter if below threshold
+        }
         if (counter > times)
         {
             Serial.println("Launch detected!");
