@@ -147,13 +147,8 @@ namespace buzzer
 
     void signalStandBy()
     {
-        int interval = 5000;
+        int interval = 20000;
         int duration = BOP; // interval time in milliseconds
-
-        if (!arming::isPyroContinuity()) // if there is no pyro continuity signal with BEEP
-        {
-            duration = BEEP;
-        }
 
         currentTime = millis();
 
@@ -172,7 +167,7 @@ namespace buzzer
 
     void signalMain()
     {
-        int interval = 5000;
+        int interval = 500;
         int pause = BOP;
         int duration = BOP; // interval time in milliseconds
         int times_to_buzz = 2;
@@ -292,7 +287,7 @@ namespace buzzer
             digitalWrite(piezo_pin, LOW);
             delay(BOP);
         }
-        delay(500);
+        delay(2000); // delay to signify end of system health reporting
     }
 
 }
