@@ -46,7 +46,7 @@ namespace lora
     //*NEW
     int getPacketSize();
 
-    void setup(double frequency = 433E6, boolean canPrintHeaderMessage = false)
+    void setup(double frequency = 434.1E6, boolean canPrintHeaderMessage = false)
     {
 
         _canPrintHeaderMessage = canPrintHeaderMessage;

@@ -13,7 +13,7 @@ namespace comms
     String serializeData();
     void loop(void *args);
 
-    void setup(long frequency = 433E6) //434.1
+    void setup(long frequency = 434.1E6) //434.1
     {
         lora::setup(frequency);
         s_thread::setup(loop);
