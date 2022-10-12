@@ -47,6 +47,9 @@ public:
         //*Flash setup
         flash::setup();
 
+        //*Add necessary delay
+        delay(100);
+
         //*Sensor setups
         Wire.begin(21, 22); // initialize correct i2c lines
         gps::setup();
