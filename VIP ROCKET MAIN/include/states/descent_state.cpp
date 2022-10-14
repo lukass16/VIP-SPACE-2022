@@ -26,7 +26,7 @@ public:
 
         SD_File fileSD;
 
-        s_data.setRocketState(4); // set rocket state to descent (4) state
+        s_data.setRocketState(5); // set rocket state to descent (5) state
 
         // variables for writing to memory
         sens_data::GpsData gd;
@@ -66,7 +66,7 @@ public:
 
             if (!flash::flashEnded(file, flash_write_time)) //if not finished writing to flash
             {
-                flash_counter = flash::writeData(file, gd, md, bd, btd, 4); // writing data to flash memory
+                flash_counter = flash::writeData(file, gd, md, bd, btd, 5); // writing data to flash memory
                 if (flash_counter % interval == 1)
                 {
                     file = flash::closeOpen(file); // close and open the file every 100th reading
@@ -78,6 +78,8 @@ public:
 
         //mark touchdown in EEPROM
         eeprom::markTouchdown();
+
+        s_data.setRocketState(6); // set rocket state to touchdown detected (6) state
 
 
         unsigned long process_start_time = millis();

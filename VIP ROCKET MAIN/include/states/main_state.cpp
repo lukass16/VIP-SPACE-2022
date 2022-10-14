@@ -24,7 +24,7 @@ public:
         int interval = 100; // amount of loops after which the flash is closed and opened
         int main_state_delay = 16; // delay used in main state [ms]
 
-        s_data.setRocketState(3); // set rocket state to main (3) state
+        s_data.setRocketState(4); // set rocket state to main wait (4) state
 
         // variables for writing to memory
         sens_data::GpsData gd;
@@ -59,7 +59,7 @@ public:
             //give necessary feedback during loop
             //barometer::printState();
 
-            flash_counter = flash::writeData(file, gd, md, bd, btd, 3); // writing data to flash memory
+            flash_counter = flash::writeData(file, gd, md, bd, btd, 4); // writing data to flash memory
             if (flash_counter % interval == 1)
             {
                 file = flash::closeOpen(file); // close and open the file every 100th reading
@@ -68,8 +68,10 @@ public:
             delay(main_state_delay);
         }
 
+        buzzer::signalWarningMainEjection();
+
         //fire main parachute pyro charge
-        //arming::fireMainCharge(); //! commented out for safety
+        arming::fireMainCharge(); //! commented out for safety
 
         //mark main ejection in EEPROM
         eeprom::markMainEjection();

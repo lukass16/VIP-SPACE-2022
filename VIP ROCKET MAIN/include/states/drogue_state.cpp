@@ -23,7 +23,7 @@ public:
         int interval = 100; // amount of loops after which the flash is closed and opened
         int drogue_state_delay = 4; // delay used in drogue state [ms]
 
-        s_data.setRocketState(2); // set rocket state to drogue (2) state
+        s_data.setRocketState(2); // set rocket state to launch wait (2) state
 
         // variables for writing to memory
         sens_data::GpsData gd;
@@ -66,6 +66,8 @@ public:
         eeprom::markLaunch();
         eeprom::lockFlash();
 
+        s_data.setRocketState(3); // set rocket state to launch detected (3) state
+
         //start apogee detection timer
         arming::startApogeeTimer();
 
@@ -96,7 +98,7 @@ public:
             //give necessary feedback during loop
             //barometer::printState();
 
-            flash_counter = flash::writeData(file, gd, md, bd, btd, 2); // writing data to flash memory
+            flash_counter = flash::writeData(file, gd, md, bd, btd, 3); // writing data to flash memory
             if (flash_counter % interval == 1)
             {
                 file = flash::closeOpen(file); // close and open the file every 100th reading

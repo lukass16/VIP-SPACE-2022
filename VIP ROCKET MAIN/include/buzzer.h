@@ -320,4 +320,12 @@ namespace buzzer
         delay(500);
     }
 
+    void signalWarningMainEjection()
+    {
+        digitalWrite(piezo_pin, HIGH);
+        delay(3000);
+        digitalWrite(piezo_pin, LOW);
+        delay(1000);
+    }
+
 }
