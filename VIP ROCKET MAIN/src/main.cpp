@@ -35,9 +35,11 @@ Memory writing, operational parameters:
 16) Main loop delay - include/states/main_state.cpp/delay()
 17) Pre-touchdown loop delay - include/states/descent_state.cpp/delay()#1
 18) Post-touchdown loop delay - include/states/descent_state.cpp/delay()#2
+19) LoRa loop delay - include/communication.h -> lora_delay
+
 
 Kalman filter parameters:
-17) Q, process noise uncertainty - include/kalman.h -> Q
-18) P, estimate uncertainty - include/kalman.h -> P
-19) R, measurement uncertainty - include/kalman.h -> R
+20) Q, process noise uncertainty - include/kalman.h -> Q
+21) P, estimate uncertainty - include/kalman.h -> P
+22) R, measurement uncertainty - include/kalman.h -> R
 */

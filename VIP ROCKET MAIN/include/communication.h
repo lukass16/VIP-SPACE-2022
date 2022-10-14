@@ -9,6 +9,7 @@
 namespace comms
 {
     bool stopped = 0; //note - no protection used in case accessed from both threads simultaneously
+    int lora_delay = 400;
 
     String serializeData();
     void loop(void *args);
@@ -48,7 +49,7 @@ namespace comms
             lora::encodeMessage(); 
             lora::sendEncodedMessage(1);
 
-            delay(400);
+            delay(lora_delay);
 
             while (stopped) // stops the loop if necessary
             {
