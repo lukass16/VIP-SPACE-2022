@@ -81,7 +81,7 @@ namespace lora
 
     void sendMessage(String outgoing, int lora_message_id);
 
-    void setup(double frequency = 433E6, boolean canPrintHeaderMessage = false)
+    void setup(double frequency = 434.1E6, boolean canPrintHeaderMessage = false)
     {
         _canPrintHeaderMessage = canPrintHeaderMessage;
 
@@ -105,7 +105,7 @@ namespace lora
         LoRa.setCodingRate4(6);
         LoRa.setSignalBandwidth(62.5E3);
 
-        Serial.println("Lora initialized!");
+        Serial.println("Lora initialized with frequency: " + String(frequency / 1e6, 1) + " MHz");
     }
 
     void sendMessage(String outgoing, int lora_message_id)

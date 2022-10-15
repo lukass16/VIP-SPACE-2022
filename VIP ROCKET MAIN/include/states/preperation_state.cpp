@@ -56,7 +56,7 @@ public:
         barometer::setup();
         imu::setup();
 
-        comms::setup(433E6);
+        comms::setup();
 
         //*inform about battery voltage
         if (eeprom::readPreviousState() == 0)

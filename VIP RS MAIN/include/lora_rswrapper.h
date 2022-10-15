@@ -69,8 +69,8 @@ namespace lora
         LoRa.setSpreadingFactor(10);
         LoRa.setCodingRate4(6);
         LoRa.setSignalBandwidth(62.5E3);
-        Serial.println("Lora connected");
-        Serial.println(LoRa.available());
+        
+        Serial.println("Lora initialized with frequency: " + String(frequency / 1e6, 1) + " MHz");
     }
 
     /*
