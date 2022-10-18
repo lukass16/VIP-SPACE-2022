@@ -98,10 +98,10 @@ namespace lcd
         lcd.print(counter);
     }
 
-    void showRSinfo(int sats, int gpsValid, bool canWriteToFlash)
+    void showGPSinfo(int sats_rs, int sats_fc, int gpsValid, bool canWriteToFlash)
     {
         lcd.clear();
-        if (sats <= 3)
+        if (sats_rs <= 3)
         {
             lcd.setCursor(0, 0);
             lcd.print("Finding GPS sats");
@@ -111,13 +111,18 @@ namespace lcd
             lcd.setCursor(0, 0);
             lcd.print("3D Lock Established");
         }
-        // print visible sats
+        // print RS visible sats
         lcd.setCursor(0, 1);
-        lcd.print("Sats visible: ");
-        lcd.print(sats);
+        lcd.print("Sats visible RS: ");
+        lcd.print(sats_rs);
+
+        // print FC visible sats
+        lcd.setCursor(0, 2);
+        lcd.print("Sats visible FC: ");
+        lcd.print(sats_fc);
 
         //print if local GPS is getting valid readings
-        lcd.setCursor(0, 2);
+        lcd.setCursor(0, 3);
         lcd.print("GPS is valid: ");
         lcd.print(gpsValid);
 

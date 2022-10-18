@@ -19,6 +19,7 @@ char buffer[80] = "";
 double lat = 0;
 double lng = 0;
 double alt = 0;
+int sats_fc = 0;
 
 float acc_x = 0;
 float acc_y = 0;
@@ -63,7 +64,8 @@ File file;
 
 // Screen update logic
 int currentScreen = 1;
-int prevSats = -1;
+int prevSatsRS = -1;
+int prevSatsFC = -1;
 int pageCounter = 1;
 int prevDisplayedCounter = 0;
 int lastCounter = 0; // EXP
@@ -73,7 +75,7 @@ bool ScreenSwitched = 0;
 double prevDistance = 0;
 double distance = 0;
 double course = 0;
-double sats = 0;
+double sats_rs = 0;
 bool gpsValid = 0;
 
 void allotData(sens_data::SensorData s_data)
@@ -82,7 +84,7 @@ void allotData(sens_data::SensorData s_data)
 	lat = s_data.gpsData.lat;
 	lng = s_data.gpsData.lng;
 	alt = s_data.gpsData.alt;
-	sats = s_data.gpsData.sats;
+	sats_fc = s_data.gpsData.sats;
 
 	// IMU data
 	acc_x = s_data.imuData.acc_x;
@@ -105,12 +107,12 @@ void allotData(sens_data::SensorData s_data)
 
 void printData()
 {
-	Serial.printf("%7.4f,%7.4f,%5.0f,%2d,%4.2f,%4.2f,%4.2f,%5.0f,%6.1f,%6.1f,%3.0f,%2.1f,%1d,%4d\n", lat, lng, alt, sats, acc_x, acc_y, acc_z, pres, bar_alt, f_alt, f_vel, bat1, r_state, counter);
+	Serial.printf("%7.4f,%7.4f,%5.0f,%2d,%4.2f,%4.2f,%4.2f,%5.0f,%6.1f,%6.1f,%3.0f,%2.1f,%1d,%4d\n", lat, lng, alt, sats_fc, acc_x, acc_y, acc_z, pres, bar_alt, f_alt, f_vel, bat1, r_state, counter);
 }
 
 void deserializeData(char buffer[])
 {
-	sscanf(buffer, "%lf,%lf,%lf,%d,%f,%f,%f,%f,%f,%f,%f,%f,%d,%d", &lat, &lng, &alt, &sats, &acc_x, &acc_y, &acc_z, &pres, &bar_alt, &f_alt, &f_vel, &bat1, &r_state, &counter); // for deserialization double ahs to vbe specified as %lf
+	sscanf(buffer, "%lf,%lf,%lf,%d,%f,%f,%f,%f,%f,%f,%f,%f,%d,%d", &lat, &lng, &alt, &sats_fc, &acc_x, &acc_y, &acc_z, &pres, &bar_alt, &f_alt, &f_vel, &bat1, &r_state, &counter); // for deserialization double ahs to vbe specified as %lf
 }
 
 bool calculatePacketInfo() // atgriež true, ja pienākusi jauna pakete, false, ja nē
@@ -193,7 +195,7 @@ void loop()
 		distance = gps::getDistance(lat, lng);
 		course = gps::getCourseTo(lat, lng);
 	}
-	sats = gps::getSatellites();
+	sats_rs = gps::getSatellites();
 	gpsValid = gps::gpsValid();
 
 	//
@@ -204,7 +206,7 @@ void loop()
 	if (newPacket) //ja pienākusi jauna - rakstam iekšā flash;
 	{
 		gps::disableSerial();
-		flash::writeData(file, canWriteToFlash, lat, lng, alt, sats, acc_x, acc_y, acc_z, pres, bar_alt, f_alt, f_vel, bat1, r_state, counter); //ja nav atļauts 
+		flash::writeData(file, canWriteToFlash, lat, lng, alt, sats_fc, acc_x, acc_y, acc_z, pres, bar_alt, f_alt, f_vel, bat1, r_state, counter); //ja nav atļauts 
 		gps::enableSerial();
 	}
 
@@ -232,19 +234,20 @@ void loop()
 	}
 
 	//*Rīkojamies, ja pārsniegts intervāls cik turējām līdz atlaidām
-	if (hold_time > 15000 && !holdBoth) // ja turējām vairāk par 15 sekundēm un atlaidām
+	
+	if (hold_time > 25000 && !holdBoth) // ja turējām vairāk par 25 sekundēm un atlaidām (izmantots tikai testiem)
+	{
+		gps::disableSerial();
+		flash::readFlashVerbose("/test.txt");
+		gps::enableSerial();
+		Serial.println("Turējām vairāk par 25!");
+	}
+	else if (hold_time > 15000 && !holdBoth) // ja turējām vairāk par 15 sekundēm un atlaidām
 	{
 		Serial.println("Turējām vairāk par 15!");
 		gps::disableSerial();
 		flash::deleteFile("/test.txt");
 		gps::enableSerial();
-	}
-	else if (hold_time > 10000 && !holdBoth) // ja turējām vairāk par 10 sekundēm un atlaidām
-	{
-		gps::disableSerial();
-		flash::readFlashVerbose("/test.txt");
-		gps::enableSerial();
-		Serial.println("Turējām vairāk par 10!");
 	}
 	else if (hold_time > 3000 && !holdBoth) // ja turējām vairāk par 3 sekundēm un atlaidām
 	{
@@ -292,10 +295,11 @@ void loop()
 	}
 
 	// Ja pg counter == 1 un ekrāns pārslēgts vai mainās satelītu skaits, tad atsvaidzina
-	else if (pageCounter == 1 && (currentScreen != 1 || prevSats != sats || canWriteToFlash != prevCanWriteToFlash))
+	else if (pageCounter == 1 && (currentScreen != 1 || prevSatsRS != sats_rs || prevSatsFC != sats_fc || canWriteToFlash != prevCanWriteToFlash))
 	{
-		lcd::showRSinfo(sats, gpsValid, canWriteToFlash);
-		prevSats = sats;
+		lcd::showGPSinfo(sats_rs, sats_fc, gpsValid, canWriteToFlash);
+		prevSatsRS = sats_rs;
+		prevSatsFC = sats_fc;
 		prevCanWriteToFlash = canWriteToFlash;
 		currentScreen = 1;
 	}
