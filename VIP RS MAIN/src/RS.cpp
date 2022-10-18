@@ -171,16 +171,16 @@ void loop()
 	// Ziņu nolasīšana
 
 	//*option 1 - Not encoded
-	// message = lora::readMessage();
-	// message.toCharArray(buffer, 80);
-	// deserializeData(buffer);
+	message = lora::readMessage();
+	message.toCharArray(buffer, 80);
+	deserializeData(buffer);
 
 	//*option 2 - Encoded
-	s_data = lora::readEncodedMessage();
-	if (s_data.counter != -1) // ja tika saņemta ziņa
-	{
-		allotData(s_data);
-	}
+	// s_data = lora::readEncodedMessage();
+	// if (s_data.counter != -1) // ja tika saņemta ziņa
+	// {
+	// 	allotData(s_data);
+	// }
 
 	// LoRa parametri
 	receivedRSSI = lora::getPacketRssi();

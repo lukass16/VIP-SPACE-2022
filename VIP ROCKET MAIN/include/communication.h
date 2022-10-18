@@ -43,11 +43,11 @@ namespace comms
             Serial.println("Sent data: " + String(serialized));
 
             //*option 1 - Not encoded
-            //lora::sendMessage(serialized, 1);
+            lora::sendMessage(serialized, 1);
 
             //*option 2 - Encoded
-            lora::encodeMessage(); 
-            lora::sendEncodedMessage(1);
+            // lora::encodeMessage(); 
+            // lora::sendEncodedMessage(1);
 
             delay(lora_delay);
 
