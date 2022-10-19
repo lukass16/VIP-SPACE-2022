@@ -34,7 +34,7 @@ public:
         // Detect launch using IMU acceleration *a* for *n* times, or if has been launch - skip
         while (!imu::launchDetected() && !eeprom::hasBeenLaunch())
         {
-            buzzer::signalDrogue();
+            buzzer::signalDrogue1();
 
             //*gps
             gps::readGps();
@@ -73,7 +73,7 @@ public:
 
         while (!arming::timerDetectApogee())
         {
-            buzzer::signalDrogue();
+            buzzer::signalDrogue2();
             
             //*gps
             gps::readGps();

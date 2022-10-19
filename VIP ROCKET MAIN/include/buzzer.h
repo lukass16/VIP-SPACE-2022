@@ -149,13 +149,23 @@ namespace buzzer
     {
         int interval = 5000;
         int duration = BOP; // interval time in milliseconds
-
-        if (!arming::isPyroContinuity()) // if there is no pyro continuity signal with BEEP
-        {
-            duration = BEEP;
-        }
+        int pyro_times = 10; // pyro no continuity interval time in milliseconds
+        int pyro_duration = 20;
 
         currentTime = millis();
+
+        if (currentTime - previousTime >= interval && !arming::isPyroContinuity()) // if there is no pyro continuity signal with warble
+        {
+            previousTime = currentTime; // reset timer
+            for(int i = 0; i < pyro_times; i++)
+            {
+                digitalWrite(piezo_pin, HIGH);
+                delay(pyro_duration);
+                digitalWrite(piezo_pin, LOW);
+                delay(pyro_duration);
+            }
+            buzzing = false;
+        }
 
         if (currentTime - previousTime >= interval && !buzzing)
         {
@@ -165,14 +175,42 @@ namespace buzzer
         }
         else if (currentTime - previousTime >= duration && buzzing)
         {
+            previousTime = currentTime;
             digitalWrite(piezo_pin, LOW);
             buzzing = false;
         }
     }
 
-    void signalDrogue()
+    void signalDrogue1()
     {
         int interval = 5000;
+        int pause = BOP;
+        int duration = BOP; // interval time in milliseconds
+        int times_to_buzz = 2;
+        currentTime = millis();
+
+        if (currentTime - previousTime >= pause && !buzzing && times_buzzed < times_to_buzz) // if hasn't buzzed the allowed times and isn't currently buzzing - starts buzz
+        {
+            previousTime = currentTime; // save the last time that buzzer was toggled
+            digitalWrite(piezo_pin, HIGH);
+            buzzing = true;
+        }
+        else if (currentTime - previousTime >= duration && buzzing) // if is currently buzzing and has buzzed more than allowed - ends buzz
+        {
+            previousTime = currentTime; // save the last time that buzzer was toggled
+            digitalWrite(piezo_pin, LOW);
+            buzzing = false;
+            times_buzzed++;
+        }
+        else if (currentTime - previousTime >= interval && !buzzing) // after every interval resets times the buzzr has buzzed
+        {
+            times_buzzed = 0;
+        }
+    }
+
+    void signalDrogue2()
+    {
+        int interval = 500;
         int pause = BOP;
         int duration = BOP; // interval time in milliseconds
         int times_to_buzz = 2;
