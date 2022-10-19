@@ -68,8 +68,6 @@ public:
             delay(main_state_delay);
         }
 
-        buzzer::signalWarningMainEjection();
-
         //fire main parachute pyro charge
         arming::fireMainCharge(); //! commented out for safety
 
