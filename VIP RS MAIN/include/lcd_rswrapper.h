@@ -77,8 +77,7 @@ namespace lcd
     void writeState(int r_state)
     {
         lcd.setCursor(12, 1);
-        lcd.print("S:");
-        lcd.setCursor(14, 1);
+        lcd.print("State:");
         lcd.print(r_state);
     }
 
