@@ -24,7 +24,7 @@ public:
 
         Serial.println("PREP STATE");
 
-        int prep_state_delay = 50; // delay used in preparation state [ms]
+        int prep_state_delay = 46; // delay used in preparation state [ms]
 
         s_data.setRocketState(1); // set rocket state to preparation (1) state
 

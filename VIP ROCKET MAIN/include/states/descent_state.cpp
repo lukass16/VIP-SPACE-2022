@@ -20,7 +20,7 @@ public:
         Serial.println("DESCENT STATE");
 
         File file = flash::openFile(); // opening flash file for writing during descent
-        int flash_counter = 0, flash_write_time = 10000;
+        int flash_counter = 0, flash_write_time = 60000;
         int interval = 100; // amount of loops after which the flash is closed and opened
         int descent_state_delay = 46; // delay used in descent state [ms]
 
