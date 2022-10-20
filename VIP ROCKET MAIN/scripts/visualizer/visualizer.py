@@ -8,7 +8,7 @@ Created on Sat Sep  3 15:56:00 2022
 import pandas as pd
 import matplotlib.pyplot as plt
 
-ID = 2
+ID = 0
 
 data = pd.read_csv("{}.CSV".format(ID), sep=',')
 
@@ -38,9 +38,30 @@ gyr_z = data["IMU Gyr Z [deg/s]"].to_list()
 
 s = data["State"].to_list()
 
+# Convert time
+start_t = t[0]
+t = [x - start_t for x in t]
 
 # Printing info
 print("Data successfully extracted from {}.CSV, amount:".format(ID), len(t))
+
+
+# Extracting state change info
+# 1 - PREPARATION, 2 - LAUNCH WAIT, 3 - LAUNCH DETECTED, 4 - MAIN WAIT, 5 - DESCENT, 6 TOUCHDOWN DETECTED
+t_apogee = 0
+t_main_eject = 0
+for i, el in enumerate(s):
+    if el == 4 and t_apogee == 0:
+        t_apogee = t[i]
+    elif el == 5:
+        t_main_eject = t[i]
+        break
+    
+    
+# Printing info
+print("Apogee time: " + str(t_apogee), "\tMain ejection time: " + str(t_main_eject))
+
+
 
 
 # Plot positional data
@@ -49,18 +70,45 @@ fig, axis = plt.subplots(2, 2, figsize=(12,8))
 fig.suptitle('Positional Data')
 
 axis[0, 0].plot(t, p, color="b", label = "Pressure [hPa]")
+axis[0, 0].axvline(x = t_apogee, color = 'tab:orange', label = 'Apogee Detected')
+axis[0, 0].axvline(x = t_main_eject, color = 'g', label = 'Main Ejected')
 axis[0, 0].legend()
 
 axis[0, 1].plot(t, r_alt, color="b", label = "Raw Altitude [m]")
 axis[0, 1].plot(t, f_alt, color="r", label = "Filtered Altitude [m]")
+axis[0, 1].axvline(x = t_apogee, color = 'tab:orange', label = 'Apogee Detected')
+axis[0, 1].axvline(x = t_main_eject, color = 'g', label = 'Main Ejected')
 axis[0, 1].legend()
 
-axis[1, 0].plot(t, f_alt, color="m", label = "Filtered Velocity [m/s]")
+axis[1, 0].plot(t, f_vel, color="m", label = "Filtered Velocity [m/s]")
+axis[1, 0].axvline(x = t_apogee, color = 'tab:orange', label = 'Apogee Detected')
+axis[1, 0].axvline(x = t_main_eject, color = 'g', label = 'Main Ejected')
 axis[1, 0].legend()
 
 axis[1, 1].plot(t, f_acc, color="y", label = "Filtered Acceleration [m/s]")
+axis[1, 1].axvline(x = t_apogee, color = 'tab:orange', label = 'Apogee Detected')
+axis[1, 1].axvline(x = t_main_eject, color = 'g', label = 'Main Ejected')
 axis[1, 1].legend()
 
 plt.savefig("posdata{}.png".format(ID), dpi=300)
+
+# Plot individual altitude data
+plt.figure(figsize=(12,8))
+plt.plot(t, r_alt, color="b", label = "Raw Altitude [m]")
+plt.plot(t, f_alt, color="r", label = "Filtered Altitude [m]")
+plt.axvline(x = t_apogee, color = 'tab:orange', label = 'Apogee Detected')
+plt.axvline(x = t_main_eject, color = 'g', label = 'Main Ejected')
+plt.legend()
+plt.title("Individual altitude data")
+plt.savefig("altdata{}.png".format(ID), dpi=300)
+
+# Plot individual velocity data
+plt.figure(figsize=(12,8))
+plt.plot(t, f_vel, color="m", label = "Filtered Velocity [m/s]")
+plt.axvline(x = t_apogee, color = 'tab:orange', label = 'Apogee Detected')
+plt.axvline(x = t_main_eject, color = 'g', label = 'Main Ejected')
+plt.legend()
+plt.title("Individual velocity data")
+plt.savefig("veldata{}.png".format(ID), dpi=300)
 
 
