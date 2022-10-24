@@ -34,7 +34,7 @@ namespace barometer
             Serial.println(F("Error connecting..."));
             delay(500);
         }
-        Serial.println(F("Connected to Sensor"));
+        Serial.println(F("Connected to MS5607"));
         delay(5);
 
         seaLevelPressure = eeprom::readSampledPressure();
