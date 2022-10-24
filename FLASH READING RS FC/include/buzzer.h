@@ -23,8 +23,6 @@ namespace buzzer
     {
         ledcSetup(channel, freq, resolution); // setting up the PWM channel
         ledcAttachPin(piezo_pin, channel);    // attaching the piezo_pin to the PWM channel
-
-        Serial.println("Buzzer ready!");
     }
 
     void transitionToGeneratorMode()

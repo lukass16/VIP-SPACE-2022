@@ -74,7 +74,6 @@ namespace flash
             // LITTLEFS.format(); //comment this out - only for first time with testing flash
             return;
         }
-        Serial.println("Flash setup");
     }
 
     void deleteFile(const char *path)

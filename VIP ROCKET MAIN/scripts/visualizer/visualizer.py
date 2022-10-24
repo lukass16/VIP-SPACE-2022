@@ -8,7 +8,7 @@ Created on Sat Sep  3 15:56:00 2022
 import pandas as pd
 import matplotlib.pyplot as plt
 
-ID = 0
+ID = 101
 
 data = pd.read_csv("{}.CSV".format(ID), sep=',')
 
