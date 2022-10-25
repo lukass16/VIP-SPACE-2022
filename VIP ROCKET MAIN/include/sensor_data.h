@@ -49,7 +49,7 @@ namespace sens_data
     class SensorData
     {
     private:
-        int current_rocket_state = 0; // 1 - PREPARATION, 2 - LAUNCH WAIT, 3 - LAUNCH DETECTED, 4 - MAIN WAIT, 5 - DESCENT, 6 TOUCHDOWN DETECTED
+        int current_rocket_state = 0; // 1 - PREPARATION, 2 - LAUNCH WAIT, 3 - APOGEE WAIT, 4 - MAIN WAIT, 5 - DESCENT, 6 TOUCHDOWN
         GpsData gpsData;
         IMUData imuData;
         BarometerData barometerData;

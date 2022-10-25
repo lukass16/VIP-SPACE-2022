@@ -63,7 +63,7 @@ public:
         eeprom::markLaunch();
         eeprom::lockFlash();
 
-        s_data.setRocketState(3); // set rocket state to launch detected (3) state
+        s_data.setRocketState(3); // set rocket state to apogee wait (3) state
 
         //start apogee detection timer
         arming::startApogeeTimer();

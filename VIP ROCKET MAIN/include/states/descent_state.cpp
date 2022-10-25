@@ -76,7 +76,7 @@ public:
         //*mark touchdown in EEPROM
         eeprom::markTouchdown();
 
-        s_data.setRocketState(6); // set rocket state to touchdown detected (6) state
+        s_data.setRocketState(6); // set rocket state to touchdown (6) state
 
         //*Dump flash contents to SD card
         comms::stop(); // stop communication to not interfere with writing to SD card
