@@ -56,9 +56,6 @@ public:
             btd = arming::getBatteryState();
             s_data.setBatteryData(btd);
 
-            //give necessary feedback during loop
-            //imu::printAll();
-
             delay(drogue_state_delay);
         }
 
@@ -94,9 +91,6 @@ public:
             arming::readBatteryVoltage();
             btd = arming::getBatteryState();
             s_data.setBatteryData(btd);
-
-            //give necessary feedback during loop
-            //barometer::printState();
 
             flash_counter = flash::writeData(file, gd, md, bd, btd, 3); // writing data to flash memory
             if (flash_counter % interval == 1)

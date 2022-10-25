@@ -21,7 +21,6 @@ class PreperationState : public State
 public:
     void start() override
     {
-
         Serial.println("PREP STATE");
 
         int prep_state_delay = 46; // delay used in preparation state [ms]
@@ -34,10 +33,9 @@ public:
         sens_data::IMUData md;
         sens_data::BatteryData btd;
 
-        //*Buzzer setup - signal start
+        //*Buzzer setup 
         buzzer::setup();
-        buzzer::transitionToGeneratorMode();
-
+        
         //*EEPROM setup
         eeprom::setup();
 
@@ -103,7 +101,7 @@ public:
         //*perform barometer ground pressure sampling and save sampled pressure value to EEPROM
         barometer::sampleSeaLevel();
 
-        while (!arming::armed()) // nominal
+        while (!arming::armed())
         {
             buzzer::signalPreparation();
 

@@ -388,6 +388,7 @@ namespace flash
     int dumpContentsToSD(const char *path, SD_File fileSD)
     {
         int count = 0;
+        unsigned long process_start_time = millis();
 
         File file = LITTLEFS.open(path);
         // This is the size of reading
@@ -482,6 +483,8 @@ namespace flash
         file.close();
 
         Serial.println("\nFinished dumping flash contents to SD card");
+        Serial.println("Process took: " + String(millis() - process_start_time) + " ms");
+
         return 1;
     }
 

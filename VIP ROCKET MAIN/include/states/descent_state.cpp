@@ -34,10 +34,10 @@ public:
         sens_data::IMUData md;
         sens_data::BatteryData btd;
 
-        //start touchdown detection timer
+        //*start touchdown detection timer
         arming::startTouchdownTimer();
 
-        while (!arming::timerDetectTouchdown() && !eeprom::hasBeenTouchdown()) // while touchdown has not been detected by timer
+        while (!arming::timerDetectTouchdown() && !eeprom::hasBeenTouchdown()) // while touchdown has not been detected by timer or has not already been detected
         {
             buzzer::signalDescent();
 
@@ -61,9 +61,6 @@ public:
             btd = arming::getBatteryState();
             s_data.setBatteryData(btd);
 
-            //give necessary feedback during loop
-            //barometer::printState();
-
             if (!flash::flashEnded(file, flash_write_time)) //if not finished writing to flash
             {
                 flash_counter = flash::writeData(file, gd, md, bd, btd, 5); // writing data to flash memory
@@ -76,26 +73,18 @@ public:
             delay(descent_state_delay);
         }
 
-        //mark touchdown in EEPROM
+        //*mark touchdown in EEPROM
         eeprom::markTouchdown();
 
         s_data.setRocketState(6); // set rocket state to touchdown detected (6) state
 
-
-        unsigned long process_start_time = millis();
-
-        //* stop communication to not interfere with writing to SD card
-        comms::stop();
-
-        SDcard::setup();
+        //*Dump flash contents to SD card
+        comms::stop(); // stop communication to not interfere with writing to SD card
+        SDcard::setup(); // setup SD card
         fileSD = SDcard::openNextFile();
         flash::dumpContentsToSD("/data.txt", fileSD);
         SDcard::closeFile(fileSD);
-
-        //* resume communication
-        comms::resume();
-
-        Serial.println("Process took: " + String(millis() - process_start_time) + " ms");
+        comms::resume(); // resume communication
 
 
         while (true) // post touchdown operations
@@ -121,9 +110,6 @@ public:
             arming::readBatteryVoltage();
             btd = arming::getBatteryState();
             s_data.setBatteryData(btd);
-
-            //give necessary feedback during loop
-            //barometer::printState();
 
             delay(descent_state_delay);
         }

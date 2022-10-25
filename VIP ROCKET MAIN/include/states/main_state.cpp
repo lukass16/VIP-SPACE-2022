@@ -56,9 +56,6 @@ public:
             btd = arming::getBatteryState();
             s_data.setBatteryData(btd);
 
-            //give necessary feedback during loop
-            //barometer::printState();
-
             flash_counter = flash::writeData(file, gd, md, bd, btd, 4); // writing data to flash memory
             if (flash_counter % interval == 1)
             {
@@ -69,7 +66,7 @@ public:
         }
 
         //fire main parachute pyro charge
-        arming::fireMainCharge(); //! commented out for safety
+        arming::fireMainCharge();
 
         //mark main ejection in EEPROM
         eeprom::markMainEjection();
