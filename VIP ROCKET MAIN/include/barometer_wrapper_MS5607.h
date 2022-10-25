@@ -111,6 +111,7 @@ namespace barometer
         kalman::printKalmanState();
     }
  
+    //Apogee detection function - currently unused
     bool apogeeDetected(int times = 3, float minimum_height = 20.0) // times - times to detect the vertical speed being below zero, minimum_height - the minimum height at which apogee can be detected, otherwise apogee detection is prohibited
     {
         static int counter = 0;

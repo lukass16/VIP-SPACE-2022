@@ -26,18 +26,18 @@ namespace gps
             gps.encode(Serial2.read());
             hasData = true;
         }
-        /*
-        if (hasData)
-        {
-            Serial.print("LAT=");
-            Serial.println(gps.location.lat(), 6);
-            Serial.print("LONG=");
-            Serial.println(gps.location.lng(), 6);
-            Serial.print("ALT=");
-            Serial.println(gps.altitude.meters(), 1);
-            Serial.println();
-        }
-        */
+        
+    }
+
+    void printData()
+    {
+        Serial.print("LAT=");
+        Serial.println(gps.location.lat(), 6);
+        Serial.print("LONG=");
+        Serial.println(gps.location.lng(), 6);
+        Serial.print("ALT=");
+        Serial.println(gps.altitude.meters(), 1);
+        Serial.println();
     }
 
     double lastLatitude()

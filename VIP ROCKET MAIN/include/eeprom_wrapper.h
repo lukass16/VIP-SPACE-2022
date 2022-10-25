@@ -59,7 +59,7 @@ namespace eeprom
 		return locked;
 	}
 
-	// STATE MARKING
+	// EEPROM STATE MARKING
 	/*
 	1 - Launch has been detected
 	2 - Apogee has been detected

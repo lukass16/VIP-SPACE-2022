@@ -39,9 +39,9 @@ namespace imu
         bno.getEvent(&angVelocityData, Adafruit_BNO055::VECTOR_GYROSCOPE);
         accEvent = &accelerometerData;
         gyrEvent = &angVelocityData;
-        acc_x = accEvent->acceleration.x / 9.82; //converting to [g]
-        acc_y = accEvent->acceleration.y / 9.82;
-        acc_z = accEvent->acceleration.z / 9.82;
+        acc_x = accEvent->acceleration.x / 9.807; //converting to [g]
+        acc_y = accEvent->acceleration.y / 9.807;
+        acc_z = accEvent->acceleration.z / 9.807;
         gyr_x = gyrEvent->gyro.x;
         gyr_y = gyrEvent->gyro.y;
         gyr_z = gyrEvent->gyro.z;

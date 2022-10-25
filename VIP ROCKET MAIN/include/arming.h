@@ -12,7 +12,7 @@ namespace arming
 {
     int n_volt_readings = 10, sum1 = 0;
     int pyroReading = 0;
-    float bat1 = 0, coef1 = 762.5;
+    float bat1 = 0, coef1 = 777.9;
 
     //*GPIO
     void setup()
@@ -127,7 +127,7 @@ namespace arming
         return 0;
     }
 
-    //* 2) Main ejection detection
+    //* 2) Main ejection detection - Currently unused
     // creating a variable for timer detection of main ejection
     volatile bool timerDetMainEject = 0;
     hw_timer_t *mainEjectTimer = NULL;
