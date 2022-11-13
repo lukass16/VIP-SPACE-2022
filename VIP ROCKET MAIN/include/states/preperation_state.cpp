@@ -62,18 +62,18 @@ public:
             buzzer::signalBatteryVoltage();
         }
 
-        //*check if need to clear EEPROM
-        if (arming::clearEEPROM())
-        {
-            buzzer::signalEEPROMClear();
-            eeprom::clean();
-        }
-
-        //*if flash not locked - delete file
-        if (!eeprom::lockedFlash())
-        {
-            flash::deleteFile("/data.txt"); //*deleting file so as to reset it
-        }
+        //!The following code should be commented out for flight
+        // //*check if need to clear EEPROM
+        // if (arming::clearEEPROM())
+        // {
+        //     buzzer::signalEEPROMClear();
+        //     eeprom::clean();
+        // }
+        // //*if flash not locked - delete file
+        // if (!eeprom::lockedFlash())
+        // {
+        //     flash::deleteFile("/data.txt"); //*deleting file so as to reset it
+        // }
 
         //*determine if has been reset - need to transfer to different state
         eeprom::readPreviousState();
