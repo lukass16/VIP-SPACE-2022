@@ -141,10 +141,6 @@ namespace barometer
         {
             counter++;
         }
-        else if (f_vel < abn_speed) // if abnormal descent speed is detected
-        {
-            counter++;
-        }
         else
         {
             counter = 0;
