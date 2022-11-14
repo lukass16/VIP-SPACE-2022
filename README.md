@@ -1,6 +1,6 @@
 # VIP-SPACE-2022
 
-![github logo](https://user-images.githubusercontent.com/81519843/201768718-48982545-0f3a-45ed-8f66-67699ff5cef0.png)
+![github logo](https://user-images.githubusercontent.com/81519843/201768989-ed1dc04c-27de-4da1-bdf9-18541baf7715.png)
 
 Main repository for the RTU High Power Rocketry Team 2022
 
