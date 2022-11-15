@@ -13,7 +13,7 @@
 // - VECTOR_LINEARACCEL   - m/s^2
 // - VECTOR_GRAVITY       - m/s^2
 
-Adafruit_BNO055 bno = Adafruit_BNO055(55, 0x28);
+Adafruit_BNO055 bno = Adafruit_BNO055(55, 0x29);
 sensors_event_t angVelocityData, accelerometerData;
 sensors_event_t *gyrEvent, *accEvent;
 
