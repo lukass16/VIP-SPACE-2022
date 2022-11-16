@@ -11,7 +11,7 @@ import serial
 import csv  
 
 header = ["Time [ms]","Lat","Lng","GPS Alt [m]","Sats","Pressure [hPa]","Raw Baro Alt [m]","Filter Baro Alt [m]","Baro Vert Vel [m/s]","Baro Vert Acc [m/s^2]","Baro Temp [°C]","Bat 1 Voltage [V]","IMU Acc X [m/s^2]","IMU Acc Y [m/s^2]","IMU Acc Z [m/s^2]","IMU Gyr X [deg/s]","IMU Gyr Y [deg/s]","IMU Gyr Z [deg/s]","State"]
-ser = serial.Serial('COM6', baudrate=115200)
+ser = serial.Serial('COM9', baudrate=115200)
 
 
 with open('data.csv', 'w', encoding='UTF8', newline='') as f:
