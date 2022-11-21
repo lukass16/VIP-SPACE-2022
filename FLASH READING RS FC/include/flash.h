@@ -382,9 +382,9 @@ namespace flash
         file.close();
     }
 
-    int dumpContentsToSerial(const char *path)
+    int dumpContentsToSerial(String filepath = "/test.txt")
     {
-        File file = LITTLEFS.open(path);
+        File file = LITTLEFS.open(filepath);
         // This is the size of reading
         auto const buf_size = sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float) + sizeof(float);
 

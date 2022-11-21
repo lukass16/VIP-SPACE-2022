@@ -14,7 +14,7 @@ void setup()
 
 	//*Dump contents
 	buzzer::signalFlashStart();
-	flash::dumpContentsToSerial("/data.txt");
+	flash::dumpContentsToSerial();
 	buzzer::signalFlashEnd();
 }
 
